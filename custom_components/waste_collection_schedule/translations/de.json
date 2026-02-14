@@ -1845,7 +1845,7 @@
           "addition": "Zusatz",
           "calendar": "Kalender",
           "calendar_splitter": "Kalendereintrag-Trenner",
-          "calendar_title_separator": "Kalendertitel Seperator",
+          "calendar_title_separator": "Kalendertitel Separator",
           "district": "Bezirk",
           "hnr": "Hnr",
           "municipal": "Gemeinde",
@@ -1875,7 +1875,7 @@
           "addition": "Zusatz",
           "calendar": "Kalender",
           "calendar_splitter": "Kalendereintrag-Trenner",
-          "calendar_title_separator": "Kalendertitel Seperator",
+          "calendar_title_separator": "Kalendertitel Separator",
           "district": "Bezirk",
           "hnr": "Hnr",
           "municipal": "Gemeinde",
@@ -8879,8 +8879,8 @@
         "data": {
           "calendar_title": "Kalender Titel",
           "city": "Ort",
-          "paper_route": "Papier Rute",
-          "yellow_route": "Gelbe Tonne Rute"
+          "paper_route": "Papier Route",
+          "yellow_route": "Gelbe Tonne Route"
         },
         "data_description": {
           "calendar_title": "Ein lesbarerer oder benutzerfreundlicherer Name für den Müllkalender. Wenn nichts angegeben wird, wird der Name der Quelle verwendet.",
@@ -8895,8 +8895,8 @@
         "data": {
           "calendar_title": "Kalender Titel",
           "city": "Ort",
-          "paper_route": "Papier Rute",
-          "yellow_route": "Gelbe Tonne Rute"
+          "paper_route": "Papier Route",
+          "yellow_route": "Gelbe Tonne Route"
         },
         "data_description": {
           "city": "Genau wie in der `ort` URL-Parameter des Links auf der Website: {url_0} Z.B. `lisp`, `rot`, `bebra`, ...",
