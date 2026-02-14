@@ -8,7 +8,7 @@ from waste_collection_schedule import Collection
 TITLE = "Grosswangen"
 DESCRIPTION = " Source for 'Grosswangen, CH'"
 URL = "https://www.grosswangen.ch"
-TEST_CASES = {"TEST": "TEST"}
+TEST_CASES: dict[str, dict[str, str]] = {"TEST": {}}
 
 ICON_MAP = {
     "Grüngutabfuhr": "mdi:leaf",
