@@ -1,7 +1,5 @@
-from collections.abc import Iterable
-from typing import Any, Generic, TypeVar
-
-T = TypeVar("T")
+from collections.abc import Iterable, Sequence
+from typing import Any
 
 
 class SourceArgumentExceptionMultiple(Exception):
@@ -40,14 +38,14 @@ class SourceArgumentException(Exception):
         return self._argument
 
 
-class SourceArgumentSuggestionsExceptionBase(SourceArgumentException, Generic[T]):
+class SourceArgumentSuggestionsExceptionBase(SourceArgumentException):
     """Base class for exceptions that provide suggestions for a source argument."""
 
     def __init__(
         self,
         argument: str,
         message: str,
-        suggestions: Iterable[T],
+        suggestions: Iterable[object],
         message_addition: str = "",
     ):
         """Initialize the SourceArgumentSuggestionsExceptionBase.
@@ -61,15 +59,15 @@ class SourceArgumentSuggestionsExceptionBase(SourceArgumentException, Generic[T]
         self._simple_message = message
         message += f", {message_addition}" if message_addition else ""
         super().__init__(argument=argument, message=message)
-        self._suggestions = suggestions
-        self._suggestion_type: type[T] | None = type(list(suggestions)[0]) if suggestions else None
+        self._suggestions = list(suggestions)
+        self._suggestion_type: type[object] | None = type(self._suggestions[0]) if self._suggestions else None
 
     @property
-    def suggestions(self) -> Iterable[T]:
+    def suggestions(self) -> Sequence[object]:
         return self._suggestions
 
     @property
-    def suggestion_type(self) -> type[T] | None:
+    def suggestion_type(self) -> type[object] | None:
         return self._suggestion_type
 
     @property
@@ -110,7 +108,7 @@ class SourceArgumentNotFoundWithSuggestions(SourceArgumentSuggestionsExceptionBa
     This should be raised if a source argument is not valid but you want to provide suggestions to the user what they could use instead.
     """
 
-    def __init__(self, argument: str, value: Any, suggestions: Iterable[T]) -> None:
+    def __init__(self, argument: str, value: Any, suggestions: Iterable[object]) -> None:
         """Initialize the SourceArgumentNotFoundWithSuggestions.
 
         Args:
@@ -139,13 +137,13 @@ class SourceArgAmbiguousWithSuggestions(SourceArgumentSuggestionsExceptionBase):
     This should be raised if a there are multiple different results matching the source argument and you want to provide suggestions to the user what they could use instead.
     """
 
-    def __init__(self, argument: str, value: Any, suggestions: Iterable[T]) -> None:
+    def __init__(self, argument: str, value: Any, suggestions: Iterable[object]) -> None:
         """Initialize the SourceArgAmbiguousWithSuggestions.
 
         Args:
             argument (str): The source argument that caused the exception (written exactly like in the source __init__).
             value (Any): The value of that source argument.
-            suggestions (Iterable[T]): An iterable of suggestions for the provided argument.
+            suggestions (Iterable[object]): An iterable of suggestions for the provided argument.
         """
         message = f"Multiple values found for the argument '{argument}' with the value '{value}'"
         message_addition = f"please specify one of: {suggestions}"
@@ -182,13 +180,13 @@ class SourceArgumentRequiredWithSuggestions(SourceArgumentSuggestionsExceptionBa
     This should be raised if a source argument is required but not provided by the user and you want to provide suggestions to the user what they could use.
     """
 
-    def __init__(self, argument: str, reason: str, suggestions: Iterable[T]) -> None:
+    def __init__(self, argument: str, reason: str, suggestions: Iterable[object]) -> None:
         """Initialize the SourceArgumentRequiredWithSuggestions.
 
         Args:
             argument (str): The source argument that is required but not provided (written exactly like in the source __init__).
             reason (str): The reason why the source argument is required.
-            suggestions (Iterable[T]): An iterable of suggestions for the provided argument.
+            suggestions (Iterable[object]): An iterable of suggestions for the provided argument.
         """
         message = f"Argument '{argument}' must be provided"
         message_addition = f"you may want to use one of the following: {list(suggestions)}"

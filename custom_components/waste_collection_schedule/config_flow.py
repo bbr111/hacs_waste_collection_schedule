@@ -139,7 +139,9 @@ SUPPORTED_ARG_TYPES = {
 }
 
 
-def get_customize_schema(defaults: dict[str, Any] = {}):
+def get_customize_schema(defaults: dict[str, Any] | None = None):
+    if defaults is None:
+        defaults = {}
     schema = {
         vol.Optional(CONF_ALIAS, default=defaults.get(CONF_ALIAS, UNDEFINED)): str,
         vol.Optional(CONF_SHOW, default=defaults.get(CONF_SHOW, True)): cv.boolean,
@@ -157,12 +159,14 @@ def get_customize_schema(defaults: dict[str, Any] = {}):
     return schema
 
 
-def get_sensor_schema(fetched_types, add_delete=False, defaults: dict = {}):
+def get_sensor_schema(fetched_types, add_delete=False, defaults: dict | None = None):
+    if defaults is None:
+        defaults = {}
     schema = {
         vol.Optional(CONF_NAME, default=defaults.get(CONF_NAME, UNDEFINED)): cv.string,
     }
     if add_delete:
-        schema[vol.Optional("delete", default=False)] = bool
+        schema[vol.Optional("delete", default=False)] = cv.boolean
 
     schema.update(
         {
@@ -316,7 +320,7 @@ class WasteCollectionConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call
 
     _options: dict = {}
     _sources: dict[str, list[SourceDict]] = {}
-    _error_suggestions: dict[str, list[Any]]
+    _error_suggestions: dict[str, list[Any]] = {}
 
     async def _async_setup_sources(self) -> None:
         if len(self._sources) > 0:
@@ -625,7 +629,7 @@ class WasteCollectionConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call
             description_placeholders["invalid_arg_message"] = e.message
         except SourceArgumentExceptionMultiple as e:
             description_placeholders["invalid_arg_message"] = e.message
-            if len(e.arguments) == 0:
+            if len(list(e.arguments)) == 0:
                 errors["base"] = "invalid_arg"
             else:
                 for arg in e.arguments:
@@ -655,7 +659,7 @@ class WasteCollectionConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call
                 placeholders["howto"] = placeholders["howto"].rstrip("\n") + "\n\n"
         return placeholders
 
-    async def async_source_selected(self) -> None:
+    async def async_source_selected(self) -> FlowResult:
         async def args_method(args_input):
             return await self.async_step_args(args_input)
 
@@ -703,8 +707,8 @@ class WasteCollectionConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call
     async def async_step_flow_type(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         schema = vol.Schema(
             {
-                vol.Optional("show_customize_config", default=False): bool,
-                vol.Optional("show_sensor_config", default=False): bool,
+                vol.Optional("show_customize_config", default=False): cv.boolean,
+                vol.Optional("show_sensor_config", default=False): cv.boolean,
             }
         )
 
@@ -774,8 +778,8 @@ class WasteCollectionConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call
             data_schema=schema,
             description_placeholders={
                 "type": types[self._customize_index],
-                "index": self._customize_index + 1,
-                "total": len(types),
+                "index": str(self._customize_index + 1),
+                "total": str(len(types)),
             },
             errors=errors,
         )
@@ -861,12 +865,13 @@ class WasteCollectionOptionsFlow(OptionsFlow):
 
     async def translate(self, text: str) -> str:
         user_language = self.hass.config.language
-        return await async_get_translations(self.hass, user_language, DOMAIN)(text)
+        translations = await async_get_translations(self.hass, user_language, DOMAIN)
+        return translations.get(text, text)
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None):
         # get SourceShells
         collection_types = []
-        calendar_title = UNDEFINED
+        calendar_title: Any = UNDEFINED
         # get the right coordinator
         coordinator: WCSCoordinator = self.hass.data.get(DOMAIN, {}).get(self._entry.entry_id)
 
@@ -893,19 +898,22 @@ class WasteCollectionOptionsFlow(OptionsFlow):
                 ): TimeSelector(),
                 vol.Optional(
                     CONF_RANDOM_FETCH_TIME_OFFSET,
-                    default={
-                        "hours": self._entry.options.get(
-                            CONF_RANDOM_FETCH_TIME_OFFSET,
-                            CONF_RANDOM_FETCH_TIME_OFFSET_DEFAULT,
-                        )
-                        // 60,
-                        "minutes": self._entry.options.get(
-                            CONF_RANDOM_FETCH_TIME_OFFSET,
-                            CONF_RANDOM_FETCH_TIME_OFFSET_DEFAULT,
-                        )
-                        % 60,
-                        "seconds": 0,
-                    },
+                    default=cast(
+                        dict[str, int],
+                        {
+                            "hours": self._entry.options.get(
+                                CONF_RANDOM_FETCH_TIME_OFFSET,
+                                CONF_RANDOM_FETCH_TIME_OFFSET_DEFAULT,
+                            )
+                            // 60,
+                            "minutes": self._entry.options.get(
+                                CONF_RANDOM_FETCH_TIME_OFFSET,
+                                CONF_RANDOM_FETCH_TIME_OFFSET_DEFAULT,
+                            )
+                            % 60,
+                            "seconds": 0,
+                        },
+                    ),
                 ): DurationSelector(DurationSelectorConfig(enable_day=False)),
                 vol.Optional(
                     CONF_DAY_SWITCH_TIME,
@@ -1000,7 +1008,7 @@ class WasteCollectionOptionsFlow(OptionsFlow):
         is_new = self._customize_select[self._customize_select_idx] not in self._entry.options.get(CONF_CUSTOMIZE, {})
         dict_schema: dict[vol.Optional, Any] = get_customize_schema(defaults)
         if not is_new:
-            dict_schema[vol.Optional("delete", default=False)] = bool
+            dict_schema[vol.Optional("delete", default=False)] = cv.boolean
 
         schema = self.add_suggested_values_to_schema(vol.Schema(dict_schema), user_input)
         if user_input is not None:
