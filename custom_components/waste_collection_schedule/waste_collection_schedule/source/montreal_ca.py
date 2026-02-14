@@ -187,9 +187,7 @@ class Source:
                 break  # Stop searching if the day is found
 
         # These happens weekly
-        if not re.search(
-            r"(?:every\s+(?:.*)week|of the month)", schedule_message, re.IGNORECASE
-        ):
+        if not re.search(r"(?:every\s+(?:.*)week|of the month)", schedule_message, re.IGNORECASE):
             # Iterate through each month and day, and handle the "out of range" error
             for month in range(1, 13):
                 for day in range(1, 32):
@@ -254,23 +252,13 @@ class Source:
                 if re.search("(every )?week(ly)?", line):
                     for day in range(1, 32):
                         try:
-                            if (
-                                not within_dates
-                                and day_start == day
-                                and month_start == month_id
-                            ):
+                            if not within_dates and day_start == day and month_start == month_id:
                                 within_dates = True
-                            if (
-                                within_dates
-                                and day_stop >= day
-                                and month_stop == month_id
-                            ):
+                            if within_dates and day_stop >= day and month_stop == month_id:
                                 within_dates = False
                             if within_dates:
                                 date = datetime(year, month_id, day)
-                                if (
-                                    date.weekday() == collection_day
-                                ):  # Tuesday has index 1
+                                if date.weekday() == collection_day:  # Tuesday has index 1
                                     days.append(date.date())
                         except ValueError:
                             pass  # Skip if the day is out of range for the month
@@ -283,25 +271,17 @@ class Source:
                 line = line.replace("*", "")
 
                 try:
-                    days_in_month = re.search(
-                        rf"\b{month}(.*){MONTH_PATTERN}", line, re.IGNORECASE
-                    )
+                    days_in_month = re.search(rf"\b{month}(.*){MONTH_PATTERN}", line, re.IGNORECASE)
                     if not days_in_month:
-                        days_in_month = re.search(
-                            rf"(?:\s*{month} {year})(.*)", line, re.IGNORECASE
-                        ).group(1)
+                        days_in_month = re.search(rf"(?:\s*{month} {year})(.*)", line, re.IGNORECASE).group(1)
                     else:
                         days_in_month = days_in_month.group(1)
 
                     days_in_month = re.split(r", | and ", days_in_month)
-                    days_in_month = [
-                        part.lstrip().split(" ")[0] for part in days_in_month
-                    ]
+                    days_in_month = [part.lstrip().split(" ")[0] for part in days_in_month]
 
                     # Converting the extracted strings to integers
-                    days_numbers = [
-                        int(num) for num in days_in_month if num.isnumeric()
-                    ]
+                    days_numbers = [int(num) for num in days_in_month if num.isnumeric()]
 
                     for day in days_numbers:
                         date = datetime(year, MONTHS[month], day)
@@ -352,13 +332,9 @@ class Source:
                 if self._sector[source["type"].lower()] is not None:
                     entries += self.get_data_by_source(source["type"], source["url"])
                 else:
-                    LOGGER.warning(
-                        f"Skipped {source['type']} schedule as no sector was provided."
-                    )
+                    LOGGER.warning(f"Skipped {source['type']} schedule as no sector was provided.")
             except Exception:
                 # Probably because the natural language format does not match known formats.
                 LOGGER.error("Error", exc_info=True)
-                LOGGER.warning(
-                    f"Error while parsing {source['type']} schedule. Ignored."
-                )
+                LOGGER.warning(f"Error while parsing {source['type']} schedule. Ignored.")
         return entries

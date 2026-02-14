@@ -1,10 +1,9 @@
 import datetime
 import logging
-import requests
 
+import requests
 from bs4 import BeautifulSoup
 from waste_collection_schedule import Collection
-
 
 TITLE = "Moji odpadki, Ljubljana"
 DESCRIPTION = "Source script for mojiodpadki.si"
@@ -41,12 +40,9 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class Source:
-
-
     def __init__(self, uprn):
         _LOGGER.info(f"Initializing mojiodpadki.si waste collection service for uprn={uprn}")
         self._uprn = uprn
-
 
     def fetch(self):
         # GET request returns schedule for matching uprn
@@ -95,7 +91,7 @@ class Source:
                     Collection(
                         date=datetime.date(int(year), MONTHS.get(month), int(day)),
                         t=tag["title"],
-                        icon=ICON_MAP.get(tag.string)
+                        icon=ICON_MAP.get(tag.string),
                     )
                 )
 

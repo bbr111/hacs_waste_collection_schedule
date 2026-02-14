@@ -31,9 +31,7 @@ ICON_MAP = {
 }
 
 
-API_URL = (
-    "https://ebbweb.stadt.bamberg.de/WasteManagementBamberg/WasteManagementServlet"
-)
+API_URL = "https://ebbweb.stadt.bamberg.de/WasteManagementBamberg/WasteManagementServlet"
 
 # Parser for HTML input (hidden) text
 
@@ -117,7 +115,5 @@ class Source:
 
         entries = []
         for d in dates:
-            entries.append(
-                Collection(d[0], d[1].strip(), ICON_MAP.get(d[1].strip().split()[0]))
-            )
+            entries.append(Collection(d[0], d[1].strip(), ICON_MAP.get(d[1].strip().split()[0])))
         return entries

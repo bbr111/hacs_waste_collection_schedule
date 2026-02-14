@@ -93,9 +93,7 @@ class Source:
             json=payload,
         )
 
-        rowdata = json.loads(schedule_request.content)["integration"]["transformed"][
-            "rows_data"
-        ]
+        rowdata = json.loads(schedule_request.content)["integration"]["transformed"]["rows_data"]
 
         html_content = rowdata["0"]["UpcomingCollections"]
 

@@ -1,5 +1,4 @@
-from waste_collection_schedule.source.jumomind_de import \
-    Source as JumomindSource
+from waste_collection_schedule.source.jumomind_de import Source as JumomindSource
 
 TITLE = "Rhein-Hunsrück Entsorgung (RHE)"
 DESCRIPTION = "Source for RHE (Rhein Hunsrück Entsorgung)."
@@ -30,9 +29,7 @@ PARAM_TRANSLATIONS = {
 
 
 class Source(JumomindSource):
-    def __init__(
-        self, city: str, street: str, house_number: int, address_suffix: str = ""
-    ):
+    def __init__(self, city: str, street: str, house_number: int, address_suffix: str = ""):
         super().__init__(
             service_id="rhe",
             city=city,

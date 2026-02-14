@@ -13,9 +13,7 @@ TEST_CASES = {
     "padded_uprn": {"uprn": "010093279003", "postcode": "SN128FF"},
 }
 
-SEARCH_URLS = {
-    "collection_search": "https://ilforms.wiltshire.gov.uk/wastecollectiondays/wastecollectioncalendar"
-}
+SEARCH_URLS = {"collection_search": "https://ilforms.wiltshire.gov.uk/wastecollectiondays/wastecollectioncalendar"}
 COLLECTIONS = {
     "Household waste",
     "Mixed dry recycling (blue lidded bin)",  # some addresses may not have a black box collection
@@ -39,9 +37,7 @@ def add_month(date_):
 
 
 class Source:
-    def __init__(
-        self, uprn=None, postcode=None
-    ):  # argX correspond to the args dict in the source configuration
+    def __init__(self, uprn=None, postcode=None):  # argX correspond to the args dict in the source configuration
         self._uprn = str(uprn).zfill(12)  # pad uprn to 12 characters
         self._postcode = postcode
 
@@ -73,9 +69,7 @@ class Source:
             for tag in soup.find_all(attrs={"data-original-title": collection}):
                 entries.append(
                     Collection(
-                        datetime.strptime(
-                            tag["data-original-datetext"], "%A %d %B, %Y"
-                        ).date(),
+                        datetime.strptime(tag["data-original-datetext"], "%A %d %B, %Y").date(),
                         collection,
                         icon=ICON_MAP.get(collection),
                     )

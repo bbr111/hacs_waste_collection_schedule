@@ -48,11 +48,7 @@ class Source:
     def __compare(self, a: str, b: str) -> bool:
         a = a.strip().replace(" ", "").replace(",", "")
         b = b.strip().replace(" ", "").replace(",", "")
-        return (
-            a.lower() == b.lower()
-            or a.lower().startswith(b.lower())
-            or b.lower().startswith(a.lower())
-        )
+        return a.lower() == b.lower() or a.lower().startswith(b.lower()) or b.lower().startswith(a.lower())
 
     def fetch(self):
         s = requests.Session()
@@ -66,13 +62,9 @@ class Source:
 
         soup = BeautifulSoup(r.text, "html.parser")
 
-        request_verification_token = soup.find(
-            "input", {"name": "__RequestVerificationToken"}
-        )
+        request_verification_token = soup.find("input", {"name": "__RequestVerificationToken"})
 
-        if request_verification_token is None or not request_verification_token.get(
-            "value"
-        ):
+        if request_verification_token is None or not request_verification_token.get("value"):
             raise Exception("Invalid response")
 
         args["__RequestVerificationToken"] = request_verification_token.get("value")
@@ -85,11 +77,7 @@ class Source:
         addresses = json.loads(r.text)
 
         args[POST_POST_UPRN_KEY] = next(
-            (
-                key
-                for key, value in addresses.items()
-                if self.__compare(value, self._address)
-            ),
+            (key for key, value in addresses.items() if self.__compare(value, self._address)),
             None,
         )
 

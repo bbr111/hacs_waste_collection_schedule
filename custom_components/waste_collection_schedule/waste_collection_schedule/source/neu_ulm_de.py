@@ -38,9 +38,7 @@ class Source:
 
     def fetch(self) -> list[Collection]:
         # get json file
-        r = requests.get(
-            f"{HOST_URI}/buerger-service/leben-in-neu-ulm/abfall-sauberkeit/abfallkalender"
-        )
+        r = requests.get(f"{HOST_URI}/buerger-service/leben-in-neu-ulm/abfall-sauberkeit/abfallkalender")
         r.raise_for_status()
 
         soup = BeautifulSoup(r.text, "html.parser")

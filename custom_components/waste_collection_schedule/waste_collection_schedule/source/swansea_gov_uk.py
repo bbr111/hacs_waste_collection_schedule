@@ -76,9 +76,7 @@ class Source:
             raise Exception("Address lookup failed")
 
         for table in tables:
-            month_year_text = (
-                table.find("td", width="70%").find("b").text.strip()
-            )  # Extract month and year
+            month_year_text = table.find("td", width="70%").find("b").text.strip()  # Extract month and year
 
             if not month_year_text:
                 raise Exception("Cannot find month and year in Calendar")
@@ -89,13 +87,9 @@ class Source:
                         raise Exception("Cannot find " + bin_type + " dates")
 
                     try:
-                        date = datetime.strptime(
-                            f"{td.text.strip()} {month_year_text}", "%d %B %Y"
-                        ).date()
+                        date = datetime.strptime(f"{td.text.strip()} {month_year_text}", "%d %B %Y").date()
                     except ValueError:
-                        _LOGGER.warning(
-                            f"Skipped day='{td.text.strip()}', month_day='{month_year_text}'. Unexpected format."
-                        )
+                        _LOGGER.warning(f"Skipped day='{td.text.strip()}', month_day='{month_year_text}'. Unexpected format.")
                         continue
 
                     entries.append(

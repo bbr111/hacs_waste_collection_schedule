@@ -26,9 +26,7 @@ ICON_MAP = {
 
 
 SEARCH_URL = "https://map.whitehorse.vic.gov.au/weave/services/v1/index/search"
-BIN_REQUEST_URL = (
-    "https://map.whitehorse.vic.gov.au/weave/services/v1/feature/getFeaturesByIds"
-)
+BIN_REQUEST_URL = "https://map.whitehorse.vic.gov.au/weave/services/v1/feature/getFeaturesByIds"
 
 # opening or closing tag
 HTML_TAG_REGEX = re.compile(r"</?.*?>")
@@ -129,16 +127,12 @@ class Source:
         data = r.json()
         entries = []
         for features in data["features"]:
-            waste_list: dict[str, str] = features.get("properties", {}).get(
-                "dd_whm_property_waste", []
-            )
+            waste_list: dict[str, str] = features.get("properties", {}).get("dd_whm_property_waste", [])
             if not waste_list:
                 continue
             for waste_map in waste_list:
                 try:
-                    entries.extend(
-                        self._get_house_hold_waste(waste_map.get("collectionDay", ""))
-                    )
+                    entries.extend(self._get_house_hold_waste(waste_map.get("collectionDay", "")))
                 except ValueError:
                     _LOGGER.warning(
                         "Could not get household waste for weekday '%s'",

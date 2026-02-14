@@ -91,11 +91,7 @@ class Source:
         if len(data["Items"]) == 0:
             splitted_address = self.address.split()
             data = self.search_address(
-                (
-                    (splitted_address[0] + splitted_address[1][:4])
-                    if len(splitted_address) > 1
-                    else splitted_address[0]
-                ),
+                ((splitted_address[0] + splitted_address[1][:4]) if len(splitted_address) > 1 else splitted_address[0]),
                 session,
             )
             raise SourceArgumentNotFoundWithSuggestions(
@@ -108,9 +104,7 @@ class Source:
         locationId = data["Items"][0]["Id"]
 
         if locationId == 0:
-            raise ValueError(
-                f"Unable to find location ID for {self.address}, maybe you misspelled your address?"
-            )
+            raise ValueError(f"Unable to find location ID for {self.address}, maybe you misspelled your address?")
 
         # Retrieve the upcoming collections for our property
         q = requote_uri(str(API_URLS["collection"]).format(locationId))
@@ -136,9 +130,7 @@ class Source:
 
             try:
                 # Strip carriage returns and newlines out of the HTML content
-                cleaned_date_text = (
-                    date_text.text.replace("\r", "").replace("\n", "").strip()
-                )
+                cleaned_date_text = date_text.text.replace("\r", "").replace("\n", "").strip()
 
                 # Parse the date
                 date = datetime.datetime.strptime(cleaned_date_text, date_format).date()

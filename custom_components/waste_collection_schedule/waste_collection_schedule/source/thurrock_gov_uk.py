@@ -42,9 +42,7 @@ ICON_MAP = {
 
 
 API_URL = "https://www.thurrock.gov.uk/household-bin-collection-days/household-bin-collection-weeks"
-STREETS_URL = (
-    "https://www.thurrock.gov.uk/household-bin-collection-days/street-names-{start}"
-)
+STREETS_URL = "https://www.thurrock.gov.uk/household-bin-collection-days/street-names-{start}"
 
 
 class Source:
@@ -60,9 +58,7 @@ class Source:
                 "street",
                 "Please provide a street name",
             )
-        r = requests.get(
-            STREETS_URL.format(start=self._street[0].lower()), verify=False
-        )
+        r = requests.get(STREETS_URL.format(start=self._street[0].lower()), verify=False)
         r.raise_for_status()
         soup = BeautifulSoup(r.text.replace("\xa0", " "), "html.parser")
         table = soup.select_one("table")
@@ -128,9 +124,7 @@ class Source:
 
         return sorted([date_1, date_2, date_3], key=lambda x: abs(x - now.date()))[0]
 
-    def parse_date_range(
-        self, range_str: str, not_before: date | None = None
-    ) -> tuple[date, date]:
+    def parse_date_range(self, range_str: str, not_before: date | None = None) -> tuple[date, date]:
         now = datetime.now()
         start, end = range_str.split(" to ")
         start_date = self.parse_date_without_year(start)
@@ -168,9 +162,7 @@ class Source:
             cells = tr.select("td")
             if len(cells) != 3:
                 raise Exception("Invalid table format")
-            start_date, end_date = self.parse_date_range(
-                cells[0].text.strip(), not_before=end_date
-            )
+            start_date, end_date = self.parse_date_range(cells[0].text.strip(), not_before=end_date)
 
             bin_text = cells[(1 if self._round == "A" else 2)].text.strip()
             bins = bin_text.split(" and ")

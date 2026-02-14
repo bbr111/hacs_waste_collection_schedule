@@ -53,8 +53,6 @@ class Source:
         dates = self._ics.convert(r.text)
         entries = []
         for d in dates:
-            entries.append(
-                Collection(d[0], d[1], ICON_MAP.get(d[1].split(" ")[0].lower()))
-            )
+            entries.append(Collection(d[0], d[1], ICON_MAP.get(d[1].split(" ")[0].lower())))
 
         return entries

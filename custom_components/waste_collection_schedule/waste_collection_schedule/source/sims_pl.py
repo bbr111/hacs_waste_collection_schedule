@@ -263,15 +263,11 @@ class Source:
         if owner_id is None:
             assert owner is not None
             for o_id, o_name in OWNER_IDS.items():
-                if self.compare(
-                    o_name.removeprefix("Gmina").removeprefix("Miasto"), owner
-                ):
+                if self.compare(o_name.removeprefix("Gmina").removeprefix("Miasto"), owner):
                     owner_id = o_id
                     break
             if owner_id is None:
-                raise SourceArgumentNotFoundWithSuggestions(
-                    "owner", owner, [o_name for o_name in OWNER_IDS.values()]
-                )
+                raise SourceArgumentNotFoundWithSuggestions("owner", owner, [o_name for o_name in OWNER_IDS.values()])
         self._owner_id: str = str(owner_id)
 
     def get_bins(self, unitId: str) -> BinResponse:
@@ -325,18 +321,8 @@ class Source:
     @staticmethod
     def compare(a: str, b: str) -> bool:
         return (
-            a.lower()
-            .strip()
-            .replace(" ", "")
-            .replace(",", "")
-            .replace(".", "")
-            .casefold()
-            == b.lower()
-            .strip()
-            .replace(" ", "")
-            .replace(",", "")
-            .replace(".", "")
-            .casefold()
+            a.lower().strip().replace(" ", "").replace(",", "").replace(".", "").casefold()
+            == b.lower().strip().replace(" ", "").replace(",", "").replace(".", "").casefold()
         )
 
     def fetch(self) -> list[Collection]:
@@ -347,9 +333,7 @@ class Source:
                 town_id = town["id"]
                 break
         if town_id is None:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "town", self._town, [town["name"] for town in towns["data"]]
-            )
+            raise SourceArgumentNotFoundWithSuggestions("town", self._town, [town["name"] for town in towns["data"]])
 
         address_id: str | None = None
         if self._town_address is not None:
@@ -389,10 +373,7 @@ class Source:
                 raise SourceArgumentNotFoundWithSuggestions(
                     "street_address",
                     self._street_address,
-                    [
-                        street_address["number"]
-                        for street_address in street_addresses["data"]
-                    ],
+                    [street_address["number"] for street_address in street_addresses["data"]],
                 )
 
         bins = self.get_bins(address_id)

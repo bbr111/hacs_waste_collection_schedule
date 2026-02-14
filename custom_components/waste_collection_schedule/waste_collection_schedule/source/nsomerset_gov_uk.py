@@ -74,9 +74,7 @@ class Source:
                         continue
                     entries.append(
                         Collection(
-                            date=datetime.strptime(date, "%A %d %B")
-                            .replace(year=datetime.now().year)
-                            .date(),
+                            date=datetime.strptime(date, "%A %d %B").replace(year=datetime.now().year).date(),
                             t=collection["Service"],
                             icon=ICON_MAP.get(collection["Service"].upper()),
                         )

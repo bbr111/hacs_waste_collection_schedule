@@ -59,12 +59,7 @@ class OptionParser(HTMLParser):
         if tag == "select":
             self._within_select = False
         elif tag == "option":
-            if (
-                self._within_select
-                and self._within_option
-                and len(self._option_name) > 0
-                and self._option_value != ""
-            ):
+            if self._within_select and self._within_option and len(self._option_name) > 0 and self._option_value != "":
                 self._choices.append((self._option_name, self._option_value))
             self._within_option = False
             self._option_name = ""
@@ -103,9 +98,7 @@ def main():
         parser = OptionParser(select_name="asId")
         parser.feed(r.text)
 
-        questions = [
-            inquirer.List("asId", choices=parser.choices, message="Select street")
-        ]
+        questions = [inquirer.List("asId", choices=parser.choices, message="Select street")]
         answers.update(inquirer.prompt(questions))
 
     # search for building number
@@ -121,9 +114,7 @@ def main():
     if len(parser.choices) == 0:
         answers["hnId"] = ""
     else:
-        questions = [
-            inquirer.List("hnId", choices=parser.choices, message="Select house number")
-        ]
+        questions = [inquirer.List("hnId", choices=parser.choices, message="Select house number")]
         answers.update(inquirer.prompt(questions))
 
     print("Copy the following statements into your configuration.yaml:\n")

@@ -39,13 +39,7 @@ class Source:
         dates = self._ics.convert(r.text)
         entries = []
         for d in dates:
-            icon_get_string = (
-                d[1]
-                .removeprefix("Odpady ")
-                .removeprefix("z ")
-                .replace(",", "")
-                .split()[0]
-            )
+            icon_get_string = d[1].removeprefix("Odpady ").removeprefix("z ").replace(",", "").split()[0]
             entries.append(Collection(d[0], d[1], ICON_MAP.get(icon_get_string)))
 
         return entries

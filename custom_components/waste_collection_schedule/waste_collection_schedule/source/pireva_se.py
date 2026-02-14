@@ -1,6 +1,5 @@
 import re
 from datetime import date, datetime
-from typing import List
 
 import bs4
 import requests
@@ -42,7 +41,7 @@ class Source:
     def __init__(self, street_address: str):
         self._street_address = street_address
 
-    def fetch(self) -> List[Collection]:
+    def fetch(self) -> list[Collection]:
         slug = self.find_slug()
         if not slug:
             raise SourceArgumentException(
@@ -64,11 +63,7 @@ class Source:
         matched_addresses = response.json().get("matches")
 
         return next(
-            (
-                item["address_slug"]
-                for item in matched_addresses
-                if item.get("address") == self._street_address
-            ),
+            (item["address_slug"] for item in matched_addresses if item.get("address") == self._street_address),
             "",
         )
 
@@ -81,7 +76,7 @@ class Source:
         return soup.find_all("table")
 
     @staticmethod
-    def parse_entries(pickup_tables: bs4.ResultSet[bs4.Tag]) -> List[Collection]:
+    def parse_entries(pickup_tables: bs4.ResultSet[bs4.Tag]) -> list[Collection]:
         """Traverse and parse HTML data.
 
         Args:

@@ -26,9 +26,7 @@ CONFIG_VARIABLES = [
     "f_abfallarten",
 ]
 
-ACTION_EXTRACTOR_PATTERN = re.compile(
-    '(?<=awk-data-onchange-submit-waction=")[^\\n\\r"]+'
-)
+ACTION_EXTRACTOR_PATTERN = re.compile('(?<=awk-data-onchange-submit-waction=")[^\\n\\r"]+')
 
 
 class OptionParser(HTMLParser):
@@ -68,19 +66,12 @@ class OptionParser(HTMLParser):
         if tag == "input":
             if "type" in attributes:
                 if attributes["type"] == "hidden":
-                    if (
-                        "name" in attributes
-                        and "value" in attributes
-                        and attributes["name"] == self._target_var
-                    ):
+                    if "name" in attributes and "value" in attributes and attributes["name"] == self._target_var:
                         # self._within_option = True
                         self._is_selector = True
                         self._option_value = attributes["value"]
                         self._choices.append((attributes["value"], attributes["value"]))
-                elif (
-                    self._target_var == OptionParser.TEXTBOXES
-                    and attributes["type"] == "text"
-                ):
+                elif self._target_var == OptionParser.TEXTBOXES and attributes["type"] == "text":
                     self._is_text_input = True
                     if "id" in attributes:
                         self._text_field_id = attributes["id"]
@@ -99,11 +90,7 @@ class OptionParser(HTMLParser):
                 self._option_value = attributes["value"]
 
     def handle_endtag(self, tag):
-        if (
-            self._within_option
-            and len(self._option_name) > 0
-            and self._option_value != "-1"
-        ):
+        if self._within_option and len(self._option_name) > 0 and self._option_value != "-1":
             self._choices.append((self._option_name, self._option_value))
         self._within_option = False
         self._option_name = ""
@@ -179,9 +166,7 @@ def select_and_query(data, answers):
         "modus": MODUS_KEY,
         "waction": ACTION_EXTRACTOR_PATTERN.findall(data)[0],
     }
-    r = requests.post(
-        "https://api.abfall.io", params=args, data=answers, headers=HEADERS
-    )
+    r = requests.post("https://api.abfall.io", params=args, data=answers, headers=HEADERS)
     return r.text
 
 

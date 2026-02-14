@@ -7,9 +7,7 @@ TITLE = "Wollondilly Shire Council"
 DESCRIPTION = "Source for Wollondilly Shire Council."
 URL = "https://www.wollondilly.nsw.gov.au/"
 TEST_CASES = {
-    "87 Remembrance Driveway TAHMOOR NSW": {
-        "address": "87 Remembrance Driveway TAHMOOR NSW"
-    },
+    "87 Remembrance Driveway TAHMOOR NSW": {"address": "87 Remembrance Driveway TAHMOOR NSW"},
     "Thirlmere Way THIRLMERE NSW": {"address": "Thirlmere Way THIRLMERE NSW"},
 }
 

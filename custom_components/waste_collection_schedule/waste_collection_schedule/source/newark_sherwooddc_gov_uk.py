@@ -36,9 +36,7 @@ class Source:
         return entries
 
     def get_data(self, payload):
-        r = requests.get(
-            "http://app.newark-sherwooddc.gov.uk/bincollection/calendar", params=payload
-        )
+        r = requests.get("http://app.newark-sherwooddc.gov.uk/bincollection/calendar", params=payload)
 
         entries = []
 
@@ -61,9 +59,7 @@ class Source:
             rows = month.find_all("tr", class_=re.compile("bin_"))
             for collection_day in rows:
                 # Get type of bin collection
-                collection_type_match = re.search(
-                    r"bin_(\w*)", collection_day["class"][0]
-                )
+                collection_type_match = re.search(r"bin_(\w*)", collection_day["class"][0])
                 collection_type = collection_type_match.group(1)
 
                 # Get date of collection
@@ -75,15 +71,9 @@ class Source:
 
                 entries.append(
                     Collection(
-                        date=datetime.date(
-                            int(year), int(month_number), int(collection_day)
-                        ),  # Collection date
-                        t=BINS.get(collection_type, {}).get(
-                            "name", collection_type
-                        ),  # Collection type
-                        icon=BINS.get(collection_type, {}).get(
-                            "icon"
-                        ),  # Collection icon
+                        date=datetime.date(int(year), int(month_number), int(collection_day)),  # Collection date
+                        t=BINS.get(collection_type, {}).get("name", collection_type),  # Collection type
+                        icon=BINS.get(collection_type, {}).get("icon"),  # Collection icon
                     )
                 )
 

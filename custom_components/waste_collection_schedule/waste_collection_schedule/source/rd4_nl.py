@@ -64,11 +64,7 @@ class Source:
         r = requests.get(API_URL, params=args)
         r.raise_for_status()
         data = r.json()
-        if not (
-            "data" in data
-            and "items" in data["data"]
-            and len(data["data"]["items"]) > 0
-        ):
+        if not ("data" in data and "items" in data["data"] and len(data["data"]["items"]) > 0):
             raise ValueError("No data found, check your arguments")
 
         entries = []

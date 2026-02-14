@@ -63,9 +63,7 @@ ICON_MAP = {
 
 
 class Source:
-    def __init__(
-        self, post_code: str, suburb: str, street_name: str, street_number: str | int
-    ):
+    def __init__(self, post_code: str, suburb: str, street_name: str, street_number: str | int):
         self.post_code = post_code
         self.suburb = suburb
         self.street_name = street_name
@@ -74,9 +72,7 @@ class Source:
     def fetch(self):
         locationId = ""
 
-        address = "{} {} {} SA {}".format(
-            self.street_number, self.street_name, self.suburb, self.post_code
-        )
+        address = f"{self.street_number} {self.street_name} {self.suburb} SA {self.post_code}"
 
         q = requote_uri(str(API_URLS["address_search"]).format(address))
 
@@ -124,12 +120,8 @@ class Source:
 
             try:
                 # Parse the date (format: "Thu 7/8/2025")
-                cleaned_date_text = (
-                    date_text.text.replace("\r", "").replace("\n", "").strip()
-                )
-                date = datetime.datetime.strptime(
-                    cleaned_date_text, "%a %d/%m/%Y"
-                ).date()
+                cleaned_date_text = date_text.text.replace("\r", "").replace("\n", "").strip()
+                date = datetime.datetime.strptime(cleaned_date_text, "%a %d/%m/%Y").date()
 
                 waste_type_text = waste_type.text.strip()
 

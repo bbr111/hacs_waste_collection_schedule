@@ -258,9 +258,7 @@ class Source:
 
         data = response.json()[0]["data"]["features"]
         if not data:
-            raise SourceArgumentException(
-                "address", "No results found for the given address and INSEE code"
-            )
+            raise SourceArgumentException("address", "No results found for the given address and INSEE code")
 
         lat, lon = data[0]["geometry"]["coordinates"]
         return {
@@ -321,9 +319,7 @@ class Source:
 
         filtered_responses: dict[str, list[str]] = {}
         for response_item in list_of_infos:
-            waste_collection_per_type = filtered_responses.setdefault(
-                response_item["type"], []
-            )
+            waste_collection_per_type = filtered_responses.setdefault(response_item["type"], [])
             for jour_col in response_item["jour_col"]:
                 waste_collection_per_type.append(jour_col)
 
@@ -336,9 +332,7 @@ class Source:
                     entries.append(
                         Collection(
                             date=next_date,  # Next collection date
-                            t=LABEL_MAP.get(
-                                _collection_type, _collection_type
-                            ),  # Collection type
+                            t=LABEL_MAP.get(_collection_type, _collection_type),  # Collection type
                             icon=ICON_MAP.get(_collection_type),  # Collection icon
                         )
                     )

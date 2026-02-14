@@ -108,9 +108,7 @@ class Source:
 
     def fetch(self):
         # request to get an adresslist containing the parameter A used for the wasteschedule request.
-        adresslist = requests.get(
-            API_URLS["address_search"], params={"svar": self.street}
-        )
+        adresslist = requests.get(API_URLS["address_search"], params={"svar": self.street})
         adresslist.raise_for_status()
 
         streetcitylist = (self.street.lower(), self.city.lower())
@@ -123,9 +121,7 @@ class Source:
                 break
 
         if A is None:
-            raise Exception(
-                "Address not found, please verify the street name and city are correct."
-            )
+            raise Exception("Address not found, please verify the street name and city are correct.")
 
         payload = {"hsG": self.street, "hsO": self.city, "nrA": A}
         payload_str = urllib.parse.urlencode(payload, encoding="cp1252")

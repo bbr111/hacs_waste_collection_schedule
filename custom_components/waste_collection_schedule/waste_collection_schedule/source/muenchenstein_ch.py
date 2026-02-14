@@ -47,10 +47,7 @@ class Source:
 
         entries = []
         for item in data["data"]:
-            if (
-                self._waste_district in item["abfallkreisIds"]
-                or self._waste_district in item["abfallkreisNameList"]
-            ):
+            if self._waste_district in item["abfallkreisIds"] or self._waste_district in item["abfallkreisNameList"]:
                 # Datum aus HTML extrahieren statt aus dem -sort Feld
                 date_raw_html = item["_anlassDate"]
                 date_soup = BeautifulSoup(date_raw_html, "html.parser").find("span")
@@ -75,11 +72,7 @@ class Source:
         # Collection of "Kehricht und Kleinsperrgut brennbar" are not listed with dates as events on website.
         # Instead it states the day of the week for each waste district: tuesday for east and friday for west
         # So we're going to set those collections programmatically for the next 4 occurrences
-        weekday_collection = (
-            2
-            if self._waste_district == "Abfuhrkreis Ost" or self._waste_district == 491
-            else 5
-        )
+        weekday_collection = 2 if self._waste_district == "Abfuhrkreis Ost" or self._waste_district == 491 else 5
         weekday_today = datetime.now().isoweekday()
         for x in range(4):
             days_to_pickup = (x * 7) + ((weekday_collection - weekday_today) % 7)

@@ -85,9 +85,7 @@ class Source:
         self._municipality_id: int | None = None
 
     @staticmethod
-    def _fetch_json(
-        url: str, headers: dict
-    ) -> MunicipalitiesResult | list[CollectionEntry]:
+    def _fetch_json(url: str, headers: dict) -> MunicipalitiesResult | list[CollectionEntry]:
         r = requests.get(url, headers)
         if r.status_code != 200:
             r.raise_for_status()
@@ -113,9 +111,7 @@ class Source:
         )
         self._municipality_id = _municipalities.get(self._municipality)
         if not self._municipality_id:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "municipality", self._municipality, list(_municipalities.keys())
-            )
+            raise SourceArgumentNotFoundWithSuggestions("municipality", self._municipality, list(_municipalities.keys()))
 
     def fetch(self) -> list[Collection]:
         if not self._municipality_id:

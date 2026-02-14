@@ -127,9 +127,7 @@ class Source:
                 try:
                     date = datetime.strptime(date_str, "%A %d/%m/%Y").date()
                 except ValueError:
-                    _LOGGER.warning(
-                        "Could not parse date '%s', unknown format", date_str
-                    )
+                    _LOGGER.warning("Could not parse date '%s', unknown format", date_str)
                     continue
                 entries.append(Collection(date=date, t=bin_type, icon=icon))
 

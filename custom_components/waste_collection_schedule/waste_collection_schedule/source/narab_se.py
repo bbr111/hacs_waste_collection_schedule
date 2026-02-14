@@ -37,12 +37,8 @@ TEST_CASES = {
     "Commercial": {"address": "Hallandsvägen 9", "kundNr": 33159},
 }
 
-API_URL_FETCH_ADDRESS = (
-    "https://www.narabtomningskalender.se/basfiler/system_ladda_adresser.php"
-)
-API_URL_FETCH_COLLECTIONS = (
-    "https://www.narabtomningskalender.se/basfiler/online_kalender_skapa.php"
-)
+API_URL_FETCH_ADDRESS = "https://www.narabtomningskalender.se/basfiler/system_ladda_adresser.php"
+API_URL_FETCH_COLLECTIONS = "https://www.narabtomningskalender.se/basfiler/online_kalender_skapa.php"
 
 PARAM_DESCRIPTIONS = {
     "en": {
@@ -321,9 +317,7 @@ class Source:
             if len(parts) != 5:
                 raise ValueError(f"Expected 5 parts in line, got {len(parts)}: {line}")
             hsG, hsO, knR, abK, nrA = (p.strip() for p in parts)
-            addresses.append(
-                {"hsG": hsG, "hsO": hsO, "knR": knR, "abK": abK, "nrA": nrA}
-            )
+            addresses.append({"hsG": hsG, "hsO": hsO, "knR": knR, "abK": abK, "nrA": nrA})
         return addresses
 
     def fetch(self) -> list[Collection]:
@@ -402,11 +396,7 @@ class Source:
                     sp.decompose()
 
                 # Extract the day number from the remaining text
-                day_text = (
-                    cell_no_spans.get_text(strip=True).split()[0]
-                    if cell_no_spans.get_text(strip=True)
-                    else None
-                )
+                day_text = cell_no_spans.get_text(strip=True).split()[0] if cell_no_spans.get_text(strip=True) else None
 
                 if not (day_text and day_text.isdigit()):
                     continue  # skip empty or invalid cells

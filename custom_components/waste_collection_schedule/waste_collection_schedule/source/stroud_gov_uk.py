@@ -29,14 +29,7 @@ DATE_REGEX = r"(\w+day) (\d{1,2}) (\w+) (\d{4})"
 
 
 def make_bin_type_string(bin_type: str) -> str:
-    return (
-        bin_type.lower()
-        .replace("next", "")
-        .replace("collection date", "")
-        .replace("collection", "")
-        .strip()
-        .capitalize()
-    )
+    return bin_type.lower().replace("next", "").replace("collection date", "").replace("collection", "").strip().capitalize()
 
 
 def get_icon(bin_type: str) -> str | None:
@@ -54,9 +47,7 @@ class Source:
         if not match:
             raise ValueError(f"Could not parse bin type: {bin_type}")
 
-        d = datetime.strptime(
-            f"{match.group(4)}-{match.group(3)}-{match.group(2)}", "%Y-%B-%d"
-        ).date()
+        d = datetime.strptime(f"{match.group(4)}-{match.group(3)}-{match.group(2)}", "%Y-%B-%d").date()
         bin_type = bin_type.replace(match.group(0), "").strip()
         return Collection(date=d, t=bin_type, icon=get_icon(bin_type))
 
@@ -76,9 +67,7 @@ class Source:
         """
         match = re.match(r"every (\w+)", date_string.lower())
         if not match:
-            raise ValueError(
-                f"Could not parse bin type: {bin_type} with date string: {date_string}"
-            )
+            raise ValueError(f"Could not parse bin type: {bin_type} with date string: {date_string}")
         weekday = match.group(1)
 
         next_date = datetime.now().date()
@@ -117,9 +106,7 @@ class Source:
             try:
                 entries += self._parse_date_in_title(bin_type)
             except ValueError:
-                _LOGGER.warning(
-                    f"Could not parse date: {date_string} for bin type: {bin_type}"
-                )
+                _LOGGER.warning(f"Could not parse date: {date_string} for bin type: {bin_type}")
         return entries
 
     def fetch(self) -> list[Collection]:
@@ -131,15 +118,11 @@ class Source:
         soup = BeautifulSoup(r.text, "html.parser")
         rubbish_panel = soup.select("section.panel-rubbish")
         if len(rubbish_panel) == 0:
-            raise Exception(
-                "No data found for this postcode and uprn (could not find panel-rubbish)"
-            )
+            raise Exception("No data found for this postcode and uprn (could not find panel-rubbish)")
 
         lis = rubbish_panel[0].select("li")
         if len(lis) == 0:
-            raise Exception(
-                "No data found for this postcode and uprn (could not find any collection entries)"
-            )
+            raise Exception("No data found for this postcode and uprn (could not find any collection entries)")
 
         entries = []
         for li in lis:
@@ -149,9 +132,7 @@ class Source:
                 if len(strongs) < 2:
                     continue
                 try:
-                    entries += self._parse_entry(
-                        strongs[1].text, make_bin_type_string(strongs[0].text)
-                    )
+                    entries += self._parse_entry(strongs[1].text, make_bin_type_string(strongs[0].text))
                 except ValueError:
                     pass
                 continue
@@ -163,9 +144,7 @@ class Source:
                 try:
                     entries += self._parse_date_in_title(bin_type)
                 except ValueError:
-                    _LOGGER.warning(
-                        f"Could not parse bin type: {bin_type} did not find date string"
-                    )
+                    _LOGGER.warning(f"Could not parse bin type: {bin_type} did not find date string")
                 continue
 
             date_string = date_string_tag.text

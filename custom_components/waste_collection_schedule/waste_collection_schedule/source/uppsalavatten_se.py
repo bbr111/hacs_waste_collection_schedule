@@ -30,6 +30,4 @@ class Source(EdpEventSource):
     def __init__(self, street, city):
         super().__init__(street, service_provider="uppsalavatten")
         # Log a warning message indicating that this source is deprecated
-        _LOGGER.warning(
-            "The Uppsala Vatten och Avfall AB source is deprecated, please use edpevent_se instead"
-        )
+        _LOGGER.warning("The Uppsala Vatten och Avfall AB source is deprecated, please use edpevent_se instead")

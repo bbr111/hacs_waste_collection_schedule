@@ -5,17 +5,13 @@ from bs4 import BeautifulSoup
 from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 
 TITLE = "Stratford District Council"
-DESCRIPTION = (
-    "Source for Stratford District Council and their 123+ bin collection system"
-)
+DESCRIPTION = "Source for Stratford District Council and their 123+ bin collection system"
 URL = "https://stratford.gov.uk"
 
-TEST_CASES = (
-    {  # if you want your address removed, please submit a request and this will be done
-        "Stratford DC": {"uprn": "100071513500"},  # doesn't have food waste
-        "Alscot Estate": {"uprn": 10024633309},
-    }
-)
+TEST_CASES = {  # if you want your address removed, please submit a request and this will be done
+    "Stratford DC": {"uprn": "100071513500"},  # doesn't have food waste
+    "Alscot Estate": {"uprn": 10024633309},
+}
 
 ICON_MAP = {
     "Garden waste": "mdi:leaf",
@@ -27,9 +23,7 @@ ICON_MAP = {
 # these names have been chosen to accurately reflect naming convention on Stratford.gov
 BINS = ["Food waste", "Recycling", "Refuse", "Garden waste"]
 
-API_URL = (
-    "https://www.stratford.gov.uk/waste-recycling/when-we-collect.cfm/part/calendar"
-)
+API_URL = "https://www.stratford.gov.uk/waste-recycling/when-we-collect.cfm/part/calendar"
 HEADERS = {"Content-Type": "application/x-www-form-urlencoded"}
 
 DATE_FORMAT = "%A, %d/%m/%Y"  # format of the date string in the collection table
@@ -68,9 +62,6 @@ class Source:
             # each bin may be "checked" to show it can be collected on that date
             for idx, cell in enumerate(all_bins):
                 if cell.find("img", class_="check-img"):
-
-                    entries.append(
-                        Collection(date=date, t=BINS[idx], icon=ICON_MAP.get(BINS[idx]))
-                    )
+                    entries.append(Collection(date=date, t=BINS[idx], icon=ICON_MAP.get(BINS[idx])))
 
         return entries

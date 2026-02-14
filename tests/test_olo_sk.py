@@ -1,27 +1,28 @@
-import sys
 import os
-from datetime import date, timedelta
-from unittest.mock import MagicMock
+import sys
 import types
+from datetime import date
+from unittest.mock import MagicMock
+
 import pytest
 
+from custom_components.waste_collection_schedule.waste_collection_schedule.source import olo_sk
+
+# Initialize test fixtures after imports
 # Mock the waste_collection_schedule module before importing olo_sk
 wcs = types.ModuleType('waste_collection_schedule')
-wcs.Collection = MagicMock
+setattr(wcs, 'Collection', MagicMock)
 sys.modules['waste_collection_schedule'] = wcs
 
 exceptions = types.ModuleType('waste_collection_schedule.exceptions')
 class SourceArgumentExceptionMultiple(Exception):
     def __init__(self, args, reason):
         super().__init__(f"Arguments required: {args} - {reason}")
-exceptions.SourceArgumentExceptionMultiple = SourceArgumentExceptionMultiple
+setattr(exceptions, 'SourceArgumentExceptionMultiple', SourceArgumentExceptionMultiple)
 sys.modules['waste_collection_schedule.exceptions'] = exceptions
 
 # Insert source path to sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "custom_components", "waste_collection_schedule", "waste_collection_schedule")))
-
-# Now we can import the source module directly
-from source import olo_sk
 
 
 class FixedDate(date):

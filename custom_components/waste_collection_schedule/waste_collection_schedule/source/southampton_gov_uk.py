@@ -20,9 +20,7 @@ ICON_MAP = {
     "General Waste": "mdi:trash-can",
     "Garden Waste": "mdi:leaf",
 }
-REGEX = (
-    r"(Glass|Recycling|General Waste|Garden Waste).*?([0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4})"
-)
+REGEX = r"(Glass|Recycling|General Waste|Garden Waste).*?([0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4})"
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -33,15 +31,11 @@ class Source:
 
     def fetch(self):
         s = requests.Session()
-        r = s.get(
-            f"https://www.southampton.gov.uk/whereilive/waste-calendar?UPRN={self._uprn}"
-        )
+        r = s.get(f"https://www.southampton.gov.uk/whereilive/waste-calendar?UPRN={self._uprn}")
         r.raise_for_status()
 
         # Limit search scope to avoid duplicates
-        calendar_view_only = re.search(
-            r"#calendar1.*?listView", r.text, flags=re.DOTALL
-        )[0]
+        calendar_view_only = re.search(r"#calendar1.*?listView", r.text, flags=re.DOTALL)[0]
 
         results = re.findall(REGEX, calendar_view_only)
 

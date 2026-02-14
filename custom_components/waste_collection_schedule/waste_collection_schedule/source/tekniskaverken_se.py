@@ -8,9 +8,7 @@ from waste_collection_schedule.exceptions import SourceArgumentNotFoundWithSugge
 TITLE = "Linköping - Tekniska Verken"
 DESCRIPTION = "Source for Tekniska Verken in Linköping waste collection"
 URL = "https://www.tekniskaverken.se/"
-API_URL = (
-    "https://www.tekniskaverken.se/privat/avfall-atervinning/sophamtning-mat-restavfall"
-)
+API_URL = "https://www.tekniskaverken.se/privat/avfall-atervinning/sophamtning-mat-restavfall"
 TEST_CASES = {
     "Somewhere": {"street": "Roshagsvägen 2", "city": "Linköping"},
     "Away": {"street": "Roshagsvägen 6", "city": "Linköping"},
@@ -46,9 +44,7 @@ class Source:
         response = requests.post(API_URL, params=data)
         response.encoding = "UTF-8"
         soup = BeautifulSoup(response.text, "html.parser")
-        addresses = soup.find_all(
-            "div", attrs={"class": "wastecollections-selectedaddress"}
-        )
+        addresses = soup.find_all("div", attrs={"class": "wastecollections-selectedaddress"})
         infos = soup.find_all("ul", attrs={"class": "wastecollections-results"})
 
         streets = []
@@ -62,14 +58,10 @@ class Source:
 
     def get_entries(self, info):
         entries = []
-        waste_types_info = info.find_all(
-            "li", attrs={"class": "wastecollections-results-item"}
-        )
+        waste_types_info = info.find_all("li", attrs={"class": "wastecollections-results-item"})
 
         for waste_type_info in waste_types_info:
-            waste_type = waste_type_info.find(
-                "strong", attrs={"class": "wastecollections-results-item-type-label"}
-            ).text
+            waste_type = waste_type_info.find("strong", attrs={"class": "wastecollections-results-item-type-label"}).text
             pickup_date = self.get_date(waste_type_info)
             icon = ICON_MAP.get(waste_type)
             entries.append(Collection(date=pickup_date, t=waste_type, icon=icon))
@@ -77,9 +69,7 @@ class Source:
         return entries
 
     def get_date(self, waste_type_info):
-        pickup_date_metas = waste_type_info.find_all(
-            "div", attrs={"class": "wastecollections-results-item__meta"}
-        )
+        pickup_date_metas = waste_type_info.find_all("div", attrs={"class": "wastecollections-results-item__meta"})
 
         for pickup_date_meta in pickup_date_metas:
             if "Nästa" in pickup_date_meta.text:

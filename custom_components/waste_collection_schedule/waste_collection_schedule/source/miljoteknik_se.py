@@ -87,9 +87,7 @@ class Source:
 
         entries = []
         for entry in re.findall(r"{.title:[^}]+}", response.text):
-            json_entry = json.loads(
-                re.sub(r"(title|start):", r'"\1":', entry.replace("'", '"'))
-            )
+            json_entry = json.loads(re.sub(r"(title|start):", r'"\1":', entry.replace("'", '"')))
             # Same icon always, due to two bins both being various recycled things
             icon = "mdi:recycle"
             waste_type = json_entry["title"].split(":")[1].lstrip()

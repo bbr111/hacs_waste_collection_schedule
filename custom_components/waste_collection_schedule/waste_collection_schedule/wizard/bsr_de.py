@@ -6,14 +6,12 @@ import requests
 ENDPOINT_STREET = "https://umnewforms.bsr.de/p/de.bsr.adressen.app/streetNames"
 ENDPOINT_SCHEDID = "https://umnewforms.bsr.de/p/de.bsr.adressen.app/plzSet/plzSet"
 
-def main():
 
+def main():
     while True:
         questions = [inquirer.Text("street", message="Enter search string for street")]
         answers = inquirer.prompt(questions)
-        args = {
-            "searchQuery": answers["street"]
-        }
+        args = {"searchQuery": answers["street"]}
 
         with requests.Session() as street_session:
             response = street_session.get(ENDPOINT_STREET, params=args)
@@ -27,20 +25,16 @@ def main():
         else:
             street_choices = [entry["value"] for entry in street_list]
             # select street
-            questions = [
-                inquirer.List("street", choices=street_choices, message="Select street")
-            ]
+            questions = [inquirer.List("street", choices=street_choices, message="Select street")]
             answers = inquirer.prompt(questions)
             street = answers["street"]
         print(f"Selected street: {street}.")
 
         questions = [inquirer.Text("number", message="Enter house number")]
         answers = inquirer.prompt(questions)
-        number = answers['number']
+        number = answers["number"]
         print(f"Selected number: {number}.")
-        args = {
-            "searchQuery": f"{street}:::{number}"
-        }
+        args = {"searchQuery": f"{street}:::{number}"}
         with requests.Session() as schedid_session:
             response = schedid_session.get(ENDPOINT_SCHEDID, params=args)
         schedid_list = response.json()
@@ -74,7 +68,7 @@ def main():
     print("  sources:")
     print("    - name: bsr_de")
     print("      args:")
-    print(f"        schedule_id: \"{schedid}\"")
+    print(f'        schedule_id: "{schedid}"')
 
 
 if __name__ == "__main__":

@@ -1,10 +1,9 @@
 import re
+from datetime import datetime
+
 import requests
 from bs4 import BeautifulSoup
-
-from datetime import datetime
-from waste_collection_schedule import Collection    # type: ignore[attr-defined]
-
+from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 
 TITLE = "Borough Council of King's Lynn & West Norfolk"
 DESCRIPTION = "Source for www.west-norfolk.gov.uk services for Borough Council of King's Lynn & West Norfolk, UK."
@@ -18,11 +17,7 @@ TEST_CASES = {
     "Test_003": {"uprn": "10000021270"},
     "Test_004": {"uprn": 100090969937},
 }
-ICON_MAP = {
-    "REFUSE": "mdi:trash-can",
-    "RECYCLING": "mdi:recycle",
-    "GARDEN": "mdi:leaf"
-}
+ICON_MAP = {"REFUSE": "mdi:trash-can", "RECYCLING": "mdi:recycle", "GARDEN": "mdi:leaf"}
 
 
 class Source:
@@ -30,13 +25,9 @@ class Source:
         self._uprn = str(uprn).zfill(12)
 
     def fetch(self):
-
         # Get session and amend cookies
         s = requests.Session()
-        s.get(
-            "https://www.west-norfolk.gov.uk/info/20174/bins_and_recycling_collection_dates",
-            headers=HEADERS
-        )
+        s.get("https://www.west-norfolk.gov.uk/info/20174/bins_and_recycling_collection_dates", headers=HEADERS)
         s.cookies.update(
             {
                 "bcklwn_store": s.cookies.get("PHPSESSID"),
@@ -48,15 +39,11 @@ class Source:
         s.get(
             "https://www.west-norfolk.gov.uk/info/20174/bins_and_recycling_collection_dates",
             headers=HEADERS,
-            cookies=s.cookies
+            cookies=s.cookies,
         )
 
         # Get extended collection schedule from calendar end point
-        r2 = s.get(
-            "https://www.west-norfolk.gov.uk/bincollectionscalendar",
-            headers=HEADERS,
-            cookies=s.cookies
-        )
+        r2 = s.get("https://www.west-norfolk.gov.uk/bincollectionscalendar", headers=HEADERS, cookies=s.cookies)
 
         # Extract dates and waste types: Extracts ~6 months worth of collections from the optional website calendar page
         entries = []
@@ -70,11 +57,7 @@ class Source:
                 for a in attr[2:]:
                     dt = d.text + " " + month.text
                     entries.append(
-                        Collection(
-                            date=datetime.strptime(dt, "%d %B %Y").date(),
-                            t=a,
-                            icon=ICON_MAP.get(a.upper())
-                        )
+                        Collection(date=datetime.strptime(dt, "%d %B %Y").date(), t=a, icon=ICON_MAP.get(a.upper()))
                     )
 
         return entries

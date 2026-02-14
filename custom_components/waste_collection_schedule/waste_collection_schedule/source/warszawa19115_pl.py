@@ -47,9 +47,7 @@ NAME_MAP = {
 class Source:
     def __init__(self, street_address=None, geolocation_id=None):
         if street_address is None and geolocation_id is None:
-            raise SourceConfigurationError(
-                "Either street_address or geolocation_id must have a value"
-            )
+            raise SourceConfigurationError("Either street_address or geolocation_id must have a value")
         self._street_address = street_address
         self._geolocation_id = geolocation_id
 
@@ -62,9 +60,7 @@ class Source:
         OC_PARAMS["p_p_resource_id"] = "autocompleteResource"
 
         # Search for geolocation ID
-        OC_PARAMS[
-            "_portalCKMjunkschedules_WAR_portalCKMjunkschedulesportlet_INSTANCE_o5AIb2mimbRJ_name"
-        ] = street_address
+        OC_PARAMS["_portalCKMjunkschedules_WAR_portalCKMjunkschedulesportlet_INSTANCE_o5AIb2mimbRJ_name"] = street_address
         geolocation_response = geolocation_session.get(
             OC_URL,
             headers=OC_HEADERS,
@@ -77,21 +73,15 @@ class Source:
         _LOGGER.debug(f"Search response: {geolocation_response!r}")
 
         if len(geolocation_result) < 1:
-            raise SourceParseError(
-                "Expected list of locations from address search, got empty or missing list"
-            )
+            raise SourceParseError("Expected list of locations from address search, got empty or missing list")
 
         geolocation_data = geolocation_result[0]
 
         if "addressPointId" not in geolocation_data:
-            raise SourceParseError(
-                "Location in address search result but missing geolocation ID"
-            )
+            raise SourceParseError("Location in address search result but missing geolocation ID")
 
         geolocation_id = geolocation_data["addressPointId"]
-        _LOGGER.info(
-            f"Address {street_address} mapped to geolocation ID {geolocation_id}"
-        )
+        _LOGGER.info(f"Address {street_address} mapped to geolocation ID {geolocation_id}")
 
         return geolocation_id
 
@@ -108,9 +98,9 @@ class Source:
         # Calendar call requires 'ajaxResourceURL' param to work
         OC_PARAMS["p_p_resource_id"] = "ajaxResource"
 
-        OC_PARAMS[
-            "_portalCKMjunkschedules_WAR_portalCKMjunkschedulesportlet_INSTANCE_o5AIb2mimbRJ_addressPointId"
-        ] = self._geolocation_id
+        OC_PARAMS["_portalCKMjunkschedules_WAR_portalCKMjunkschedulesportlet_INSTANCE_o5AIb2mimbRJ_addressPointId"] = (
+            self._geolocation_id
+        )
         calendar_request = calendar_session.get(
             OC_URL,
             headers=OC_HEADERS,
@@ -128,9 +118,7 @@ class Source:
             or not calendar_result[0][harmonogramy]
             or len(calendar_result[0][harmonogramy]) <= 0
         ):
-            raise SourceParseError(
-                "Expected list of dates from calendar search, got empty or missing list"
-            )
+            raise SourceParseError("Expected list of dates from calendar search, got empty or missing list")
 
         entries = []
 

@@ -41,9 +41,7 @@ class Source:
 
     def fetch(self):
         s = requests.session()
-        r = s.get(
-            f"https://portal.oldham.gov.uk/bincollectiondates/details?uprn={self._uprn}"
-        )
+        r = s.get(f"https://portal.oldham.gov.uk/bincollectiondates/details?uprn={self._uprn}")
         r.raise_for_status
 
         soup = BeautifulSoup(r.content, "html.parser")

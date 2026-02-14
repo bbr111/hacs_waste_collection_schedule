@@ -22,15 +22,13 @@ ICON_MAP = {
     # "Altmetall": "mdi:engine",
 }
 
-OLD_WASTE_NAME = (
-    {  # New fetcher uses different names this should prevent breaking changes
-        "Kehrichtsammlung": "Kehricht",
-        "Grüngutsammlung": "Grüngut",
-        "Papiersammlung": "Papier",
-        "Kartonsammlung": "Karton",
-        "Alteisen/Metallsammlung": "Altmetall",
-    }
-)
+OLD_WASTE_NAME = {  # New fetcher uses different names this should prevent breaking changes
+    "Kehrichtsammlung": "Kehricht",
+    "Grüngutsammlung": "Grüngut",
+    "Papiersammlung": "Papier",
+    "Kartonsammlung": "Karton",
+    "Alteisen/Metallsammlung": "Altmetall",
+}
 
 API_URL = "https://www.real-luzern.ch/abfall/sammeldienst/abfallkalender/"
 
@@ -71,10 +69,7 @@ class Source:
             "calendar[tourId]": str(tour_id),
             "calendar[gemeinde]": "Luzern",
             "calendar[format]": "ics",
-            **{
-                f"calendar[{category}]": category
-                for category in str(categories).split(",")
-            },
+            **{f"calendar[{category}]": category for category in str(categories).split(",")},
         }
 
     def fetch(self) -> list[Collection]:

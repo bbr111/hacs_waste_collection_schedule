@@ -5,7 +5,6 @@ import requests
 from bs4 import BeautifulSoup
 from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 from waste_collection_schedule.exceptions import (
-    SourceArgumentExceptionMultiple,
     SourceArgumentNotFoundWithSuggestions,
 )
 
@@ -64,9 +63,7 @@ class Source:
             try:
                 return strdict[street]
             except KeyError:
-                raise SourceArgumentNotFoundWithSuggestions(
-                    "street", street, strdict.keys()
-                )
+                raise SourceArgumentNotFoundWithSuggestions("street", street, strdict.keys())
 
         if district:
             reglist = next(iter([s for s in selects if s["id"] == "reglist"]))
@@ -79,9 +76,7 @@ class Source:
             try:
                 return regdict[district]
             except KeyError:
-                raise SourceArgumentNotFoundWithSuggestions(
-                    "district", district, regdict.keys()
-                )
+                raise SourceArgumentNotFoundWithSuggestions("district", district, regdict.keys())
 
     def fetch(self):
         LOGGER.warning(

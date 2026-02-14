@@ -100,17 +100,15 @@ class Source:
             4: int(papier_rhythm),
         }
 
-    def __get_entries_for_street(
-        self, year: int, today: datetime
-    ) -> list[dict[str, str | int]] | None:
+    def __get_entries_for_street(self, year: int, today: datetime) -> list[dict[str, str | int]] | None:
         try:
             # get json file
             r = requests.get(API_URL.format(year=year))
             r.raise_for_status()
-        except:
+        except Exception:
             if year == today.year:
                 raise Exception("culd not get data from url exit")
-            return
+            return None
 
         try:
             data = r.json()["result"]["data"]["dbapi"]
@@ -124,6 +122,7 @@ class Source:
                 if strasse["name"].lower().strip() != self._strasse.lower().strip():
                     continue
                 return strasse["eintraege"]
+        return None
 
     # generate dates, typematch and date_is_collection* are nearly 1:1 implementation of teir original crappy js code
     def __generate_dates(self, start, end):
@@ -144,18 +143,8 @@ class Source:
                     or (
                         (gruen == 5)
                         and (
-                            (
-                                (turnus == 2)
-                                and (partm + partd >= startkombi)
-                                and (partm + partd <= endekombi)
-                            )
-                            or (
-                                (turnus == 3)
-                                and (
-                                    (partm + partd < startkombi)
-                                    or (partm + partd > endekombi)
-                                )
-                            )
+                            ((turnus == 2) and (partm + partd >= startkombi) and (partm + partd <= endekombi))
+                            or ((turnus == 3) and ((partm + partd < startkombi) or (partm + partd > endekombi)))
                         )
                     )
                 )
@@ -165,21 +154,17 @@ class Source:
         )
 
     def __date_is_collection(self, node, day: datetime, exceptions) -> bool:
-        return self.__date_is_collection_1_to_4(
-            node, day, exceptions
-        ) or self.__date_is_collection5_6(node, day)
+        return self.__date_is_collection_1_to_4(node, day, exceptions) or self.__date_is_collection5_6(node, day)
 
     def __date_is_collection5_6(self, node, day: datetime) -> bool:
-        if not node["typ"] in (5, 6):
+        if node["typ"] not in (5, 6):
             return False
         termin1 = datetime.fromisoformat(node["termin1"].replace("Z", "+00:00")).date()
         termin2 = datetime.fromisoformat(node["termin2"].replace("Z", "+00:00")).date()
-        day = day.date()
-        return (termin1 == day) or (termin2 == day)
+        day_date = day.date()
+        return (termin1 == day_date) or (termin2 == day_date)
 
-    def __date_is_collection_1_to_4(
-        self, node, day: datetime, exceptions, check_exception=True
-    ) -> bool:
+    def __date_is_collection_1_to_4(self, node, day: datetime, exceptions, check_exception=True) -> bool:
         weekno = day.isocalendar()[1]
         weekeven = weekno % 2 == 0
         dow = day.weekday() + 1
@@ -189,9 +174,7 @@ class Source:
                 if day == e_from:
                     return False
                 if day == e_to:
-                    return self.__date_is_collection_1_to_4(
-                        node, e_from, exceptions, check_exception=False
-                    )
+                    return self.__date_is_collection_1_to_4(node, e_from, exceptions, check_exception=False)
 
         return (
             (
@@ -209,10 +192,7 @@ class Source:
                 )
                 and (
                     ((node["tag1"] == dow) and (node["tag2"] == 0))
-                    or (
-                        ((node["tag1"] == dow) and not weekeven)
-                        or ((node["tag2"] == dow) and weekeven)
-                    )
+                    or (((node["tag1"] == dow) and not weekeven) or ((node["tag2"] == dow) and weekeven))
                 )
             )
             or (
@@ -228,10 +208,7 @@ class Source:
                         self._rhythms[4],
                     )
                 )
-                and (
-                    ((node["woche"] == 2) and not weekeven)
-                    or ((node["woche"] == 3) and weekeven)
-                )
+                and (((node["woche"] == 2) and not weekeven) or ((node["woche"] == 3) and weekeven))
                 and (node["tag1"] == dow)
             )
             or (
@@ -263,10 +240,7 @@ class Source:
                         self._rhythms[4],
                     )
                 )
-                and (
-                    (node["tag1"] == dow)
-                    or ((node["tag2"] > 0) and (node["tag2"] == dow))
-                )
+                and ((node["tag1"] == dow) or ((node["tag2"] > 0) and (node["tag2"] == dow)))
             )
             and (weekno >= node["beginn"])
         )
@@ -289,16 +263,19 @@ class Source:
 
             for entry in entries:
                 exceptions = {
-                    datetime.strptime(d_from, "%d.%m.%Y"): datetime.strptime(
-                        d_to, "%d.%m.%Y"
-                    )
-                    for d_from, d_to in json.loads(entry["ausnahmen"]).items()
+                    datetime.strptime(d_from, "%d.%m.%Y"): datetime.strptime(d_to, "%d.%m.%Y")
+                    for d_from, d_to in json.loads(str(entry["ausnahmen"])).items()
                 }
-                icon = ICON_MAP.get(entry["typ"])
-                type = TYPE_MAP.get(entry["typ"])
-                rhythm_type = self._rhythms.get(entry["typ"])
+                entry_typ = int(entry["typ"])
+                icon = ICON_MAP.get(entry_typ)
+                type = TYPE_MAP.get(entry_typ)
+                if type is None:
+                    continue
+                rhythm_type = self._rhythms.get(entry_typ)
                 if rhythm_type in RHYTHM_MAP:
-                    type += " (" + RHYTHM_MAP.get(rhythm_type) + ")"
+                    rhythm_label = RHYTHM_MAP.get(rhythm_type)
+                    if rhythm_label is not None:
+                        type += " (" + rhythm_label + ")"
 
                 for day in self.__generate_dates(today, datetime(year + 1, 1, 1)):
                     if not self.__date_is_collection(entry, day, exceptions):

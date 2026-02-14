@@ -96,11 +96,7 @@ class Source:
 
                 # Remove nd,rd,th,st from the date so it can be parsed
 
-                datestring = (
-                    re.sub(r"(\d)(st|nd|rd|th)", r"\1", collection["nextDate"])
-                    + " "
-                    + str(year)
-                )
+                datestring = re.sub(r"(\d)(st|nd|rd|th)", r"\1", collection["nextDate"]) + " " + str(year)
 
                 date = datetime.datetime.strptime(datestring, "%A %d %B %Y").date()
 

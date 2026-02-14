@@ -22,9 +22,7 @@ ICON_MAP = {
 }
 
 
-API_URL = (
-    "https://api.westnorthants.digital/openapi/v1/unified-waste-collections/{uprn}"
-)
+API_URL = "https://api.westnorthants.digital/openapi/v1/unified-waste-collections/{uprn}"
 
 
 class Source:

@@ -34,12 +34,8 @@ DAYS = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUN
 # Next Rubbish Collection
 REGEX_GET_BIN_TYPE = re.compile(r"Next (.*?) Collection")
 # collection is on a WEDNESDAY and will be collected on the same week as your rubbish bin collection
-REGEX_GET_GARDEN_DAY = re.compile(
-    r"collection is on a\s*(.*?)\s*and will be collected on the same week as"
-)
-REGEX_GET_GARDEN_SAME_WEEK_AS = re.compile(
-    r"collected on the same week as your\s*(.*?)\s*(bin)?\s*collection"
-)
+REGEX_GET_GARDEN_DAY = re.compile(r"collection is on a\s*(.*?)\s*and will be collected on the same week as")
+REGEX_GET_GARDEN_SAME_WEEK_AS = re.compile(r"collected on the same week as your\s*(.*?)\s*(bin)?\s*collection")
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -93,16 +89,10 @@ class Source:
         day = REGEX_GET_GARDEN_DAY.search(soup.text)
         same_week_as = REGEX_GET_GARDEN_SAME_WEEK_AS.search(soup.text)
         if not day or not same_week_as:
-            raise ValueError(
-                f"Could not find garden waste collection days: {day} {same_week_as}"
-            )
+            raise ValueError(f"Could not find garden waste collection days: {day} {same_week_as}")
 
-        relevant_coll_date = get_date_by_weekday(
-            type_to_day[same_week_as.group(1).lower()]
-        )
-        monday_of_garden_week = relevant_coll_date - timedelta(
-            days=relevant_coll_date.weekday()
-        )
+        relevant_coll_date = get_date_by_weekday(type_to_day[same_week_as.group(1).lower()])
+        monday_of_garden_week = relevant_coll_date - timedelta(days=relevant_coll_date.weekday())
 
         garden_day = monday_of_garden_week + timedelta(DAYS.index(day.group(1).upper()))
         entries = []

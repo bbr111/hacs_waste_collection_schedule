@@ -24,9 +24,7 @@ ICON_MAP = {
 }
 
 
-SITE_URL = (
-    "https://mycouncil.milton-keynes.gov.uk/service/Waste_Collection_Round_Checker"
-)
+SITE_URL = "https://mycouncil.milton-keynes.gov.uk/service/Waste_Collection_Round_Checker"
 HEADERS = {
     "user-agent": "Mozilla/5.0",
 }

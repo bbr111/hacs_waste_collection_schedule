@@ -17,6 +17,4 @@ class Source(EdpEventSource):
     def __init__(self, street_address):
         super().__init__(street_address, service_provider="ssam")
         # Log a warning message indicating that this source is deprecated
-        _LOGGER.warning(
-            "The SSAM source is deprecated, please use edpevent_se instead."
-        )
+        _LOGGER.warning("The SSAM source is deprecated, please use edpevent_se instead.")

@@ -39,9 +39,7 @@ class Source:
         r.raise_for_status()
 
         soup = BeautifulSoup(r.text, features="html.parser")
-        collections_data = soup.find(
-            "script", {"type": "application/json", "id": "collections-data"}
-        )
+        collections_data = soup.find("script", {"type": "application/json", "id": "collections-data"})
 
         entries = []
 
@@ -61,9 +59,7 @@ class Source:
                     if details is None:
                         continue  # skip empty bins
 
-                    collection_type = details[
-                        "ShortName"
-                    ]  # e.g. "Blue", "Brown", "Grey"
+                    collection_type = details["ShortName"]  # e.g. "Blue", "Brown", "Grey"
 
                     entries.append(
                         Collection(

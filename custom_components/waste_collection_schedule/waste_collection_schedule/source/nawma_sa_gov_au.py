@@ -5,9 +5,7 @@ import requests
 from waste_collection_schedule import Collection
 
 TITLE = "North Adelaide Waste Management Authority"
-DESCRIPTION = (
-    "Source for nawma.sa.gov.au (Salisbury, Playford, and Gawler South Australia)."
-)
+DESCRIPTION = "Source for nawma.sa.gov.au (Salisbury, Playford, and Gawler South Australia)."
 URL = "https://www.nawma.sa.gov.au"
 TEST_CASES = {
     "128 Bridge Road": {

@@ -9,15 +9,9 @@ TITLE = "Porirua City"
 DESCRIPTION = "Source for Porirua City."
 URL = "https://poriruacity.govt.nz/"
 TEST_CASES = {
-    "6 Ration Lane, Whitby, Porirua City 5024": {
-        "address": "6 Ration Lane Whitby, Porirua City 5024"
-    },
-    "104 Main Road, Titahi Bay, Porirua City 5022": {
-        "address": "104 Main Road Titahi Bay, Porirua City 5022"
-    },
-    "Address single-comma test": {
-        "address": "104 Main Road Titahi Bay, Porirua City 5022"
-    },
+    "6 Ration Lane, Whitby, Porirua City 5024": {"address": "6 Ration Lane Whitby, Porirua City 5024"},
+    "104 Main Road, Titahi Bay, Porirua City 5022": {"address": "104 Main Road Titahi Bay, Porirua City 5022"},
+    "Address single-comma test": {"address": "104 Main Road Titahi Bay, Porirua City 5022"},
 }
 
 
@@ -46,9 +40,7 @@ class Source:
         r = requests.get(JS_URL)
         zones_js_match = ZONES_REGEX.search(r.text)
         if not zones_js_match:
-            raise Exception(
-                "Zones not found probably due to a change in the websites javascript"
-            )
+            raise Exception("Zones not found probably due to a change in the websites javascript")
         zones_js = zones_js_match.group(0)
         # const Xs={zone1:[new Date(2022,7,22),new Date(2022,7,23),new Date(2022,7,24),new Date(2022,7,25),new Date(2022,7,26)],zone2:[new Date(2022,7,8),new Date(2022,7,9),new Date(2022,7,10),new Date(2022,7,11),new Date(2022,7,12)],zone3:[new Date(2022,7,1),new Date(2022,7,2),new Date(2022,7,3),new Date(2022,7,4),new Date(2022,7,5)],zone4:[new Date(2022,7,15),new Date(2022,7,16),new Date(2022,7,17),new Date(2022,7,18),new Date(2022,7,19)]};
         zones_js = zones_js.replace("const Xs=", "").replace(";", "")
@@ -63,12 +55,8 @@ class Source:
         ZONES: dict[str, list[str]] = json.loads(zones_js)
         collections_map_reg_result = COLLECTIONS_MAP_REGEX.search(r.text)
         if not collections_map_reg_result:
-            raise Exception(
-                "Collections map not found probably due to a change in the websites javascript"
-            )
-        collections_map_str = (
-            collections_map_reg_result.group(0).replace("collections:", "").strip()
-        )
+            raise Exception("Collections map not found probably due to a change in the websites javascript")
+        collections_map_str = collections_map_reg_result.group(0).replace("collections:", "").strip()
 
         # repalce glass with "glass"
         collections_map_str = re.sub(r"(\w+):", r'"\1":', collections_map_str)

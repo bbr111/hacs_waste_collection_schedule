@@ -21,9 +21,7 @@ ICON_MAP = {
 }
 
 
-COLLECTION_URL = (
-    "https://domesticmobileserviceapi.azurewebsites.net/api/Account/GetData"
-)
+COLLECTION_URL = "https://domesticmobileserviceapi.azurewebsites.net/api/Account/GetData"
 LOGIN_URL = "https://domesticmobileserviceapi.azurewebsites.net/token"
 COMPANY_KEY = "7ACA415F-E1DB-421B-90D7-6302D2B51FF7"
 
@@ -84,9 +82,7 @@ class Source:
         entries = []
 
         for detail in data["nextCollectionDetails"]:
-            date = datetime.strptime(
-                detail["nextCollectionDate"], "%Y-%m-%dT%H:%M:%S"
-            ).date()
+            date = datetime.strptime(detail["nextCollectionDate"], "%Y-%m-%dT%H:%M:%S").date()
             bin_type = detail["binType"]
             icon = ICON_MAP.get(bin_type)
             entries.append(Collection(date=date, t=bin_type, icon=icon))

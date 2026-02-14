@@ -28,9 +28,7 @@ class Source:
         form = {
             "street": self.street,
         }
-        header = {
-            "referer": "https://www.stadtwerke-roesrath.de/service/abfuhrkalender/"
-        }
+        header = {"referer": "https://www.stadtwerke-roesrath.de/service/abfuhrkalender/"}
         r = requests.post(
             "https://www.stadtwerke-roesrath.de/wp-admin/admin-ajax.php?action=binalarm_filter",
             data=form,

@@ -7,9 +7,7 @@ TITLE = "Townsville"
 DESCRIPTION = "Source for Townsville."
 URL = "https://townsville.qld.gov.au/"
 TEST_CASES = {
-    "Woodwark Drive, Bushland Beach": {
-        "property_id": "009fe2d01b9ba090598520202d4bcbc7"
-    },
+    "Woodwark Drive, Bushland Beach": {"property_id": "009fe2d01b9ba090598520202d4bcbc7"},
     "Riverway Dr, Kelso": {"property_id": "d41fe69c1b5ba090598520202d4bcb3c"},
     "37 Pilkington St, Garbutt": {"property_id": "580f6e5c1b5ba090598520202d4bcb91"},
 }

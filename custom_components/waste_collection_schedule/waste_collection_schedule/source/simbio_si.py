@@ -48,9 +48,7 @@ class Source:
                 if not key.startswith("next_"):
                     continue
                 bin_name = key.split("_")[1]
-                bin_type, icon = BIN_TYPES.get(bin_name, bin_name), ICON_MAP.get(
-                    bin_name
-                )
+                bin_type, icon = BIN_TYPES.get(bin_name, bin_name), ICON_MAP.get(bin_name)
 
                 mes_date = self.get_date(value)
                 if mes_date is not None:

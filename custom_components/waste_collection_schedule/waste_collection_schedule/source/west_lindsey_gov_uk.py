@@ -81,9 +81,7 @@ class Source:
         )
         r.raise_for_status
 
-        soup: BeautifulSoup = BeautifulSoup(
-            r.content.decode("unicode-escape"), "html.parser"
-        )
+        soup: BeautifulSoup = BeautifulSoup(r.content.decode("unicode-escape"), "html.parser")
 
         list_item = soup.find("li", {"class": "auroraListItem"})
         lis = list_item.find_all("li")
@@ -96,8 +94,6 @@ class Source:
                 waste_type: str = flattened[0]
                 waste_dates = self.append_year(flattened[1:])
                 for dt in waste_dates:
-                    entries.append(
-                        Collection(date=dt, t=waste_type, icon=ICON_MAP.get(waste_type))
-                    )
+                    entries.append(Collection(date=dt, t=waste_type, icon=ICON_MAP.get(waste_type)))
 
         return entries

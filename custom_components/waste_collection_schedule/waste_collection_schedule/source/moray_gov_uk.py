@@ -54,9 +54,7 @@ class Source:
                 elif div["class"] and div["class"][0] in ["B", "GPOC", "GBPOC"]:
                     bins = div["class"][0]
                     dom = int(div.text)
-                    parsed_date = datetime.strptime(
-                        f"{dom} {month} {year}", "%d %B %Y"
-                    ).date()
+                    parsed_date = datetime.strptime(f"{dom} {month} {year}", "%d %B %Y").date()
                     for i in bins:
                         entries.append(
                             Collection(

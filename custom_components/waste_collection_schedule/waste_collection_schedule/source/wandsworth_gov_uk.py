@@ -62,7 +62,6 @@ class Source:
             raise SourceArgumentException(self._uprn, "UPRN must be numeric")
 
     def fetch(self) -> list[Collection]:
-
         try:
             # Wandsworth site can be slow; using a 90s timeout to avoid false failures
             r = requests.get(
@@ -76,17 +75,13 @@ class Source:
 
         # Check for Website Errors
         except requests.RequestException as e:
-            raise SourceArgumentException(
-                self._uprn, "Wandsworth Council website unreachable"
-            ) from e
+            raise SourceArgumentException(self._uprn, "Wandsworth Council website unreachable") from e
 
         soup = BeautifulSoup(r.text, "html.parser")
 
         # Check for unexpected page My Property H1
         if not soup.find("h1", string="My Property"):
-            raise SourceArgumentException(
-                self._uprn, "Unexpected page content from Wandsworth Council"
-            )
+            raise SourceArgumentException(self._uprn, "Unexpected page content from Wandsworth Council")
 
         # Check if UPRN is correct by if Results Div is returned
         if not soup.find("div", id="result"):
@@ -96,9 +91,7 @@ class Source:
             )
 
         # Find the heading for the Rubbish & Recycling section
-        rubbish_heading = soup.find(
-            "h3", string=lambda text: text and "Rubbish and recycling" in text
-        )
+        rubbish_heading = soup.find("h3", string=lambda text: text and "Rubbish and recycling" in text)
 
         if rubbish_heading:
             # Look for the next <p> sibling immediately after the heading
@@ -106,9 +99,7 @@ class Source:
 
             # Check to see if source data currently unavailable
             if next_p and "currently unavailable" in next_p.get_text():
-                raise SourceArgumentException(
-                    self._uprn, "Source data currently unavailable."
-                )
+                raise SourceArgumentException(self._uprn, "Source data currently unavailable.")
 
         entries = []
 
@@ -140,9 +131,7 @@ class Source:
 
                 # Format Date String
                 try:
-                    collection_date = datetime.datetime.strptime(
-                        date_str, "%A %d %B %Y"
-                    ).date()
+                    collection_date = datetime.datetime.strptime(date_str, "%A %d %B %Y").date()
 
                 except ValueError:
                     _LOGGER.warning(

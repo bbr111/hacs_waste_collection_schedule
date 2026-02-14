@@ -9,11 +9,7 @@ from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 TITLE = "Whittlesea City Council"
 DESCRIPTION = "Source for Whittlesea Council (VIC) rubbish collection."
 URL = "https://www.whittlesea.vic.gov.au/My-Neighbourhood"
-TEST_CASES = {
-    "Whittlesea Council Office": {
-        "street_address": "25 Ferres Boulevard, South Morang 3752"
-    }
-}
+TEST_CASES = {"Whittlesea Council Office": {"street_address": "25 Ferres Boulevard, South Morang 3752"}}
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -41,10 +37,7 @@ class Source:
         )
         response.raise_for_status()
         addressSearchApiResults = response.json()
-        if (
-            addressSearchApiResults["Items"] is None
-            or len(addressSearchApiResults["Items"]) < 1
-        ):
+        if addressSearchApiResults["Items"] is None or len(addressSearchApiResults["Items"]) < 1:
             raise Exception(
                 f"Address search for '{self._street_address}' returned no results. Check your address on https://www.whittlesea.vic.gov.au/My-Neighbourhood"
             )
@@ -72,11 +65,7 @@ class Source:
             icon = ICON_MAP.get(waste_type)
             next_pickup = article.find(class_="next-service").string.strip()
             if re.match(r"[^\s]* \d{1,2}\/\d{1,2}\/\d{4}", next_pickup):
-                next_pickup_date = datetime.strptime(
-                    next_pickup.split(sep=" ")[1], "%d/%m/%Y"
-                ).date()
-                entries.append(
-                    Collection(date=next_pickup_date, t=waste_type, icon=icon)
-                )
+                next_pickup_date = datetime.strptime(next_pickup.split(sep=" ")[1], "%d/%m/%Y").date()
+                entries.append(Collection(date=next_pickup_date, t=waste_type, icon=icon))
 
         return entries

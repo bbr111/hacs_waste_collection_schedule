@@ -25,9 +25,7 @@ class Source:
 
     def fetch(self):
         # get json file
-        r = requests.get(
-            f"https://waste-api.york.gov.uk/api/Collections/GetBinCalendarDataForUprn/{self._uprn}"
-        )
+        r = requests.get(f"https://waste-api.york.gov.uk/api/Collections/GetBinCalendarDataForUprn/{self._uprn}")
 
         # extract data from json
         data = json.loads(r.text)
@@ -38,9 +36,7 @@ class Source:
             try:
                 entries.append(
                     Collection(
-                        date=datetime.strptime(
-                            collection["date"], "%Y-%m-%dT%H:%M:%S"
-                        ).date(),
+                        date=datetime.strptime(collection["date"], "%Y-%m-%dT%H:%M:%S").date(),
                         t=collection["roundType"].title(),
                         icon=ICON_MAP.get(collection["roundType"]),
                     )

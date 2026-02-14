@@ -63,9 +63,7 @@ class Source:
             headers=HEADERS,
             data=form_data,
         )
-        _LOGGER.debug(
-            f"Fetching waste schedule for '{self._street}' returned status: {r.status_code}."
-        )
+        _LOGGER.debug(f"Fetching waste schedule for '{self._street}' returned status: {r.status_code}.")
         r.raise_for_status()
 
         parser = BeautifulSoup(r.text, "html.parser")
@@ -76,9 +74,7 @@ class Source:
         entries = []
         for i in range(0, len(elements), 2):
             waste_type = elements[i].get_text()[0:-1]  # strip trailing colon
-            waste_dates = (
-                elements[i + 1].get_text().split(":")[1]
-            )  # get dates after colon
+            waste_dates = elements[i + 1].get_text().split(":")[1]  # get dates after colon
             waste_dates = waste_dates.strip().split(" ")  # convert to list
             waste_dates[:] = [w for w in waste_dates if w]  # remove empty strings
             for d in waste_dates:

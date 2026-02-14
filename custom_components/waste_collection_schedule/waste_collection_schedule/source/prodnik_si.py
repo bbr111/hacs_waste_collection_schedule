@@ -1,5 +1,5 @@
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import requests
 from waste_collection_schedule import Collection
@@ -14,9 +14,7 @@ TEST_CASES = {
     }
 }
 
-HOW_TO_GET_ARGUMENTS_DESCRIPTION = {
-    "en": 'Go to "https://e.prodnik.si/Registracija" to register.'
-}
+HOW_TO_GET_ARGUMENTS_DESCRIPTION = {"en": 'Go to "https://e.prodnik.si/Registracija" to register.'}
 
 PARAM_DESCRIPTIONS = {
     "en": {
@@ -94,7 +92,7 @@ class Source:
             if start_str.startswith("/Date(") and start_str.endswith(")/"):
                 timestamp_str = start_str[len("/Date(") : -len(")/")]
                 ts = int(timestamp_str) / 1000
-                d = datetime.fromtimestamp(ts, tz=timezone.utc).date()
+                d = datetime.fromtimestamp(ts, tz=UTC).date()
                 entries.append(Collection(date=d, t=bin_type, icon=icon))
         return entries
 

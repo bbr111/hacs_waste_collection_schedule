@@ -1,4 +1,3 @@
-import json
 from datetime import datetime
 
 import requests
@@ -38,9 +37,7 @@ class Source:
                     continue
                 wasteType = key.split("Collection")[0]
                 date = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S").date()
-                if any(
-                    entry.date == date and entry.type == wasteType for entry in entries
-                ):
+                if any(entry.date == date and entry.type == wasteType for entry in entries):
                     continue
                 entries.append(
                     Collection(

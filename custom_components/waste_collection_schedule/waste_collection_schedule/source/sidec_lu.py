@@ -62,16 +62,12 @@ class Source:
                     commune_id = option["value"]
                     suggestions.append(f"{name} ({commune_id})")
 
-            raise SourceArgumentRequiredWithSuggestions(
-                "commune", None, sorted(suggestions)
-            )
+            raise SourceArgumentRequiredWithSuggestions("commune", None, sorted(suggestions))
 
         # If commune was provided but ID could not be parsed, raise error
         # This happens if user enters a free-text value not from the dropdown
         if not self._commune_id:
-            raise Exception(
-                f'Invalid commune format: "{self._commune}". Please select an entry from the dropdown list.'
-            )
+            raise Exception(f'Invalid commune format: "{self._commune}". Please select an entry from the dropdown list.')
 
         # --- Proceed with fetching data ---
         now = datetime.now()

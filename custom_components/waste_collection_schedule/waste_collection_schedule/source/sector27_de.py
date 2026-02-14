@@ -64,9 +64,7 @@ class Source:
     def fetch(self):
         city = CITIES.get(self._city)
         if city is None:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "city", self._city, [x for x in CITIES.keys()]
-            )
+            raise SourceArgumentNotFoundWithSuggestions("city", self._city, [x for x in CITIES.keys()])
 
         args = city
         args["searchFor"] = self._street
@@ -77,15 +75,11 @@ class Source:
             headers=HEADERS,
         )
         r.raise_for_status()
-        streets = {
-            e["name"].strip(): e["id"] for (e) in json.loads(extractJson(r.text))
-        }
+        streets = {e["name"].strip(): e["id"] for (e) in json.loads(extractJson(r.text))}
 
         if self._street not in streets:
             if streets:
-                SourceArgumentNotFoundWithSuggestions(
-                    "street", self._street, [x for x in streets.keys()]
-                )
+                SourceArgumentNotFoundWithSuggestions("street", self._street, [x for x in streets.keys()])
             raise SourceArgumentNotFound("street", self._street)
 
         args = {

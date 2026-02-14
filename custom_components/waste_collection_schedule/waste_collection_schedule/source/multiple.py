@@ -107,11 +107,7 @@ def check_source_type(data):
         if all(isinstance(key, str) for key in data.keys()):
             # Check if all values are either dictionaries or lists of dictionaries
             if all(
-                isinstance(value, dict)
-                or (
-                    isinstance(value, list)
-                    and all(isinstance(value2, dict) for value2 in value)
-                )
+                isinstance(value, dict) or (isinstance(value, list) and all(isinstance(value2, dict) for value2 in value))
                 for value in data.values()
             ):
                 return True

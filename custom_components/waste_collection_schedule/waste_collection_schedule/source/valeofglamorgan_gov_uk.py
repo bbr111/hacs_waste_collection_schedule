@@ -57,16 +57,12 @@ class Source:
                 if not day.isdigit():
                     continue
                 date = datetime.strptime(f"{day} {months}", "%d %B %Y").date()
-                entries.append(
-                    Collection(date=date, t=bin_type, icon=ICON_MAP[bin_type])
-                )
+                entries.append(Collection(date=date, t=bin_type, icon=ICON_MAP[bin_type]))
         return entries
 
     def fetch(self) -> list[Collection]:
         timestamp = str(int(datetime.now().timestamp() * 1000))
-        random_callback_number = str(
-            random.randint(10000000000000000000, 99999999999999999999)
-        )
+        random_callback_number = str(random.randint(10000000000000000000, 99999999999999999999))
         params = {
             "RequestType": "LocalInfo",
             "ms": "ValeOfGlamorgan/AllMaps",

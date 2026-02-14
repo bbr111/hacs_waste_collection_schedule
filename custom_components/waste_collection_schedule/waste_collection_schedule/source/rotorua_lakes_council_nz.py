@@ -10,9 +10,7 @@ _LOGGER = logging.getLogger(__name__)
 TITLE = "Rotorua Lakes Council"
 DESCRIPTION = "Source for Rotorua Lakes Council"
 URL = "https://www.rotorualakescouncil.nz"
-API_URL = (
-    "https://gis.rdc.govt.nz/server/rest/services/Core/RdcServices/MapServer/125/query"
-)
+API_URL = "https://gis.rdc.govt.nz/server/rest/services/Core/RdcServices/MapServer/125/query"
 ICON_MAP = {
     "Rubbish": "mdi:trash-can",
     "Recycling": "mdi:recycle",
@@ -50,9 +48,7 @@ class Source:
                 raise ValueError(f"Geolocation failed for address: {self._address}")
             return float(data[0]["lat"]), float(data[0]["lon"])
         except Exception as e:
-            raise ValueError(
-                f"Geolocation failed for address: {self._address} with error: {e}"
-            )
+            raise ValueError(f"Geolocation failed for address: {self._address} with error: {e}")
 
     def fetch(self):
         lat, lon = self.fetch_coordinates()
@@ -86,18 +82,12 @@ class Source:
             list_items = soup.find_all("li")
 
             if not list_items:
-                _LOGGER.warning(
-                    f"No list items found in schedule HTML: {schedule_html}"
-                )
+                _LOGGER.warning(f"No list items found in schedule HTML: {schedule_html}")
                 continue
 
             for item in list_items:
                 collection_type_tag = item.find("b")
-                collection_type_text = (
-                    collection_type_tag.get_text().strip()
-                    if collection_type_tag
-                    else "Unknown"
-                )
+                collection_type_text = collection_type_tag.get_text().strip() if collection_type_tag else "Unknown"
                 collection_type_text = collection_type_text.removesuffix("only").strip()
 
                 br_tag = item.find("br")
@@ -105,9 +95,7 @@ class Source:
                     date_str = br_tag.next_sibling.strip()
 
                     try:
-                        date = datetime.datetime.strptime(
-                            date_str, "%A %d %b %Y"
-                        ).date()
+                        date = datetime.datetime.strptime(date_str, "%A %d %b %Y").date()
                     except ValueError:
                         _LOGGER.error(f"Date parsing error for value: {date_str}")
                         continue
@@ -123,8 +111,6 @@ class Source:
                         )
 
         if not entries:
-            raise ValueError(
-                f"No collection entries found for address: {self._address}"
-            )
+            raise ValueError(f"No collection entries found for address: {self._address}")
 
         return entries

@@ -764,13 +764,14 @@ def update_json(
                     continue
                 description = languages[lang]
                 # Remove URLs from data descriptions
-                cleaned_description, _ = extract_urls_from_text(description)
-                translations["config"]["step"][f"args_{module}"]["data_description"][
-                    param
-                ] = cleaned_description
-                translations["config"]["step"][f"reconfigure_{module}"][
-                    "data_description"
-                ][param] = cleaned_description
+                if description is not None:
+                    cleaned_description, _ = extract_urls_from_text(description)
+                    translations["config"]["step"][f"args_{module}"]["data_description"][
+                        param
+                    ] = cleaned_description
+                    translations["config"]["step"][f"reconfigure_{module}"][
+                        "data_description"
+                    ][param] = cleaned_description
 
             module_howto = source_howto.get(module, {})
 

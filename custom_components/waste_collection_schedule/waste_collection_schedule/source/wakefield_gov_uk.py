@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import List
 
 import requests
 from bs4 import BeautifulSoup
@@ -37,7 +36,7 @@ class Source:
     def __init__(self, uprn):
         self._uprn = uprn
 
-    def fetch(self) -> List[Collection]:
+    def fetch(self) -> list[Collection]:
         entries = []
         with requests.Session() as sess:
             url = "https://www.wakefield.gov.uk/where-i-live/"  # the a parameter is needed for page to load but contents doesn't matter
@@ -52,11 +51,7 @@ class Source:
                     if ", " not in collection.text:
                         continue
                     try:
-                        collection_dates.add(
-                            datetime.strptime(
-                                collection.text.split(", ")[1].strip(), "%d %B %Y"
-                            ).date()
-                        )
+                        collection_dates.add(datetime.strptime(collection.text.split(", ")[1].strip(), "%d %B %Y").date())
                     except ValueError:
                         pass
                 for collection_date in collection_dates:
@@ -71,9 +66,7 @@ class Source:
                 for element in list_elements:
                     entries.append(
                         Collection(
-                            date=datetime.strptime(
-                                element.text.split(", ")[1].strip(), "%d %B %Y"
-                            ).date(),
+                            date=datetime.strptime(element.text.split(", ")[1].strip(), "%d %B %Y").date(),
                             t=TYPES[bin_type]["alias"],
                             icon=TYPES[bin_type]["icon"],
                         )

@@ -10,12 +10,8 @@ TITLE = "Yarra Ranges Council"
 DESCRIPTION = "Source for Yarra Ranges Council rubbish collection."
 URL = "https://www.yarraranges.vic.gov.au"
 TEST_CASES = {
-    "Petstock Lilydale": {
-        "street_address": "5/447-449 Maroondah Highway Lilydale 3140"
-    },
-    "Beechworth Bakery Healesville": {
-        "street_address": "316 Maroondah Highway Healesville 3777"
-    },
+    "Petstock Lilydale": {"street_address": "5/447-449 Maroondah Highway Lilydale 3140"},
+    "Beechworth Bakery Healesville": {"street_address": "316 Maroondah Highway Healesville 3777"},
 }
 
 _LOGGER = logging.getLogger(__name__)
@@ -45,10 +41,7 @@ class Source:
         )
         response.raise_for_status()
         addressSearchApiResults = response.json()
-        if (
-            addressSearchApiResults["Items"] is None
-            or len(addressSearchApiResults["Items"]) < 1
-        ):
+        if addressSearchApiResults["Items"] is None or len(addressSearchApiResults["Items"]) < 1:
             raise Exception(
                 f"Address search for '{self._street_address}' returned no results. Check your address on https://www.yarraranges.vic.gov.au/Environment/Waste/Find-your-waste-collection-and-burning-off-dates"
             )
@@ -78,16 +71,12 @@ class Source:
             if waste_type == "Burning off":
                 continue
 
-            next_pickup = (
-                article.find("div", {"class": "next-service"}).getText().strip()
-            )
+            next_pickup = article.find("div", {"class": "next-service"}).getText().strip()
 
             if not re.match(r"[^\s]* \d{1,2}\/\d{1,2}\/\d{4}", next_pickup):
                 continue
 
-            next_pickup_date = datetime.strptime(
-                next_pickup.split(sep=" ")[1], "%d/%m/%Y"
-            ).date()
+            next_pickup_date = datetime.strptime(next_pickup.split(sep=" ")[1], "%d/%m/%Y").date()
 
             if next_pickup_date is None or waste_type is None:
                 continue

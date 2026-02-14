@@ -93,14 +93,9 @@ class Source:
 
         if error:
             raise error
-        raise Exception(
-            "No data found for the postcode"
-            + (", tired multiple zipcode, entries" if len(items) > 1 else "")
-        )
+        raise Exception("No data found for the postcode" + (", tired multiple zipcode, entries" if len(items) > 1 else ""))
 
-    def _fetch_zipcode(
-        self, zipcodeId: str, url: str, headers: dict[str, str]
-    ) -> list[Collection]:
+    def _fetch_zipcode(self, zipcodeId: str, url: str, headers: dict[str, str]) -> list[Collection]:
         params = {"q": self._steet_search, "zipcodes": zipcodeId}
         r = requests.post(f"{url}/streets", params=params, headers=headers)
         r.raise_for_status()
@@ -113,9 +108,7 @@ class Source:
             if item["name"].lower().strip() == self._street.lower().strip():
                 streetId = item["id"]
         if streetId is None:
-            _LOGGER.warning(
-                f"No exact street match found, using first result: {r.json()['items'][0]['name']}"
-            )
+            _LOGGER.warning(f"No exact street match found, using first result: {r.json()['items'][0]['name']}")
             streetId = items[0]["id"]
 
         now = datetime.now()

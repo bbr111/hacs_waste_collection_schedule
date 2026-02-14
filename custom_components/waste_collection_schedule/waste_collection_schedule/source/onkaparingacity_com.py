@@ -27,12 +27,9 @@ class Source:
         self._address = address
 
     def fetch(self):
-
         params = {"keywords": self._address}
 
-        r = requests.get(
-            f"{API_URL}/api/v1/myarea/search", params=params, headers=HEADERS
-        )
+        r = requests.get(f"{API_URL}/api/v1/myarea/search", params=params, headers=HEADERS)
         r.raise_for_status()
 
         addresses = r.json()

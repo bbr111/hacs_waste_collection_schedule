@@ -49,9 +49,7 @@ class Source:
                     if match:
                         entries.append(
                             Collection(
-                                date=datetime.strptime(
-                                    match.group(1), "%d %B %Y"
-                                ).date(),
+                                date=datetime.strptime(match.group(1), "%d %B %Y").date(),
                                 t=waste,
                                 icon=ICON_MAP.get(waste.upper()),
                             )

@@ -1,7 +1,7 @@
-import requests
 import json
-
 from datetime import datetime
+
+import requests
 from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 
 TITLE = "Warrington Borough Council"
@@ -29,7 +29,6 @@ class Source:
         self._uprn = str(uprn).zfill(12)
 
     def fetch(self):
-
         s = requests.Session()
         r = s.get(f"https://www.warrington.gov.uk/bin-collections/get-jobs/{self._uprn}", headers=HEADERS)
         json_data = json.loads(r.text)
@@ -47,14 +46,18 @@ class Source:
                 continue
 
             # List contains duplicates, so skip if already added.
-            if self.contains(entries, lambda x: x.date == datetime.strptime(job["ScheduledStart"], "%Y-%m-%dT%H:00:00").date() and x.type == bin_type):
+            if self.contains(
+                entries,
+                lambda x: x.date == datetime.strptime(job["ScheduledStart"], "%Y-%m-%dT%H:00:00").date()
+                and x.type == bin_type,
+            ):
                 continue
 
             entries.append(
                 Collection(
                     date=datetime.strptime(job["ScheduledStart"], "%Y-%m-%dT%H:00:00").date(),
                     t=bin_type,
-                    icon=ICON_MAP.get(bin_type.upper())
+                    icon=ICON_MAP.get(bin_type.upper()),
                 )
             )
 

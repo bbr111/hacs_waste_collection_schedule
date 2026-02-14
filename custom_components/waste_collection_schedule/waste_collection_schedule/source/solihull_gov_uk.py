@@ -65,13 +65,8 @@ class Source:
                     try:
                         # card sibling with no class
                         freq_str = card.find_next_sibling()
-                        if not (
-                            "every other week" in freq_str.text.lower()
-                            or "every week" in freq_str.text.lower()
-                        ):
-                            _LOGGER.info(
-                                f"Skipping predict (unknown frequency) for {freq_str.text}"
-                            )
+                        if not ("every other week" in freq_str.text.lower() or "every week" in freq_str.text.lower()):
+                            _LOGGER.info(f"Skipping predict (unknown frequency) for {freq_str.text}")
                             continue
 
                         freq = 2 if "every other week" in freq_str.text.lower() else 1

@@ -1,6 +1,6 @@
 import calendar
 import re
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import requests
 from dateutil.rrule import (
@@ -239,7 +239,7 @@ EXTRA_INFO = [
     {
         "title": "Métropole Européenne de Lille",
         "url": "https://www.lillemetropole.fr/",
-        "default_params": {"instance_id": 875}
+        "default_params": {"instance_id": 875},
     },
 ]
 
@@ -278,9 +278,7 @@ class Source:
 
         data = response.json()[0]["data"]["features"]
         if not data:
-            raise SourceArgumentException(
-                "address", "No results found for the given address and INSEE code"
-            )
+            raise SourceArgumentException("address", "No results found for the given address and INSEE code")
 
         lat, lon = data[0]["geometry"]["coordinates"]
         return {
@@ -302,9 +300,7 @@ class Source:
         response = requests.get(api_url, params=params)
 
         if response.status_code != 200:
-            raise Exception(
-                f"Error fetching data from {api_url}: {response.status_code}"
-            )
+            raise Exception(f"Error fetching data from {api_url}: {response.status_code}")
 
         return self._sanitize_response(response.json())
 
@@ -406,9 +402,7 @@ class Source:
         return any(month in input_string for month in _CALENDAR_MONTHS_ABBR)
 
     def _parse_month(self, input_string):
-        input_string = input_string.replace(
-            ":", ""
-        )  # match some actual cases in production
+        input_string = input_string.replace(":", "")  # match some actual cases in production
         if "-" in input_string:
             start_month, end_month = input_string.split("-")
             month_list = list(
@@ -418,10 +412,7 @@ class Source:
                 )
             )
         else:
-            month_list = [
-                _CALENDAR_MONTHS_ABBR.index(month) + 1
-                for month in input_string.split(",")
-            ]
+            month_list = [_CALENDAR_MONTHS_ABBR.index(month) + 1 for month in input_string.split(",")]
 
         return {"bymonth": month_list}
 
@@ -442,8 +433,8 @@ class Source:
             end_year = start_year
 
         return {
-            "dtstart": datetime(start_year, 1, 1, tzinfo=timezone.utc),
-            "until": datetime(end_year, 12, 31, tzinfo=timezone.utc),
+            "dtstart": datetime(start_year, 1, 1, tzinfo=UTC),
+            "until": datetime(end_year, 12, 31, tzinfo=UTC),
         }
 
     def _parse_part(self, part):
@@ -503,8 +494,8 @@ class Source:
 
     def _parse_date_range(self, input_string):
         """Parse a date range such as "2024 Jan 01-2024 May 12" and return the corresponding kwargs to rrule constructor."""
-        start_date = datetime.strptime(input_string.split('-')[0], "%Y %b %d").astimezone(timezone.utc)
-        end_date = datetime.strptime(input_string.split('-')[1], "%Y %b %d").astimezone(timezone.utc)
+        start_date = datetime.strptime(input_string.split("-")[0], "%Y %b %d").astimezone(UTC)
+        end_date = datetime.strptime(input_string.split("-")[1], "%Y %b %d").astimezone(UTC)
         return {"dtstart": start_date, "until": end_date}
 
     def _parse_regular(self, schedule):
@@ -537,15 +528,11 @@ class Source:
             "2024,2025 week 1-17,19-52 Mo,We,Fr 14:00-18:00"
             "2024 Jan 01-2024 May 12 week 01-53/2 Mo"
         """
-        start_date = (
-            datetime.strptime(schedule["start_at"], "%Y-%m-%dT%H:%M:%S.%f%z")
-            if schedule["start_at"]
-            else None
-        )
+        start_date = datetime.strptime(schedule["start_at"], "%Y-%m-%dT%H:%M:%S.%f%z") if schedule["start_at"] else None
         if schedule["end_at"]:
             end_date = datetime.strptime(schedule["end_at"], "%Y-%m-%dT%H:%M:%S.%f%z")
         else:
-            end_date = datetime.now(timezone.utc) + timedelta(days=365)
+            end_date = datetime.now(UTC) + timedelta(days=365)
 
         opening_hours = schedule["opening_hours"]
 

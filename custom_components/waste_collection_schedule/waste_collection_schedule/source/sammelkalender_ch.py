@@ -108,9 +108,7 @@ class Source:
     ) -> None:
         service_provider_str = service_provider.lower()
         if service_provider not in SERVICES:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "service_provider", service_provider, list(SERVICES.keys())
-            )
+            raise SourceArgumentNotFoundWithSuggestions("service_provider", service_provider, list(SERVICES.keys()))
         self._search_url = SERVICES[service_provider_str]["api_url_search"]
         self._bin_url = SERVICES[service_provider_str]["api_url_bin"]
 
@@ -127,11 +125,9 @@ class Source:
             s2 = [s2]
 
         for s in s2:
-            if s1.lower().replace(" ", "").replace("str.", "straße").replace(
-                "strasse", "straße"
-            ) == s.lower().replace(" ", "").replace("str.", "straße").replace(
-                "strasse", "straße"
-            ):
+            if s1.lower().replace(" ", "").replace("str.", "straße").replace("strasse", "straße") == s.lower().replace(
+                " ", ""
+            ).replace("str.", "straße").replace("strasse", "straße"):
                 return True
         return False
 
@@ -162,12 +158,8 @@ class Source:
             return
         for sage in sages:
             if not self._street:
-                street_names = list(
-                    {s.get("STRname") or s.get("SAGEname") for s in sages}
-                )
-                raise SourceArgumentRequiredWithSuggestions(
-                    "street", "Street required for this municipality", street_names
-                )
+                street_names = list({s.get("STRname") or s.get("SAGEname") for s in sages})
+                raise SourceArgumentRequiredWithSuggestions("street", "Street required for this municipality", street_names)
             if self._compare(self._street, [sage["SAGEabk"], sage["SAGEname"]]):
                 self._address_id = sage["SAGEid"]
                 break
@@ -180,14 +172,9 @@ class Source:
 
     def _fetch_street(self) -> None:
         streets = self._get_streets()
-        
+
         # switch to Sammelgebiete if API either returns no streets or one dummy street
-        if (
-            not streets
-            or len(streets) == 1
-            and streets[0].get("STRname") is None
-            and streets[0].get("SAGEid") is not None
-        ):
+        if not streets or len(streets) == 1 and streets[0].get("STRname") is None and streets[0].get("SAGEid") is not None:
             self._fetch_sage()
             return
 
@@ -197,20 +184,14 @@ class Source:
             street_matches = streets
         else:
             if not self._street:
-                street_names = list(
-                    {s.get("STRname") or s.get("SAGEname") for s in streets}
-                )
-                raise SourceArgumentRequiredWithSuggestions(
-                    "street", "Street required for this municipality", street_names
-                )
+                street_names = list({s.get("STRname") or s.get("SAGEname") for s in streets})
+                raise SourceArgumentRequiredWithSuggestions("street", "Street required for this municipality", street_names)
             for street in streets:
                 if self._compare(street["STRname"], self._street):
                     street_matches.append(street)
 
         if not street_matches:
-            raise ValueError(
-                f"Invalid street: {self._street}, use one of {list({s['STRname'] for s in streets})}"
-            )
+            raise ValueError(f"Invalid street: {self._street}, use one of {list({s['STRname'] for s in streets})}")
 
         for street in street_matches:
             if not street["STRhausnr"]:
@@ -249,9 +230,7 @@ class Source:
                 self._municipality_id = mun["GEMid"]
                 break
         if not self._municipality_id:
-            raise ValueError(
-                f"Invalid municipality: {self._municipality}, use one of {[m['GEMname'] for m in r.json()]}"
-            )
+            raise ValueError(f"Invalid municipality: {self._municipality}, use one of {[m['GEMname'] for m in r.json()]}")
 
         self._fetch_street()
 

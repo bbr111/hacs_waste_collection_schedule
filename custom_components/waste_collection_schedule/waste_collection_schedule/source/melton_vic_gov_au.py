@@ -31,11 +31,9 @@ class Source:
 
     def fetch(self):
         session = requests.Session()
-        headers = {
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-        }
+        headers = {"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "}
         session.headers.update(headers)
-        
+
         response = session.get("https://www.melton.vic.gov.au/Home")
         response = session.get("https://www.melton.vic.gov.au/Home")
         response.raise_for_status()
@@ -49,10 +47,7 @@ class Source:
         )
         response.raise_for_status()
         addressSearchApiResults = response.json()
-        if (
-            addressSearchApiResults["Items"] is None
-            or len(addressSearchApiResults["Items"]) < 1
-        ):
+        if addressSearchApiResults["Items"] is None or len(addressSearchApiResults["Items"]) < 1:
             raise Exception(
                 f"Address search for '{self._street_address}' returned no results. Check your address on https://www.melton.vic.gov.au/My-Area"
             )
@@ -80,11 +75,7 @@ class Source:
             icon = ICON_MAP.get(waste_type)
             next_pickup = article.find(class_="next-service").string.strip()
             if re.match(r"[^\s]* \d{1,2}\/\d{1,2}\/\d{4}", next_pickup):
-                next_pickup_date = datetime.strptime(
-                    next_pickup.split(sep=" ")[1], "%d/%m/%Y"
-                ).date()
-                entries.append(
-                    Collection(date=next_pickup_date, t=waste_type, icon=icon)
-                )
+                next_pickup_date = datetime.strptime(next_pickup.split(sep=" ")[1], "%d/%m/%Y").date()
+                entries.append(Collection(date=next_pickup_date, t=waste_type, icon=icon))
 
         return entries

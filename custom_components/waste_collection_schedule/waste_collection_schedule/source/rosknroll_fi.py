@@ -79,17 +79,9 @@ class Source:
                     if service["tariff"].get("productgroup", "PER") == "PER":
                         continue
                     next_date_str = None
-                    if (
-                        "ASTSeurTyhj" in service
-                        and service["ASTSeurTyhj"] is not None
-                        and len(service["ASTSeurTyhj"]) > 0
-                    ):
+                    if "ASTSeurTyhj" in service and service["ASTSeurTyhj"] is not None and len(service["ASTSeurTyhj"]) > 0:
                         next_date_str = service["ASTSeurTyhj"]
-                    elif (
-                        "ASTNextDate" in service
-                        and service["ASTNextDate"] is not None
-                        and len(service["ASTNextDate"]) > 0
-                    ):
+                    elif "ASTNextDate" in service and service["ASTNextDate"] is not None and len(service["ASTNextDate"]) > 0:
                         next_date_str = service["ASTNextDate"]
 
                     if next_date_str is None:

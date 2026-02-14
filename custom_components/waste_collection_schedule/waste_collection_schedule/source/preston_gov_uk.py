@@ -1,5 +1,4 @@
 from datetime import date, datetime
-from typing import Optional
 
 from bs4 import BeautifulSoup
 from requests import Session
@@ -8,9 +7,7 @@ from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 TITLE = "Preston City Council"
 DESCRIPTION = "Source for preston.gov.uk services for Preston City Council, UK."
 URL = "https://preston.gov.uk"
-SRV_URL = (
-    "https://selfservice.preston.gov.uk/service/Forms/FindMyNearest.aspx?Service=bins"
-)
+SRV_URL = "https://selfservice.preston.gov.uk/service/Forms/FindMyNearest.aspx?Service=bins"
 
 TEST_CASES = {
     "Test_001": {"street": "town hall, lancaster road"},
@@ -100,12 +97,12 @@ class Source:
         return self._parse(bs)
 
     @staticmethod
-    def _entries(entries, header: str, date_obj: date, ico: Optional[str]):
+    def _entries(entries, header: str, date_obj: date, ico: str | None):
         entries.append(Collection(t=header, date=date_obj, icon=ico))
         return entries
 
     @staticmethod
-    def _date(date_string: str) -> Optional[date]:
+    def _date(date_string: str) -> date | None:
         try:
             return datetime.strptime(date_string, "%A %d/%m/%Y").date()
         except ValueError:

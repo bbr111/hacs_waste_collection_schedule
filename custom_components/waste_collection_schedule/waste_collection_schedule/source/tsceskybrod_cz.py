@@ -130,16 +130,12 @@ street_groups = {
 
 def normalize_string(s):
     """Remove accents from a string for case-insensitive and accent-insensitive comparison."""
-    return "".join(
-        c for c in unicodedata.normalize("NFKD", s) if not unicodedata.combining(c)
-    ).lower()
+    return "".join(c for c in unicodedata.normalize("NFKD", s) if not unicodedata.combining(c)).lower()
 
 
 # Create a lookup dictionary for street-to-weekday mapping (without accents)
 street_collection_weekdays = {
-    normalize_string(street): weekday
-    for weekday, streets in street_groups.items()
-    for street in streets
+    normalize_string(street): weekday for weekday, streets in street_groups.items() for street in streets
 }
 
 
@@ -201,17 +197,11 @@ class Source:
                     # Bio waste collected every first even week in month (from December to March)
                     (even_week and current_date.day <= 14)
                 ):
-                    entries.append(
-                        Collection(current_date, "Biologický odpad", icon="mdi:leaf")
-                    )
+                    entries.append(Collection(current_date, "Biologický odpad", icon="mdi:leaf"))
 
             # Paper waste is collected every odd week on Wednesday
             if current_date.weekday() == calendar.WEDNESDAY and odd_week:
-                entries.append(
-                    Collection(
-                        current_date, "Papír a lepenka", icon="mdi:package-variant"
-                    )
-                )
+                entries.append(Collection(current_date, "Papír a lepenka", icon="mdi:package-variant"))
 
             # Plastic waste is collected every even week on Thursday
             if current_date.weekday() == calendar.THURSDAY and even_week:

@@ -68,14 +68,7 @@ class Source:
         self._street = street
 
     def make_request(self, clientid, location_id, endpoint="?includeChildren=true"):
-        url = (
-            URL
-            + "/api-portal/mandators/"
-            + clientid
-            + "/cal/location/"
-            + location_id
-            + endpoint
-        )
+        url = URL + "/api-portal/mandators/" + clientid + "/cal/location/" + location_id + endpoint
         r = requests.get(url)
         r.raise_for_status()
         return r.json()
@@ -122,23 +115,17 @@ class Source:
         configid = config["calendarRootLocationId"]
 
         # get city list
-        cityid, cisFinal = self.get_data(
-            clientid, configid, self._city, "Sorry, no city found"
-        )
+        cityid, cisFinal = self.get_data(clientid, configid, self._city, "Sorry, no city found")
 
         # get district list(optional)
         districtid = cityid
         if self._district is not None and not cisFinal:
-            districtid, disFinal = self.get_data(
-                clientid, cityid, self._district, "Sorry, no district found"
-            )
+            districtid, disFinal = self.get_data(clientid, cityid, self._district, "Sorry, no district found")
 
         # get street list(optional)
         streetid = districtid
         if self._street is not None and not disFinal:
-            streetid, _ = self.get_data(
-                clientid, districtid, self._street, "Sorry, no street found"
-            )
+            streetid, _ = self.get_data(clientid, districtid, self._street, "Sorry, no street found")
 
         # get pickups
         pickups = self.make_request(clientid, streetid, endpoint="/pickups")

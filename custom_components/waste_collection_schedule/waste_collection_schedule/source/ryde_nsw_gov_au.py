@@ -49,9 +49,7 @@ ICON_MAP = {
 
 
 class Source:
-    def __init__(
-        self, post_code: str, suburb: str, street_name: str, street_number: str
-    ):
+    def __init__(self, post_code: str, suburb: str, street_name: str, street_number: str):
         self.post_code = post_code
         self.suburb = suburb
         self.street_name = street_name
@@ -60,14 +58,10 @@ class Source:
     def fetch(self):
         locationId = 0
 
-        address = "{} {} {} {}".format(
-            self.street_number, self.street_name, self.suburb, self.post_code
-        )
+        address = f"{self.street_number} {self.street_name} {self.suburb} {self.post_code}"
 
         # Retrieve suburbs
-        r = requests.get(
-            API_URLS["address_search"], params={"keywords": address}, headers=HEADERS
-        )
+        r = requests.get(API_URLS["address_search"], params={"keywords": address}, headers=HEADERS)
 
         data = json.loads(r.text)
 
@@ -77,9 +71,7 @@ class Source:
             break
 
         if locationId == 0:
-            raise Exception(
-                f"Could not find address: {self.street_number} {self.street_name}, {self.suburb} {self.post_code}"
-            )
+            raise Exception(f"Could not find address: {self.street_number} {self.street_name}, {self.suburb} {self.post_code}")
 
         # Retrieve the upcoming collections for our property
         r = requests.get(
@@ -106,9 +98,7 @@ class Source:
 
             try:
                 # Strip carriage returns and newlines out of the HTML content
-                cleaned_date_text = (
-                    date_text.text.replace("\r", "").replace("\n", "").strip()
-                )
+                cleaned_date_text = date_text.text.replace("\r", "").replace("\n", "").strip()
 
                 # Parse the date
                 date = datetime.datetime.strptime(cleaned_date_text, date_format).date()

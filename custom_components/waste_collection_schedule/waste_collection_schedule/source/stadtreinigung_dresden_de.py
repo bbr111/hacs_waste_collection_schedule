@@ -18,7 +18,6 @@ class Source:
         self._ics = ICS()
 
     def fetch(self):
-
         now = datetime.datetime.now().date()
 
         r = requests.get(

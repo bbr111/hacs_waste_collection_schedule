@@ -2,7 +2,8 @@ import datetime
 import importlib
 import logging
 import traceback
-from typing import Dict, Iterable, List, Optional, Protocol
+from collections.abc import Iterable
+from typing import Protocol
 
 from .collection import Collection
 
@@ -10,8 +11,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class Fetchable(Protocol):
-    def fetch(self) -> list[Collection]:
-        ...
+    def fetch(self) -> list[Collection]: ...
 
 
 class SourceModule(Protocol):
@@ -75,7 +75,7 @@ class Customize:
         return f"Customize{{waste_type={self._waste_type}, alias={self._alias}, show={self._show}, icon={self._icon}, picture={self._picture}}}"
 
 
-def filter_function(entry: Collection, customize: Dict[str, Customize]):
+def filter_function(entry: Collection, customize: dict[str, Customize]):
     c = customize.get(entry.type)
     if c is None:
         return True
@@ -83,7 +83,7 @@ def filter_function(entry: Collection, customize: Dict[str, Customize]):
         return c.show
 
 
-def customize_function(entry: Collection, customize: Dict[str, Customize]):
+def customize_function(entry: Collection, customize: dict[str, Customize]):
     c = customize.get(entry.type)
     if c is not None:
         if c.alias is not None:
@@ -104,11 +104,11 @@ class SourceShell:
     def __init__(
         self,
         source: Fetchable,
-        customize: Dict[str, Customize],
+        customize: dict[str, Customize],
         title: str,
         description: str,
-        url: Optional[str],
-        calendar_title: Optional[str],
+        url: str | None,
+        calendar_title: str | None,
         unique_id: str,
         day_offset: int,
     ):
@@ -120,7 +120,7 @@ class SourceShell:
         self._calendar_title = calendar_title
         self._unique_id = unique_id
         self._refreshtime: datetime.datetime | None = None
-        self._entries: List[Collection] = []
+        self._entries: list[Collection] = []
         self._day_offset = day_offset
 
     @property
@@ -157,9 +157,7 @@ class SourceShell:
             # fetch returns a list of Collection's
             entries: Iterable[Collection] = self._source.fetch()
         except Exception:
-            _LOGGER.error(
-                f"fetch failed for source {self._title}:\n{traceback.format_exc()}"
-            )
+            _LOGGER.error(f"fetch failed for source {self._title}:\n{traceback.format_exc()}")
             return
         self._refreshtime = datetime.datetime.now()
 
@@ -207,25 +205,19 @@ class SourceShell:
     @staticmethod
     def create(
         source_name: str,
-        customize: Dict[str, Customize],
+        customize: dict[str, Customize],
         source_args,
-        calendar_title: Optional[str] = None,
+        calendar_title: str | None = None,
         day_offset: int = 0,
     ) -> "SourceShell | None":
         # load source module
         try:
-            source_module: SourceModule = importlib.import_module(
-                f"waste_collection_schedule.source.{source_name}"
-            )
+            source_module: SourceModule = importlib.import_module(f"waste_collection_schedule.source.{source_name}")
         except ImportError as e:
-            if str(e).startswith(
-                f"No module named 'waste_collection_schedule.source.{source_name}'"
-            ):
+            if str(e).startswith(f"No module named 'waste_collection_schedule.source.{source_name}'"):
                 _LOGGER.error(f"source not found: {source_name}")
             else:
-                _LOGGER.error(
-                    f"error loading source {source_name}:\n{e} \n{traceback.format_exc()}"
-                )
+                _LOGGER.error(f"error loading source {source_name}:\n{e} \n{traceback.format_exc()}")
             return None
 
         # create source

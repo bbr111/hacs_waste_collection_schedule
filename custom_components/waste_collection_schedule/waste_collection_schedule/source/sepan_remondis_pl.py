@@ -1,9 +1,9 @@
 import datetime
 import json
 import logging
-import xml.etree.ElementTree
 
 import requests
+from defusedxml.ElementTree import fromstring
 from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 from waste_collection_schedule.exceptions import (
     SourceArgumentNotFoundWithSuggestions,
@@ -16,7 +16,7 @@ TEST_CASES = {
     "Street Name": {
         "city": "Poznań",
         "street_name": "ŚWIĘTY MARCIN",
-        "street_number": "1",
+        "street_number": "2",
     },
 }
 
@@ -56,9 +56,7 @@ class Source:
         try:
             return self.get_data(API_URL.format(datetime.datetime.now().year))
         except Exception:
-            _LOGGER.debug(
-                f"fetch failed for source {TITLE}: trying different API_URL ..."
-            )
+            _LOGGER.debug(f"fetch failed for source {TITLE}: trying different API_URL ...")
             return self.get_data(API_URL.format(""))
 
     def get_data(self, api_url):
@@ -70,9 +68,7 @@ class Source:
             if item["value"] == self._city:
                 city_id = item["id"]
         if city_id == 0:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "city", self._city, [item["value"] for item in cities]
-            )
+            raise SourceArgumentNotFoundWithSuggestions("city", self._city, [item["value"] for item in cities])
 
         r = requests.get(f"{api_url}/addresses/streets/{city_id}")
         r.raise_for_status()
@@ -82,9 +78,7 @@ class Source:
             if item["value"] == self._street_name:
                 street_id = item["id"]
         if street_id == 0:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "street_name", self._street_name, [item["value"] for item in streets]
-            )
+            raise SourceArgumentNotFoundWithSuggestions("street_name", self._street_name, [item["value"] for item in streets])
 
         r = requests.get(f"{api_url}/addresses/numbers/{city_id}/{street_id}")
         r.raise_for_status()
@@ -109,7 +103,7 @@ class Source:
         r = requests.get(report["filePath"])
         r.raise_for_status()
         table = r.text[r.text.find("<table") : r.text.rfind("</table>") + 8]
-        tree = xml.etree.ElementTree.fromstring(table)
+        tree = fromstring(table)
         year = datetime.date.today().year
 
         entries = []

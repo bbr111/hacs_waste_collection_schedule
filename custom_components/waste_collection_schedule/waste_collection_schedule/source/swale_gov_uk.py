@@ -11,9 +11,7 @@ URL = "https://swale.gov.uk"
 HEADERS = {
     "User-Agent": "Mozilla/5.0",
 }
-API_URL = (
-    "https://swale.gov.uk/bins-littering-and-the-environment/bins/my-collection-day"
-)
+API_URL = "https://swale.gov.uk/bins-littering-and-the-environment/bins/my-collection-day"
 ICON_MAP = {
     "Refuse": "mdi:trash-can",
     "Recycling": "mdi:recycle",
@@ -106,9 +104,7 @@ class Source:
             # Try to extract actual date from string like "Tuesday, 14 April 2025"
             try:
                 # Remove the weekday part, e.g., "Monday, "
-                dt = raw_date.split("y, ")[
-                    -1
-                ].strip()  # This might still not work for all formats
+                dt = raw_date.split("y, ")[-1].strip()  # This might still not work for all formats
             except IndexError:
                 dt = "Unknown"
 

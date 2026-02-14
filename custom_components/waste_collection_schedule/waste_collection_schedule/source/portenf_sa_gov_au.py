@@ -67,9 +67,7 @@ class Source:
         self._house_number: str = str(house_number)
         self._unit_number: str = str(unit_number)
 
-    def __set_args(
-        self, soup: BeautifulSoup, event_taget=None, additional: dict = {}
-    ) -> dict:
+    def __set_args(self, soup: BeautifulSoup, event_taget=None, additional: dict = {}) -> dict:
         args = {
             "ctl00$MainContent$txtSuburb": self._suburb,
             "ctl00$MainContent$txtStreetName": self._street,
@@ -113,12 +111,7 @@ class Source:
 
         # If multiple addresses are found, try to find the one that matches the input and warn if there are multiple or none matches
         if len(selectable) > 1:
-            found = [
-                " ".join(
-                    [y.text for y in x.parent.parent.find_all("td")[1].find_all("span")]
-                )
-                for x in selectable
-            ]
+            found = [" ".join([y.text for y in x.parent.parent.find_all("td")[1].find_all("span")]) for x in selectable]
             using_index = 0
 
             match = False
@@ -139,9 +132,7 @@ class Source:
                     using_index = index
                     match = True
             if not match:
-                LOGGER.warning(
-                    f"no perfect address match found, using:{found[using_index]}"
-                )
+                LOGGER.warning(f"no perfect address match found, using:{found[using_index]}")
 
         # request first address
         args = self.__set_args(
@@ -171,12 +162,8 @@ class Source:
         today_div = soup.find("table", id="cal").find("td", class_="today")
 
         # if other-month is to_month
-        if (
-            "other-month" in today_div.attrs["class"]
-            and datetime.now().strftime("%B") == to_month
-        ) or (
-            "main-month" in today_div.attrs["class"]
-            and datetime.now().strftime("%B") == from_month
+        if ("other-month" in today_div.attrs["class"] and datetime.now().strftime("%B") == to_month) or (
+            "main-month" in today_div.attrs["class"] and datetime.now().strftime("%B") == from_month
         ):
             main_month, other_month = from_month, to_month
             main_year, other_year = from_year, to_year
@@ -188,13 +175,9 @@ class Source:
 
         calendar = soup.find("table", {"class": "collection-day-calendar"})
         # Iterate over all days with pickups
-        for pickup in calendar.find_all(
-            "div", {"class": re.compile(r"pickup|next-pickup")}
-        ):
+        for pickup in calendar.find_all("div", {"class": re.compile(r"pickup|next-pickup")}):
             parent_td = pickup.parent
-            month = (
-                main_month if "main-month" in parent_td.attrs["class"] else other_month
-            )
+            month = main_month if "main-month" in parent_td.attrs["class"] else other_month
             year = main_year if "main-month" in parent_td.attrs["class"] else other_year
             day = parent_td.find("div", {"class": "daynumber"}).text
 
@@ -204,8 +187,6 @@ class Source:
                 container_icon = ICON_MAP.get(container_type)
 
                 date = datetime.strptime(f"{year}-{month}-{day}", "%Y-%B-%d").date()
-                entries.append(
-                    Collection(date=date, t=container_type, icon=container_icon)
-                )
+                entries.append(Collection(date=date, t=container_type, icon=container_icon))
 
         return entries

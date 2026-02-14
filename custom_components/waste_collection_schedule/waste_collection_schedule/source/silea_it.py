@@ -23,6 +23,7 @@ ICON_MAP = {
     "UMIDO": "mdi:leaf",
 }
 
+
 class Source:
     def __init__(self, municipality, address):
         self._municipality = None
@@ -60,9 +61,7 @@ class Source:
 
         # Raise error if address is not found
         if self._address is None:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "address", self._address, [item["name"].title() for item in data]
-            )
+            raise SourceArgumentNotFoundWithSuggestions("address", self._address, [item["name"].title() for item in data])
 
     def fetch(self):
         entries = []
@@ -85,7 +84,7 @@ class Source:
             }
             resp = s.post(API, data=payload)
             month_data = resp.json()
-            
+
             for item in month_data:
                 try:
                     # use 'format' field, already in YYYY-MM-DD format
@@ -95,19 +94,11 @@ class Source:
                     collection_date = datetime.strptime(date_str, "%Y-%m-%d").date()
                 except Exception:
                     continue
-                
+
                 for service in item.get("services", []):
                     # Service name is something like "INDIFFERENZIATO" or "CARTA E CARTONE"
                     raw_name = service.get("service", "").strip()
-                
-                    entries.append(
-                        Collection(
-                            date=collection_date,
-                            t=raw_name.title(),
-                            icon=ICON_MAP.get(raw_name)
-                        )
-                    )
 
-
+                    entries.append(Collection(date=collection_date, t=raw_name.title(), icon=ICON_MAP.get(raw_name)))
 
         return entries

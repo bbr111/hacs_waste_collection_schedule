@@ -21,9 +21,7 @@ ICON_MAP = {
 
 def findUrl(zoneID):
     # Take Zone ID and find url to parse
-    r = requests.get(
-        f"https://www.shellharbourwaste.com.au/wp-json/rb_co/v1/get-waste-url?zone={zoneID}"
-    )
+    r = requests.get(f"https://www.shellharbourwaste.com.au/wp-json/rb_co/v1/get-waste-url?zone={zoneID}")
     r.raise_for_status
     d = r.json()
     return d["url"]

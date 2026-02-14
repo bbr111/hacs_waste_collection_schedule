@@ -34,9 +34,7 @@ class Source:
         if not self._uprn:
             raise SourceArgumentNotFound("uprn", "UPRN is required")
 
-        ics_url = API_URLS["collection"].format(
-            post_code=self._post_code, uprn=self._uprn
-        )
+        ics_url = API_URLS["collection"].format(post_code=self._post_code, uprn=self._uprn)
         r = requests.get(ics_url, timeout=10)
         r.raise_for_status()
 

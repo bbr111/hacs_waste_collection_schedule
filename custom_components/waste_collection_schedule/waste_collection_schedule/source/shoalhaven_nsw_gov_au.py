@@ -13,12 +13,8 @@ DESCRIPTION = "Source script for shoalhaven.nsw.gov.au"
 URL = "https://www.shoalhaven.nsw.gov.au/"
 TEST_CASES = {
     # Example Geolocation ID from the provided URL.
-    "Elizabeth Dr, VINCENTIA": {
-        "geolocation_id": "2ea7b0c7-b627-421d-8436-248b8da384b6"
-    },
-    "The Park Dr, SANCTUARY POINT": {
-        "geolocation_id": "b0b35bab-76c1-4b58-b609-115da3fa3829"
-    },
+    "Elizabeth Dr, VINCENTIA": {"geolocation_id": "2ea7b0c7-b627-421d-8436-248b8da384b6"},
+    "The Park Dr, SANCTUARY POINT": {"geolocation_id": "b0b35bab-76c1-4b58-b609-115da3fa3829"},
     "Station St, NOWRA": {"geolocation_id": "984061de-cd63-43f4-bbd3-694b4e8af4d5"},
 }
 
@@ -96,9 +92,7 @@ class Source:
 
         # Find all HTML blocks that represent a waste service result with a precise date.
         # This regex targets divs with both "waste-services-result" and "date-precise" classes.
-        waste_service_blocks = soup.find_all(
-            "div", class_=re.compile(r"\bwaste-services-result\b.*\bdate-precise\b")
-        )
+        waste_service_blocks = soup.find_all("div", class_=re.compile(r"\bwaste-services-result\b.*\bdate-precise\b"))
 
         for block in waste_service_blocks:
             waste_type_tag = block.find("h3")
@@ -114,9 +108,7 @@ class Source:
                 match = re.search(r"(\d{1,2}/\d{1,2}/\d{4})", next_service_text)
                 if match:
                     date_str = match.group(1)
-                    collection_date = datetime.datetime.strptime(
-                        date_str, "%d/%m/%Y"
-                    ).date()
+                    collection_date = datetime.datetime.strptime(date_str, "%d/%m/%Y").date()
 
                     entries.append(
                         Collection(
@@ -132,9 +124,7 @@ class Source:
                     )
             else:
                 # This case should also not be hit with the refined find_all.
-                _LOGGER.warning(
-                    f"Warning: 'date-precise' block missing h3 or next-service div: {block}"
-                )
+                _LOGGER.warning(f"Warning: 'date-precise' block missing h3 or next-service div: {block}")
 
         if not entries:
             # If no collection schedules were successfully parsed, raise an error.

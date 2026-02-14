@@ -36,13 +36,7 @@ class Source:
 
     def fetch(self):
         """Fetch using cloudscraper to bypass Cloudflare anti-bot protection"""
-        scraper = cloudscraper.create_scraper(
-            browser={
-                'browser': 'chrome',
-                'platform': 'windows',
-                'mobile': False
-            }
-        )
+        scraper = cloudscraper.create_scraper(browser={"browser": "chrome", "platform": "windows", "mobile": False})
 
         # Start a session with the target URL
         r = scraper.get(API_URL, timeout=30)
@@ -52,19 +46,13 @@ class Source:
         soup = BeautifulSoup(r.text, features="html.parser")
 
         # Extract form submission url and form data
-        form_url = soup.find(
-            "form", attrs={"id": "LOOKUPBINDATESBYADDRESSSKIPOUTOFREGION_FORM"}
-        )["action"]
+        form_url = soup.find("form", attrs={"id": "LOOKUPBINDATESBYADDRESSSKIPOUTOFREGION_FORM"})["action"]
         pageSessionId = soup.find(
             "input",
             attrs={"name": "LOOKUPBINDATESBYADDRESSSKIPOUTOFREGION_PAGESESSIONID"},
         )["value"]
-        sessionId = soup.find(
-            "input", attrs={"name": "LOOKUPBINDATESBYADDRESSSKIPOUTOFREGION_SESSIONID"}
-        )["value"]
-        nonce = soup.find(
-            "input", attrs={"name": "LOOKUPBINDATESBYADDRESSSKIPOUTOFREGION_NONCE"}
-        )["value"]
+        sessionId = soup.find("input", attrs={"name": "LOOKUPBINDATESBYADDRESSSKIPOUTOFREGION_SESSIONID"})["value"]
+        nonce = soup.find("input", attrs={"name": "LOOKUPBINDATESBYADDRESSSKIPOUTOFREGION_NONCE"})["value"]
 
         form_data = {
             "LOOKUPBINDATESBYADDRESSSKIPOUTOFREGION_PAGESESSIONID": pageSessionId,
@@ -95,32 +83,21 @@ class Source:
 
         entries = []
         for key in data["_PAGEORDER_"]:
-            soup = BeautifulSoup(
-                data[key]["COLLECTIONDETAILS2"], features="html.parser"
-            )
+            soup = BeautifulSoup(data[key]["COLLECTIONDETAILS2"], features="html.parser")
             for waste_type_div in soup.find_all("div", attrs={"class": "grid__cell"}):
-                waste_type = waste_type_div.find(
-                    "p", attrs={"class": "myaccount-block__title--bin"}
-                ).text.strip()
+                waste_type = waste_type_div.find("p", attrs={"class": "myaccount-block__title--bin"}).text.strip()
 
                 # Get date nodes from not garden waste
-                date_nodes = waste_type_div.find_all(
-                    "p", attrs={"class": "myaccount-block__date--bin"}
-                )
+                date_nodes = waste_type_div.find_all("p", attrs={"class": "myaccount-block__date--bin"})
 
                 # Get Both dates from Garden Waste
                 if date_nodes is None or len(date_nodes) == 0:
-                    date_nodes = [
-                        waste_type_div.find_all("p")[1].find_all("strong")[i]
-                        for i in range(2)
-                    ]
+                    date_nodes = [waste_type_div.find_all("p")[1].find_all("strong")[i] for i in range(2)]
 
                 for date_node in date_nodes:
                     try:
                         # Remove ordinal suffixes from date string
-                        date_string = re.sub(
-                            r"(?<=[0-9])(?:st|nd|rd|th)", "", date_node.text.strip()
-                        )
+                        date_string = re.sub(r"(?<=[0-9])(?:st|nd|rd|th)", "", date_node.text.strip())
                         date = datetime.strptime(date_string, "%a %d %B %Y").date()
                         entries.append(
                             Collection(

@@ -85,9 +85,7 @@ class Source:
 
         if len(building_data["Buildings"]) == 1:
             # support only first building match
-            building_id_matches = re.findall(
-                r"\(([0-9]+)\)", building_data["Buildings"][0]
-            )
+            building_id_matches = re.findall(r"\(([0-9]+)\)", building_data["Buildings"][0])
             if not building_id_matches or len(building_id_matches) == 0:
                 raise ValueError("No building id found")
             self._building_id = building_id_matches[0]
@@ -100,9 +98,9 @@ class Source:
             address, building_id_match = building.split(" (")
             addresses.append(address)
             building_id_match.removesuffix(")")
-            if address.lower().replace(" ", "").replace(
+            if address.lower().replace(" ", "").replace(",", "") == self._street_address.lower().replace(" ", "").replace(
                 ",", ""
-            ) == self._street_address.lower().replace(" ", "").replace(",", ""):
+            ):
                 perfect_matches.append((address, building_id_match))
 
         if len(perfect_matches) == 1:
@@ -113,9 +111,7 @@ class Source:
                 f"Multiple buildings found perfectly matching your search please use a building_id: {perfect_matches}"
             )
 
-        raise SourceArgAmbiguousWithSuggestions(
-            "street_address", self._street_address, addresses
-        )
+        raise SourceArgAmbiguousWithSuggestions("street_address", self._street_address, addresses)
 
     def fetch(self):
         if not self._building_id:

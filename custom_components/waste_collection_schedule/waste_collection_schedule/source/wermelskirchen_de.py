@@ -88,7 +88,5 @@ class Source:
         entries = []
         for d in dates:
             info = ICON_MAP.get(d[1], {"icon": None, "image": None})
-            entries.append(
-                Collection(d[0], d[1], picture=info["image"], icon=info["icon"])
-            )
+            entries.append(Collection(d[0], d[1], picture=info["image"], icon=info["icon"]))
         return entries

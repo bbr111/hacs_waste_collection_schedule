@@ -60,25 +60,15 @@ class Source:
                     # Garden waste requires a subscription and may not be available for all
                     continue
 
-                parsed_collection_date = datetime.strptime(
-                    self.__remove_ordinal_indicators(date_str), "%A %d %B"
-                )
+                parsed_collection_date = datetime.strptime(self.__remove_ordinal_indicators(date_str), "%A %d %B")
 
                 # The returned bin day does not include the year
-                collection_year = self.__resolve_bin_collection_year(
-                    parsed_collection_date.month
-                )
+                collection_year = self.__resolve_bin_collection_year(parsed_collection_date.month)
 
-                parsed_collection_date = parsed_collection_date.replace(
-                    year=collection_year
-                )
+                parsed_collection_date = parsed_collection_date.replace(year=collection_year)
 
                 icon = ICON_MAP.get(bin_type)
-                entries.append(
-                    Collection(
-                        date=parsed_collection_date.date(), t=bin_type, icon=icon
-                    )
-                )
+                entries.append(Collection(date=parsed_collection_date.date(), t=bin_type, icon=icon))
 
         if not entries:
             raise Exception("Unable to find any bin collection schedules")
@@ -90,9 +80,7 @@ class Source:
             raise Exception("Rother Disctrict Council returned an invalid response")
 
         if not bin_collection_data["success"]:
-            raise Exception(
-                "Rother Disctrict Council returned a non-successful response"
-            )
+            raise Exception("Rother Disctrict Council returned a non-successful response")
 
     def __remove_ordinal_indicators(self, original_str: str) -> str:
         return re.sub(r"(\d)(st|nd|rd|th)", r"\1", original_str)

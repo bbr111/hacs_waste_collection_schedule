@@ -1,4 +1,5 @@
 from datetime import datetime
+
 import requests
 from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 
@@ -25,7 +26,9 @@ class Source:
 
     def fetch(self):
         # Step 1: ArcGIS lookup to resolve address into coordinates & codes
-        query_url = "https://services6.arcgis.com/8L5sOwfzTAvcvQur/ArcGIS/rest/services/WasteServices4Bin/FeatureServer/0/query"
+        query_url = (
+            "https://services6.arcgis.com/8L5sOwfzTAvcvQur/ArcGIS/rest/services/WasteServices4Bin/FeatureServer/0/query"
+        )
         params = {
             "where": f"EZI_Address LIKE '{self.address}%'",
             "outFields": "EZI_Address,Waste_Rate_Code,Recycling_Rate_Code,FOGO_Rate_Code,Glass_Rate_Code,Day,Zone,GlassWeek",

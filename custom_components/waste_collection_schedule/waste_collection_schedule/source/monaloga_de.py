@@ -78,15 +78,11 @@ class Source:
 
         for option in options:
             street_name = option.text.split("(")[0].lower().strip()
-            if street_name == street_search and (
-                not self._plz or self._plz in option.text
-            ):
+            if street_name == street_search and (not self._plz or self._plz in option.text):
                 street_id = option["value"]
                 break
         if street_id is None:
-            raise ValueError(
-                f"Street PLZ combination not found: {self._street} with {self._plz}"
-            )
+            raise ValueError(f"Street PLZ combination not found: {self._street} with {self._plz}")
 
         args["form_ident"] = "1"
         args["a_street"] = street_id + "|" + self._street.strip()

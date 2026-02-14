@@ -15,7 +15,9 @@ TEST_CASES = {
 
 _LOGGER = logging.getLogger(__name__)
 
-API_URL = "https://www.schweinfurt.de/leben-freizeit/umwelt/abfallwirtschaft/4427.Aktuelle-Abfuhrtermine-und-Muellkalender.html"
+API_URL = (
+    "https://www.schweinfurt.de/leben-freizeit/umwelt/abfallwirtschaft/4427.Aktuelle-Abfuhrtermine-und-Muellkalender.html"
+)
 
 
 class Source:
@@ -57,15 +59,10 @@ class Source:
 
         entries = []
         for entry in data["contents"]:
-            if (
-                "Wertstoffhof" not in data["contents"][entry]["title"]
-                or self._showmobile
-            ):
+            if "Wertstoffhof" not in data["contents"][entry]["title"] or self._showmobile:
                 entries.append(
                     Collection(
-                        datetime.strptime(
-                            data["contents"][entry]["start"], "%Y-%m-%d %H:%M:%S"
-                        ).date(),
+                        datetime.strptime(data["contents"][entry]["start"], "%Y-%m-%d %H:%M:%S").date(),
                         data["contents"][entry]["title"],
                     )
                 )

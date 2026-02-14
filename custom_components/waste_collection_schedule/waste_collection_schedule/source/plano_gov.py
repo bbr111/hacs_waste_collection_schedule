@@ -80,15 +80,11 @@ PARAM_TRANSLATIONS = {  # Optional dict to translate the arguments, will be show
 
 
 class Source:
-    def __init__(
-        self, objectId: str, daysToGenerate: int = 3
-    ):  # argX correspond to the args dict in the source configuration
+    def __init__(self, objectId: str, daysToGenerate: int = 3):  # argX correspond to the args dict in the source configuration
         self.object_id = objectId
         self.trash_days_to_generate = (
             # the int check here could cause issues if the passed value isn't coercible to an int, but the UI presently does insist this be a number
-            daysToGenerate
-            if daysToGenerate is not None and int(daysToGenerate) > 0
-            else 3
+            daysToGenerate if daysToGenerate is not None and int(daysToGenerate) > 0 else 3
         )  # Default to 3 days if not provided
 
     def is_us_federal_holiday(self, check_date: date) -> bool:
@@ -111,11 +107,7 @@ class Source:
 
         # Helper to find last weekday in a month
         def last_weekday(month, weekday):
-            last_day = (
-                date(year, month + 1, 1) - timedelta(days=1)
-                if month < 12
-                else date(year, 12, 31)
-            )
+            last_day = date(year, month + 1, 1) - timedelta(days=1) if month < 12 else date(year, 12, 31)
             days_back = (last_day.weekday() - weekday + 7) % 7
             return last_day - timedelta(days=days_back)
 
@@ -152,15 +144,11 @@ class Source:
         resp = requests.get(API_URL, params=params)
 
         if resp.status_code != 200:
-            raise Exception(
-                f"Something went wrong in ArcGIS land: {resp.text}"
-            )  # DO NOT JUST return []
+            raise Exception(f"Something went wrong in ArcGIS land: {resp.text}")  # DO NOT JUST return []
 
         parsed_resp = resp.json()
         if "features" not in parsed_resp or len(parsed_resp["features"]) == 0:
-            raise Exception(
-                f"No data found for object ID {self.object_id}. Please check your object ID."
-            )
+            raise Exception(f"No data found for object ID {self.object_id}. Please check your object ID.")
 
         bulky_dates_str = [
             parsed_resp["features"][0]["attributes"]["BLKY_CURR"],
@@ -194,15 +182,11 @@ class Source:
 
         for i in range(int(self.trash_days_to_generate)):
             # Calculate the next trash day based on the current date and the trash day number
-            next_trash_day = self.next_weekday(
-                today + datetime.timedelta(weeks=i), trash_day_num
-            )
+            next_trash_day = self.next_weekday(today + datetime.timedelta(weeks=i), trash_day_num)
 
             # If the next trash day is a holiday, bump it to the next day
             if self.is_us_federal_holiday(next_trash_day):
-                logger.warning(
-                    f"Next trash day {next_trash_day} is a holiday, bumping to next day"
-                )
+                logger.warning(f"Next trash day {next_trash_day} is a holiday, bumping to next day")
                 next_trash_day += datetime.timedelta(days=1)
 
             next_trash_days.append(next_trash_day)
@@ -220,13 +204,8 @@ class Source:
         # bulky trash
         # bulky trash comes back as a month / day, so we need to tack on the year and get a date
 
-        bulky_dates_str = [
-            bulky + " " + str(curr_year) for bulky in bulky_dates_str
-        ]  # e.g. "January 1 2023"
-        bulky_dates = [
-            datetime.datetime.strptime(bulky, "%B %d %Y").date()
-            for bulky in bulky_dates_str
-        ]
+        bulky_dates_str = [bulky + " " + str(curr_year) for bulky in bulky_dates_str]  # e.g. "January 1 2023"
+        bulky_dates = [datetime.datetime.strptime(bulky, "%B %d %Y").date() for bulky in bulky_dates_str]
 
         ttype = "BULKY"
         for bulky_date in bulky_dates:
@@ -247,29 +226,19 @@ class Source:
 
         for recycle in recycle_dates_str:
             recycle_parts = recycle.split(",")
-            recycle_date = datetime.datetime.strptime(
-                recycle_parts[0] + " " + str(curr_year), "%B %d %Y"
-            ).date()
+            recycle_date = datetime.datetime.strptime(recycle_parts[0] + " " + str(curr_year), "%B %d %Y").date()
             recycle_dates.append(recycle_date)
             if len(recycle_parts) > 1:
                 recycle_dates.append(
                     datetime.datetime.strptime(
-                        str(recycle_date.month)
-                        + " "
-                        + recycle_parts[1]
-                        + " "
-                        + str(curr_year),
+                        str(recycle_date.month) + " " + recycle_parts[1] + " " + str(curr_year),
                         "%m %d %Y",
                     ).date()
                 )
             if len(recycle_parts) > 2:
                 recycle_dates.append(
                     datetime.datetime.strptime(
-                        str(recycle_date.month)
-                        + " "
-                        + recycle_parts[2]
-                        + " "
-                        + str(curr_year),
+                        str(recycle_date.month) + " " + recycle_parts[2] + " " + str(curr_year),
                         "%m %d %Y",
                     ).date()
                 )

@@ -50,8 +50,7 @@ class Source:
             uprn_options = list(soup.select("select#SelectedUprn > option"))
             uprn_options = list(
                 filter(
-                    lambda option: option.attrs.get("value")
-                    and option.attrs["value"].isdigit(),
+                    lambda option: option.attrs.get("value") and option.attrs["value"].isdigit(),
                     uprn_options,
                 )
             )

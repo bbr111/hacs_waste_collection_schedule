@@ -9,10 +9,7 @@ DESCRIPTION = "Source for RecycleSmart collection."
 URL = "https://www.recyclesmart.com/"
 COUNTRY = "au"
 TEST_CASES = {
-    "pickup": {
-        "email": "!secret recyclesmart_email",
-        "password": "!secret recyclesmart_password"
-    },
+    "pickup": {"email": "!secret recyclesmart_email", "password": "!secret recyclesmart_password"},
 }
 
 
@@ -47,7 +44,7 @@ class Source:
             "https://www.app.recyclesmart.com/api/pickups",
             # retrieves future pickups (if scheduled), then past pickups, until per_page is reached
             # the average user is scheduled for monthly pickups
-            params={"page":"1", "per_page":"5"},
+            params={"page": "1", "per_page": "5"},
             headers={"Authorization": data["data"]["attributes"]["auth_token"]},
         )
 

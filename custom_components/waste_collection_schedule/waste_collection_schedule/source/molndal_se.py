@@ -32,8 +32,6 @@ class Source:
             next_pickup_date = datetime.strptime(next_pickup, "%Y-%m-%d").date()
             waste_type = item["WasteType"]
 
-            entries.append(
-                Collection(date=next_pickup_date, t=waste_type, icon="mdi:trash-can")
-            )
+            entries.append(Collection(date=next_pickup_date, t=waste_type, icon="mdi:trash-can"))
 
         return entries

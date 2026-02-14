@@ -58,9 +58,7 @@ class Source:
     def fetch(self):
         s = requests.Session()
 
-        r = s.get(
-            f"https://www.northlanarkshire.gov.uk/bin-collection-dates/{self._uprn}/{self._usrn}"
-        )
+        r = s.get(f"https://www.northlanarkshire.gov.uk/bin-collection-dates/{self._uprn}/{self._usrn}")
         r.raise_for_status
 
         soup = BeautifulSoup(r.text, "html.parser")

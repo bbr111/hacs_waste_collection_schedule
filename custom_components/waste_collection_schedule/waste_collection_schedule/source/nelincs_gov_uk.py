@@ -48,9 +48,7 @@ class Source:
             raise ValueError("No collection data found for the provided UPRN.")
 
         entries = []
-        for heading, col_list in zip(
-            collection_div.select("div.h4"), collection_div.select("ul")
-        ):
+        for heading, col_list in zip(collection_div.select("div.h4"), collection_div.select("ul")):
             bin_type = heading.text.strip()
             icon = ICON_MAP.get(bin_type.casefold())  # Collection icon
             for li in col_list.select("li"):
