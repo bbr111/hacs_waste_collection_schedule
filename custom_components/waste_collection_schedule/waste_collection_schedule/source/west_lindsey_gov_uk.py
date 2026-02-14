@@ -79,11 +79,13 @@ class Source:
             headers=HEADERS,
             params=params,
         )
-        r.raise_for_status
+        r.raise_for_status()
 
         soup: BeautifulSoup = BeautifulSoup(r.content.decode("unicode-escape"), "html.parser")
 
         list_item = soup.find("li", {"class": "auroraListItem"})
+        if list_item is None:
+            return []
         lis = list_item.find_all("li")
 
         entries: list = []

@@ -7,7 +7,7 @@ from waste_collection_schedule import Collection
 from waste_collection_schedule.exceptions import SourceArgumentNotFoundWithSuggestions
 
 TITLE = "Bep-Environnement"
-DESCRIPTION = "Source for Bep Environnement garbage collection"  # Describe your source
+DESCRIPTION = "Source for Bep Environnement garbage collection"  # Describe your source  # codespell: ignore
 # Insert url to service homepage. URL will show up in README.md and info.md
 URL = "https://www.bep-environnement.be"
 TEST_CASES = {  # Insert arguments for test cases to be used by test_sources.py script

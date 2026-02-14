@@ -83,7 +83,7 @@ class Source:
 
         # Extract bin types and next collection dates
         entries = []
-        for index, item in rowdata.items():
+        for _index, item in rowdata.items():
             # print(item)
             bin_type = item["AssetTypeName"]
             icon = None

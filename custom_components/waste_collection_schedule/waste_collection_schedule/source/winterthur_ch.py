@@ -1,3 +1,5 @@
+from collections.abc import Sequence
+
 from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 from waste_collection_schedule.service.A_region_ch import (
     get_region_url_by_street,
@@ -10,10 +12,10 @@ TEST_CASES = {"Am Iberghang": {"street": "Am Iberghang"}}
 
 
 ICON_MAP = {
-    "Trash": "mdi:trash-can",
+    "Kehricht": "mdi:trash-can",
     "Glass": "mdi:bottle-soda",
-    "Bio": "mdi:leaf",
-    "Paper": "mdi:package-variant",
+    "Grüntour": "mdi:leaf",
+    "Papier/Karton": "mdi:package-variant",
     "Recycle": "mdi:recycle",
 }
 
@@ -24,7 +26,7 @@ API_URL = "https://m.winterthur.ch/index.php?apid=1066394"
 class Source:
     def __init__(self, street: str):
         self._street: str = street
-        self._ics_sources: list[Source] = []
+        self._ics_sources: Sequence = []
 
     def _get_ics_sources(self):
         self._ics_sources = get_region_url_by_street(
@@ -33,8 +35,6 @@ class Source:
             "https://m.winterthur.ch/appl/ajax/index.php?id=street&usid=9749&do=lookupStreet&container=737670",
             regex=r"(?:Tour \d{1,2} )?(.*?)(?=\s*ganze Stadt|$)",
         ).fetch()
-        for source in self._ics_sources:
-            r"(\d{2}\.\d{2}\.\d{4})"
 
     def fetch(self) -> list[Collection]:
         fresh_sources = False

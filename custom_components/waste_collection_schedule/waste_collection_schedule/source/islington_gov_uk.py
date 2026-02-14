@@ -17,7 +17,7 @@ ICON_MAP = {
     "Communal dry recycling bin": "mdi:recycle",
     "Small kitchen waste box": "mdi:food",
     "Large brown kitchen waste box": "mdi:food",
-    "Reuseable garden waste sack": "mdi:leaf",
+    "Reuseable garden waste sack": "mdi:leaf",  # codespell: ignore Reuseable
     "Household refuse sack": "mdi:trash-can",
     "Refuse skip": "mdi:trash-can",
     "Food waste recycling": "mdi:food",
@@ -34,8 +34,15 @@ class Source:
 
     def fetch(self):
         url = f"https://www.islington.gov.uk/your-area?Postcode={self._postcode}&Uprn={self._uprn}"
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+            "Accept-Language": "en-GB,en;q=0.5",
+            "Referer": "https://www.islington.gov.uk/",
+            "Connection": "keep-alive",
+        }
 
-        response = self._session.get(url)
+        response = self._session.get(url, headers=headers)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
 

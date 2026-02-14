@@ -69,7 +69,7 @@ class Source:
             headers=HEADERS,
             data=payload,
         )
-        r.raise_for_status
+        r.raise_for_status()
         sleep(5)
 
         # mimic address selection
@@ -84,7 +84,7 @@ class Source:
             headers=HEADERS,
             data=payload,
         )
-        r.raise_for_status
+        r.raise_for_status()
         soup: BeautifulSoup = BeautifulSoup(r.content, "html.parser")
         temp_list: list = []
 

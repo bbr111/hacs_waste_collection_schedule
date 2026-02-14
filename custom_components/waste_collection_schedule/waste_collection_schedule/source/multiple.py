@@ -85,19 +85,8 @@ PARAM_TRANSLATIONS = {
 
 def get_source(source: str, args: dict | list[dict]) -> list:
     if isinstance(args, list):
-        return [
-            getattr(
-                importlib.import_module(f"waste_collection_schedule.source.{source}"),
-                "Source",
-            )(**arg)
-            for arg in args
-        ]
-    return [
-        getattr(
-            importlib.import_module(f"waste_collection_schedule.source.{source}"),
-            "Source",
-        )(**args)
-    ]
+        return [importlib.import_module(f"waste_collection_schedule.source.{source}").Source(**arg) for arg in args]
+    return [importlib.import_module(f"waste_collection_schedule.source.{source}").Source(**args)]
 
 
 def check_source_type(data):

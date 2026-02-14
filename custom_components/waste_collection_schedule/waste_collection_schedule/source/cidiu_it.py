@@ -92,7 +92,7 @@ class Source:
                 continue
 
             collections = []
-            for header, cell in zip(headers, cells[1:]):
+            for header, cell in zip(headers, cells[1:], strict=False):
                 if cell.text.strip():
                     collections.append(header)
 

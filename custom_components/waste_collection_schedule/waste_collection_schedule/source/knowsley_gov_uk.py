@@ -53,13 +53,21 @@ class Source:
         s: requests.Session,
         action: str,
         x_csrf_token: str,
-        changes: dict = {},
-        objects: list = [],
-        params: dict[str, str | list[str] | dict] = {},
-        profile_data: dict[str, int] = {},
+        changes: dict | None = None,
+        objects: list | None = None,
+        params: dict[str, str | list[str] | dict] | None = None,
+        profile_data: dict[str, int] | None = None,
         operation_id: str | None = None,
         validation_guids: list[str] | None = None,
     ) -> dict:
+        if profile_data is None:
+            profile_data = {}
+        if params is None:
+            params = {}
+        if objects is None:
+            objects = []
+        if changes is None:
+            changes = {}
         time_str = str(int(time.time()))
         headers = {
             "Content-Type": "application/json",

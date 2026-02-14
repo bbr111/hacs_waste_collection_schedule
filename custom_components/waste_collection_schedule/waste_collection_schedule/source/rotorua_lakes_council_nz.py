@@ -48,7 +48,7 @@ class Source:
                 raise ValueError(f"Geolocation failed for address: {self._address}")
             return float(data[0]["lat"]), float(data[0]["lon"])
         except Exception as e:
-            raise ValueError(f"Geolocation failed for address: {self._address} with error: {e}")
+            raise ValueError(f"Geolocation failed for address: {self._address} with error: {e}") from e
 
     def fetch(self):
         lat, lon = self.fetch_coordinates()
@@ -67,7 +67,7 @@ class Source:
             response.raise_for_status()
             data = response.json()
         except requests.RequestException as e:
-            raise ValueError(f"API request failed: {e}")
+            raise ValueError(f"API request failed: {e}") from e
 
         entries = []
         for feature in data.get("features", []):

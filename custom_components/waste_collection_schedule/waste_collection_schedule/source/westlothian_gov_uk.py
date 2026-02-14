@@ -67,7 +67,7 @@ class Source:
                 raise Exception(ical_content.get("error"))
             # iCal data returned isn't compatible with _ics.convert because it's UNTIL values
             # don't specify a timezone, but the ICS module asks for "timezone-aware" parsing.
-            # So, change the UNTILs to be Z because they're date only and are UK-based.
+            # So, change the UNTIL's to be Z because they're date only and are UK-based.
             ics_data = re.sub(
                 r"UNTIL=([0-9]+)",
                 lambda m: "UNTIL=" + m.group(1) + "Z",

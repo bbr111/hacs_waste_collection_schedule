@@ -75,7 +75,7 @@ class Source:
                         waste_dates.append(action_day.date())
                     else:
                         waste_dates.append(datetime.strptime(item, "%b %d, %Y").date())
-            schedule = list(zip(waste_types, waste_dates))
+            schedule = list(zip(waste_types, waste_dates, strict=False))
 
             entries = []
             for waste in schedule:

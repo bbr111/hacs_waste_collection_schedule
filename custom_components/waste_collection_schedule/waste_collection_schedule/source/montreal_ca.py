@@ -227,11 +227,11 @@ class Source:
                 date_range = re.match(r".*[fF]rom (.*) to (.*)", line)
                 date_range_start = date_range.group(1)
                 date_range_stop = date_range.group(2)
-                for month, month_id in MONTHS.items():
+                for month, _month_id in MONTHS.items():
                     if re.search(rf"{month}", date_range_start, re.IGNORECASE):
-                        month_start = month_id
+                        month_start = MONTHS[month]
                     if re.search(rf"{month}", date_range_stop, re.IGNORECASE):
-                        month_stop = month_id
+                        month_stop = MONTHS[month]
                 if re.search(r"\d+", date_range_start):
                     day_start = int(re.match(r".*(\d+).*", date_range_start).group(1))
                 if re.search(r"\d+", date_range_stop):
@@ -240,24 +240,24 @@ class Source:
             elif re.match(r"(.*\d+.*){1,}", line):
                 # Multiple dates ?
                 dates_defined = True
-                for month, month_id in MONTHS.items():
+                for month, _month_id in MONTHS.items():
                     if re.search(rf"{month}", line, re.IGNORECASE):
                         months_found.append(month)
 
-            for month, month_id in MONTHS.items():
-                if date_range and (month_id < month_start or month_id > month_stop):
+            for month, _month_id in MONTHS.items():
+                if date_range and (_month_id < month_start or _month_id > month_stop):
                     continue
                 if dates_defined and month not in months_found:
                     continue
                 if re.search("(every )?week(ly)?", line):
                     for day in range(1, 32):
                         try:
-                            if not within_dates and day_start == day and month_start == month_id:
+                            if not within_dates and day_start == day and month_start == _month_id:
                                 within_dates = True
-                            if within_dates and day_stop >= day and month_stop == month_id:
+                            if within_dates and day_stop >= day and month_stop == _month_id:
                                 within_dates = False
                             if within_dates:
-                                date = datetime(year, month_id, day)
+                                date = datetime(year, _month_id, day)
                                 if date.weekday() == collection_day:  # Tuesday has index 1
                                     days.append(date.date())
                         except ValueError:

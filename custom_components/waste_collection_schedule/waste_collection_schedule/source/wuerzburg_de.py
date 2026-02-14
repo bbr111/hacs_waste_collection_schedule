@@ -2,7 +2,7 @@ import datetime
 import logging
 
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 from waste_collection_schedule.exceptions import (
     SourceArgumentNotFoundWithSuggestions,
@@ -22,6 +22,13 @@ TEST_CASES = {
 API_URL = "https://www.wuerzburg.de/themen/umwelt-klima/vorsorge-entsorgung/abfallkalender/32208.Abfallkalender.html"
 HEADERS = {"user-agent": "Mozilla/5.0 (xxxx Windows NT 10.0; Win64; x64)"}
 
+ICON_MAP = {
+    "Bioabfall": "mdi:leaf",
+    "Restmüll": "mdi:trash-can",
+    "Gelber Sack": "mdi:recycle",
+    "Papier": "mdi:file-document-outline",
+    "Mobile Problemmüll- und Wertstoffsammlung": "mdi:alert-octagon",
+}
 
 PARAM_TRANSLATIONS = {
     "de": {
@@ -48,14 +55,18 @@ class Source:
 
         r = requests.get(API_URL, headers=HEADERS)
         r.raise_for_status()
-        selects = BeautifulSoup(r.content, "html.parser").body.find_all("select")
+        soup = BeautifulSoup(r.content, "html.parser")
+        body = soup.body
+        if not body:
+            raise ValueError("No body tag found in the HTML response")
+        selects = body.find_all("select")
 
         if street:
             strlist = next(iter([s for s in selects if s["id"] == "strlist"]))
             strdict = {
                 option.text: option.attrs["value"]
                 for option in strlist.children
-                if hasattr(option, "attrs") and "value" in option.attrs
+                if isinstance(option, Tag) and "value" in option.attrs
             }
 
             hasattr(strlist.contents[2], "attr")
@@ -63,20 +74,20 @@ class Source:
             try:
                 return strdict[street]
             except KeyError:
-                raise SourceArgumentNotFoundWithSuggestions("street", street, strdict.keys())
+                raise SourceArgumentNotFoundWithSuggestions("street", street, strdict.keys()) from None
 
         if district:
             reglist = next(iter([s for s in selects if s["id"] == "reglist"]))
             regdict = {
                 option.text: option.attrs["value"]
                 for option in reglist.children
-                if hasattr(option, "attrs") and "value" in option.attrs
+                if isinstance(option, Tag) and "value" in option.attrs
             }
 
             try:
                 return regdict[district]
             except KeyError:
-                raise SourceArgumentNotFoundWithSuggestions("district", district, regdict.keys())
+                raise SourceArgumentNotFoundWithSuggestions("district", district, regdict.keys()) from None
 
     def fetch(self):
         LOGGER.warning(
@@ -113,6 +124,7 @@ class Source:
                     datetime.datetime.fromisoformat(event["start"]).date(),
                     event["title"],
                     picture=event.get("thumb", {}).get("url"),
+                    icon=ICON_MAP.get(event["title"], "mdi:trash-can"),
                 )
             )
 

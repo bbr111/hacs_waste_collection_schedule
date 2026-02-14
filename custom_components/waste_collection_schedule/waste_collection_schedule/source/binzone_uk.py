@@ -86,7 +86,7 @@ class Source:
                 bin_date = bin_info[0].strip().replace("Your usual collection day is different this week", "")
                 bin_type = bin_info[1].strip()
             except Exception as ex:
-                raise ValueError(f"Error parsing bin data: {ex}")
+                raise ValueError(f"Error parsing bin data: {ex}") from ex
 
             for round_type in ICON_MAP:
                 if round_type in bin_type.upper():

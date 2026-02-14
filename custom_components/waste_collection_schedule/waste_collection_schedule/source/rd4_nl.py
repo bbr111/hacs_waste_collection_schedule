@@ -48,9 +48,9 @@ class Source:
         year += 1
         try:
             return entries + self._get_collections(year)
-        except Exception:
+        except Exception as e:
             if exception:
-                raise exception
+                raise exception from e
             return entries
 
     def _get_collections(self, year) -> list[Collection]:

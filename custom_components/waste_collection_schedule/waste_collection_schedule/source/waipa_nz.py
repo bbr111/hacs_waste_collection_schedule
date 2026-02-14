@@ -143,7 +143,7 @@ class Source:
         try:
             fields = property_data["infoPanels"]["info1"]["feature"]["fields"]
         except (KeyError, TypeError) as e:
-            raise Exception(f"Unexpected API response structure: {e}")
+            raise Exception(f"Unexpected API response structure: {e}") from e
 
         if len(fields) < 4:
             raise Exception(f"Expected at least 4 fields in API response, got {len(fields)}")

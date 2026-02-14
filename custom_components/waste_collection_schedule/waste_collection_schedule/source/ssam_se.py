@@ -1,6 +1,6 @@
 import logging
 
-from .edpevent_se import Source as EdpEventSource  # type: ignore[attr-defined]
+from .edpevent_se import Source as EdpEventSource
 
 TITLE = "SSAM (Deprecated)"
 DESCRIPTION = "Deprecated, please use edpevent_se instead."

@@ -33,7 +33,8 @@ class Source:
         session = cloudscraper.create_scraper()
 
         r = session.get(
-            "https://www.gateshead.gov.uk/article/3150/Bin-collection-day-checker",
+            headers={"user-agent": "Mozilla/5.0"},
+            url="https://www.gateshead.gov.uk/article/3150/Bin-collection-day-checker",
             timeout=30,
         )
 
@@ -88,9 +89,9 @@ class Source:
             decoded_data = base64.b64decode(response_data)
             data = json.loads(decoded_data)
         except (binascii.Error, ValueError) as e:
-            raise ValueError(f"Failed to decode base64 data: {e}")
+            raise ValueError(f"Failed to decode base64 data: {e}") from e
         except json.JSONDecodeError as e:
-            raise ValueError(f"Failed to parse JSON data: {e}")
+            raise ValueError(f"Failed to parse JSON data: {e}") from e
 
         if "HOUSEHOLDCOLLECTIONS_1" not in data:
             raise ValueError("HOUSEHOLDCOLLECTIONS_1 not found in response data")

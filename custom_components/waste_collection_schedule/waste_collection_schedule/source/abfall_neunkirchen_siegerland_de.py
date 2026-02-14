@@ -48,7 +48,7 @@ class Source:
             raise Exception("Unexpected autocomplete response")
 
         if not ids:
-            raise SourceArgumentNotFound(f"No address found for '{self._strasse}'")
+            raise SourceArgumentNotFound(f"No address found for '{self._strasse}'", self._strasse)
 
         if len(ids) > 1:
             raise SourceArgAmbiguousWithSuggestions("strasse", self._strasse, [id[1] for id in ids])

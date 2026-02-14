@@ -86,11 +86,11 @@ class Source:
 
             tjenester = f["Tjenester"]
             for tjeneste in tjenester:
-                tekst = tjeneste["Fraksjon"]["Tekst"]
+                tekst = tjeneste["Fraksjon"]["Tekst"]  # codespell: ignore
                 entries.append(
                     Collection(
-                        date=datetime.datetime.strptime(tjeneste["TommeDato"], "%d.%m.%Y").date(),
-                        t=tekst,
+                        date=datetime.datetime.strptime(tjeneste["TommeDato"], "%d.%m.%Y").date(),  # codespell: ignore
+                        t=tekst,  # codespell: ignore
                         icon=ICON_MAP.get(tekst.lower()),
                     )
                 )

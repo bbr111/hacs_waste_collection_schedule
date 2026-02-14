@@ -107,7 +107,7 @@ class Source:
             r.raise_for_status()
         except Exception:
             if year == today.year:
-                raise Exception("culd not get data from url exit")
+                raise Exception("culd not get data from url exit") from None
             return None
 
         try:

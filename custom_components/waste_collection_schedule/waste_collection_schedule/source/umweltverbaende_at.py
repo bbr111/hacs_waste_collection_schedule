@@ -222,7 +222,7 @@ PARAM_TRANSLATIONS = {
         "hnr": "Hausnummer",
         "zusatz": "Zusatz",
         "calendar": "Kalender",
-        "calendar_title_separator": "Kalendertitel Seperator",
+        "calendar_title_separator": "Kalendertitel Separator",
         "calendar_splitter": "Kalendereintrag-Trenner",
     },
     "en": {
@@ -373,7 +373,7 @@ PARAM_TRANSLATIONS = {
         "district": "Gebiet",
         "municipal": "Gemeinde",
         "calendar": "Kalender",
-        "calendar_title_separator": "Kalendertitel Seperator",
+        "calendar_title_separator": "Kalendertitel Separator",
         "calendar_splitter": "Kalendereintrag-Trenner",
     }
 }
@@ -497,7 +497,7 @@ class Source:
                     return self.fetch_old()
                 except Exception:
                     # If both methods fail, raise the original error from new method
-                    raise e
+                    raise e from e
         return self.fetch_old()
 
     def fetch_old(self) -> list[Collection]:

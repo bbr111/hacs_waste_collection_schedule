@@ -78,7 +78,7 @@ class Source:
                     f"Longitude must be between {BENDIGO_BOUNDS['min_lon']} and {BENDIGO_BOUNDS['max_lon']}",
                 )
         except (ValueError, TypeError) as e:
-            raise Exception(f"Invalid coordinate format. Please provide numeric values. Error: {str(e)}")
+            raise Exception(f"Invalid coordinate format. Please provide numeric values. Error: {str(e)}") from e
 
     def fetch(self):
         session = requests.Session()

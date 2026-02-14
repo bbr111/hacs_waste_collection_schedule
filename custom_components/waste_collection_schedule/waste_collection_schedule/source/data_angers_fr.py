@@ -41,7 +41,7 @@ LABEL_MAP = {
 
 # Source : https://data.angers.fr/explore/dataset/secteurs-de-collecte-tri-et-plus/information/
 CITY = Literal[
-    "LES PONTS DE CE",
+    "LES PONTS DE CE",  # codespell: ignore
     "SAINT BARTHELEMY D ANJOU",
     "SAINT CLEMENT DE LA PLACE",
     "SAINTE GEMMES SUR LOIRE",
@@ -74,7 +74,7 @@ CITY = Literal[
     "LE PLESSIS GRAMMOIRE",
 ]
 CITY_NAME = [
-    "LES PONTS DE CE",
+    "LES PONTS DE CE",  # codespell: ignore
     "SAINT BARTHELEMY D ANJOU",
     "SAINT CLEMENT DE LA PLACE",
     "SAINTE GEMMES SUR LOIRE",
@@ -133,7 +133,7 @@ TYPE_VOIE = Literal[
     "HAMEAU",
     "AUTOROUTE",
     "CARREFOUR",
-    "CLOS",
+    "CLOS",  # codespell: ignore
     "RUELLE",
     "RESIDENCE",
     "MONTEE",
@@ -183,7 +183,7 @@ TYPE_VOIE_NAME = [
     "HAMEAU",
     "AUTOROUTE",
     "CARREFOUR",
-    "CLOS",
+    "CLOS",  # codespell: ignore
     "RUELLE",
     "RESIDENCE",
     "MONTEE",
@@ -311,7 +311,7 @@ class Source:
         try:
             id_secteurs = self._get_id_secteur_address(self.address, self.city, self.typevoie, self.num_voie)
         except requests.RequestException as e:
-            raise SourceArgumentException("address", f"Error fetching address data: {e}")
+            raise SourceArgumentException("address", f"Error fetching address data: {e}") from e
 
         entries: list[EntryType] = []
         for id_secteur in id_secteurs:
@@ -332,7 +332,7 @@ class Source:
                 else:
                     raise SourceArgumentException("city", "Error response from API")
             except requests.RequestException as e:
-                raise SourceArgumentException("city", f"Error fetching collection data: {e}")
+                raise SourceArgumentException("city", f"Error fetching collection data: {e}") from e
         final_entries = []
         # print(entries)
         for entry in entries:

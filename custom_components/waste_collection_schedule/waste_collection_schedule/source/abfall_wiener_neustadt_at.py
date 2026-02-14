@@ -162,7 +162,7 @@ class Source:
             raise Exception(
                 f"Failed to connect to {self._base_url}. "
                 f"Please check your internet connection and verify the website is accessible. Error: {e}"
-            )
+            ) from e
 
         soup = BeautifulSoup(response.text, "html.parser")
 
@@ -178,7 +178,7 @@ class Source:
         for select in soup.find_all("select", {"name": "str_id"}):
             for option in select.find_all("option"):
                 option_text = option.get_text().strip()
-                option_value = option.get("value", "").strip()
+                option_value = str(option.get("value", "")).strip()
 
                 if not option_value or option_value == "0":
                     continue
@@ -208,7 +208,8 @@ class Source:
         # Step 4: Extract tn_ez_zone from hidden input (if present)
         tn_ez_zone_input = soup.find("input", {"name": "tn_ez_zone", "type": "hidden"})
         if tn_ez_zone_input:
-            tn_ez_zone = tn_ez_zone_input.get("value")
+            tn_ez_zone_value = tn_ez_zone_input.get("value")
+            tn_ez_zone = str(tn_ez_zone_value) if tn_ez_zone_value else None
 
         # Step 5: Reload page with selected street to get correct tn_ez_zone
         try:
@@ -218,17 +219,19 @@ class Source:
             raise Exception(
                 f"Failed to retrieve zone information for street '{str_name_full}'. "
                 f"The website may be temporarily unavailable. Error: {e}"
-            )
+            ) from e
 
         reload_soup = BeautifulSoup(reload_response.text, "html.parser")
         tn_ez_zone_input = reload_soup.find("input", {"name": "tn_ez_zone", "type": "hidden"})
         if tn_ez_zone_input:
-            tn_ez_zone = tn_ez_zone_input.get("value")
+            tn_ez_zone_value = tn_ez_zone_input.get("value")
+            tn_ez_zone = str(tn_ez_zone_value) if tn_ez_zone_value else None
 
         # Also get str_name from hidden input if present
         str_name_input = reload_soup.find("input", {"name": "str_name", "type": "hidden"})
         if str_name_input:
-            str_name_full = str_name_input.get("value")
+            str_name_value = str_name_input.get("value")
+            str_name_full = str(str_name_value) if str_name_value else None
 
         return (str_id, str_name_full, tn_ez_zone)
 
@@ -288,7 +291,7 @@ class Source:
             raise Exception(
                 f"Failed to fetch collection schedule for street ID '{str_id}'. "
                 f"The website may be temporarily unavailable or the street ID is invalid. Error: {e}"
-            )
+            ) from e
 
         # Parse response
         return self._parse_schedule(response.text)

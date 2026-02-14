@@ -79,7 +79,7 @@ class Source:
                     "street",
                     self._street,
                     available_streets,
-                )
+                ) from None
 
         r = session.post(
             API_URL,

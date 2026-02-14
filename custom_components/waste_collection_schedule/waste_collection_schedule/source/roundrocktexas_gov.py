@@ -54,7 +54,7 @@ class Source:
         r = s.get("https://devcorrpublicdatahub.blob.core.usgovcloudapi.net/garbage-recycling/garbagerecyclingzones.json")
         r.raise_for_status()
         areas = json.loads(r.text)
-        for idx, area in enumerate(areas):
+        for _idx, area in enumerate(areas):
             if self._area.upper() == area["Neighborhood Name"].upper():
                 recycling_zone = area["Recycling Zone"]
 
@@ -64,7 +64,7 @@ class Source:
         r = s.get("https://devcorrpublicdatahub.blob.core.usgovcloudapi.net/garbage-recycling/garbagerecyclingdays.json")
         r.raise_for_status()
         recycling_schedule = json.loads(r.text)
-        for idx, zone in enumerate(recycling_schedule):
+        for _idx, zone in enumerate(recycling_schedule):
             if recycling_zone == zone["Recycling Zone"]:
                 end_date = datetime.strptime(zone["Date"], "%Y-%m-%d")
                 dt = datetime.strptime(zone["Date"], "%Y-%m-%d").date()
@@ -80,7 +80,7 @@ class Source:
         # generate weekly trash schedule - occur weekly, the same week day as recycling collections
         trash_day = recycling_zone.split(" ")[0]
         trash_dates = list(rrule(WEEKLY, byweekday=DAYS[trash_day], dtstart=today, until=end_date))
-        for idx, item in enumerate(trash_dates):
+        for _idx, item in enumerate(trash_dates):
             item = self.check_holidays(item.date())
             entries.append(
                 Collection(

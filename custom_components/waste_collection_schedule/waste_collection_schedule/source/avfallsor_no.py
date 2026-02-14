@@ -59,7 +59,7 @@ def parse_date(date_str: str) -> datetime.date:
     try:
         day = int(date_str)
     except ValueError:
-        raise ValueError(f"Day is not an integer: {date_str}")
+        raise ValueError(f"Day is not an integer: {date_str}") from None
 
     date_ = datetime.date(datetime.datetime.now().year, month_number, day)
     if datetime.date.today() > date_:

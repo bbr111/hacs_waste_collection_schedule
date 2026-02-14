@@ -48,7 +48,7 @@ class Source:
         infos = soup.find_all("ul", attrs={"class": "wastecollections-results"})
 
         streets = []
-        for addressTag, info in zip(addresses, infos):
+        for addressTag, info in zip(addresses, infos, strict=False):
             street = addressTag.text.split(",")[0]
             streets.append(street)
             if street == self._street:

@@ -255,10 +255,10 @@ class Source:
                 timeout=REQUEST_TIMEOUT,
             )
             response.raise_for_status()
-            payload_json = cast(JSONDict, response.json())
-            addresses_data = cast(list[Address] | None, payload_json.get("addresses"))
-            if addresses_data:
-                return [cast(Address, address) for address in addresses_data]
+            payload_json: JSONDict = response.json()
+            addresses_data = payload_json.get("addresses")
+            if isinstance(addresses_data, list):
+                return addresses_data
 
         raise ValueError("No matching addresses were returned by the API.")
 

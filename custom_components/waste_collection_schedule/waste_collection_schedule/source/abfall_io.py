@@ -108,8 +108,10 @@ class Source:
         f_id_strasse,
         f_id_bezirk=None,
         f_id_strasse_hnr=None,
-        f_abfallarten=[],
+        f_abfallarten=None,
     ):
+        if f_abfallarten is None:
+            f_abfallarten = []
         self._key = key
         self._kommune = f_id_kommune
         self._bezirk = f_id_bezirk

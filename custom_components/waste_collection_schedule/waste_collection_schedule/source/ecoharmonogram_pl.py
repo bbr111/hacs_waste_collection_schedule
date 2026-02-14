@@ -180,7 +180,7 @@ class Source:
     def __init__(
         self,
         town,
-        app: SUPPORTED_APPS_LITERAL = None,
+        app: SUPPORTED_APPS_LITERAL | None = None,
         district="",
         street="",
         house_number="",

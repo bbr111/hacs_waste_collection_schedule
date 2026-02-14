@@ -35,8 +35,8 @@ ICON_MAP = {
 PARAM_TRANSLATIONS = {
     "de": {
         "city": "Ort",
-        "yellow_route": "Gelbe Tonne Rute",
-        "paper_route": "Papier Rute",
+        "yellow_route": "Gelbe Tonne Route",
+        "paper_route": "Papier Route",
     }
 }
 
@@ -92,12 +92,12 @@ class Source:
                     "city",
                     self._city,
                     "make sure the city is spelled exactly like in the link of the website https://www.mzv-rotenburg-bebra.de//webapp.html",
-                )
+                ) from None
             raise SourceArgumentNotFoundWithSuggestions(
                 "city",
                 self._city,
                 cities,
-            )
+            ) from None
 
         entries = []
 

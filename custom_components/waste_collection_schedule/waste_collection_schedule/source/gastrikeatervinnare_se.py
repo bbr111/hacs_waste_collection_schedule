@@ -41,7 +41,7 @@ class Source:
         cities = []
         streets = []
 
-        for addressTag, info in zip(addresses, infos):
+        for addressTag, info in zip(addresses, infos, strict=False):
             street = addressTag.text.split(",")[0].strip().lower()
             city = addressTag.find("span", attrs={"class": "pickup-locality"}).text.strip().lower()
             streets.append(street)

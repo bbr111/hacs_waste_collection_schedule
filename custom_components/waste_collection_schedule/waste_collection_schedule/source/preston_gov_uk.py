@@ -60,9 +60,10 @@ class Source:
     def _update_params(self, soup: BeautifulSoup) -> None:
         self._params = {k: v for k, v in PARAMS.items()}
 
-        for k, v in PARAMS.items():
+        for k, _v in PARAMS.items():
             try:
-                self._params[k] = soup.find("input", {"name": k})["value"]
+                input_element = soup.find("input", {"name": k})
+                self._params[k] = str(input_element["value"]) if input_element else ""
             except KeyError:
                 self._params[k] = ""
             except TypeError:
@@ -126,10 +127,10 @@ class Source:
             itms = blk.select("ul > li")
             for itm in itms:
                 dateTxt = itm.select_one("span")
-                dateObj = (Source._date(dateTxt.text),)
+                dateObj = Source._date(dateTxt.text)
                 if dateObj is None:
                     continue
 
-                entries = Source._entries(entries, hdr, dateObj[0], ico)
+                entries = Source._entries(entries, hdr, dateObj, ico)
 
         return entries

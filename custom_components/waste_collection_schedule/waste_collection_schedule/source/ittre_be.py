@@ -32,7 +32,7 @@ FRENSH_DAYS = {
 }
 
 
-API_URL = "https://www.ittre.be/ma-commune/services-communaux/environnement/gestion-des-dechets/collecte-des-dechets-menagers"
+API_URL = "https://www.ittre.be/ma-commune/services-communaux/environnement/gestion-des-dechets/collecte-des-dechets-menagers"  # codespell: ignore
 
 
 def clean_string(text: str) -> str:

@@ -245,13 +245,13 @@ class Source:
                     "subdistrict",
                     self.subdistrict,
                     [entry["Ortsteilname"] for entry in payload["d"] if entry["Ortsname"] == self.district],
-                )
+                ) from None
             else:
                 raise SourceArgumentNotFoundWithSuggestions(
                     "district",
                     self.district,
                     {entry["Ortsname"] for entry in payload["d"]},
-                )
+                ) from None
 
     def fetch_street_id(self, session: requests.Session, district_id: int):
         res = session.get(
@@ -268,7 +268,9 @@ class Source:
         try:
             return next(entry["StrassenId"] for entry in payload["d"] if entry["Name"] == self.street)
         except StopIteration:
-            raise SourceArgumentNotFoundWithSuggestions("street", self.street, [entry["Name"] for entry in payload["d"]])
+            raise SourceArgumentNotFoundWithSuggestions(
+                "street", self.street, [entry["Name"] for entry in payload["d"]]
+            ) from None
 
 
 # Typed dictionaries for the API

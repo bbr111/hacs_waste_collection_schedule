@@ -1,7 +1,9 @@
 import logging
 import random
 import re
+from collections.abc import Callable
 from datetime import date, datetime
+from typing import cast
 
 import requests
 from bs4 import BeautifulSoup
@@ -136,14 +138,14 @@ def select_test_cases(municipalities, mode="random_one_from_each_parser"):
             parser_test_cases[parser].append((name, info))
 
     if mode == "random_one_from_each_parser":
-        for parser, cases in parser_test_cases.items():
+        for _parser, cases in parser_test_cases.items():
             selected_case = random.choice(cases)
             test_cases[selected_case[0]] = {
                 "municipality": selected_case[0],
                 "values": selected_case[1]["values"],
             }
     elif mode == "first_from_each_parser":
-        for parser, cases in parser_test_cases.items():
+        for _parser, cases in parser_test_cases.items():
             selected_case = cases[0]
             test_cases[selected_case[0]] = {
                 "municipality": selected_case[0],
@@ -164,7 +166,7 @@ def select_test_cases(municipalities, mode="random_one_from_each_parser"):
             "values": selected_case[1]["values"],
         }
     elif mode == "all":
-        for parser, cases in parser_test_cases.items():
+        for _parser, cases in parser_test_cases.items():
             for case in cases:
                 test_cases[case[0]] = {
                     "municipality": case[0],
@@ -208,7 +210,9 @@ class Source:
         if not callable(parser):
             raise ValueError(f"Parser method for {self._parser_type} is not callable")
 
-        self._parser_method = parser
+        self._parser_method: Callable[[BeautifulSoup], list[Collection]] = cast(
+            Callable[[BeautifulSoup], list[Collection]], parser
+        )
 
     def fetch(self) -> list[Collection]:
         _LOGGER.debug("Fetching data from %s", self._api_url)
@@ -318,7 +322,7 @@ class Source:
             waste_type = strong_tag.get_text(strip=True)
             next_sibling = strong_tag.find_next_sibling(text=True)
             if next_sibling and "Næste tømningsdag" in next_sibling:
-                match = re.search(r"(\d{1,2})\. (\w+) (\d{4})", next_sibling)
+                match = re.search(r"(\d{1,2})\. (\w+) (\d{4})", str(next_sibling))
                 if match:
                     try:
                         day = int(match.group(1))

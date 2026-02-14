@@ -38,7 +38,7 @@ class Source:
         dates = soup.findAll("h3")
 
         entries = []
-        for b, d in zip(bins, dates):
+        for b, d in zip(bins, dates, strict=False):
             # check cases where no date is given for a collection
             if d and len(d.text.split(",")) > 1:
                 entries.append(

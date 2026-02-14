@@ -80,7 +80,7 @@ class Source:
         for item in items:
             streets.append(item.text)  # street name
             ids.append(item.attrs["value"])  # dropdown value
-        mapping = {k: v for (k, v) in zip(streets, ids)}
+        mapping = {k: v for (k, v) in zip(streets, ids, strict=False)}
 
         return mapping
 

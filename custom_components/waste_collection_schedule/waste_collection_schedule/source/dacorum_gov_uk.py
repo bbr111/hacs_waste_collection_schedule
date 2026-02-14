@@ -13,7 +13,7 @@ URL = "https://www.dacorum.gov.uk/"
 TEST_CASES = {
     "Hemel Hempsted": {"postcode": "HP1 1AB", "uprn": 200004054631},
     "Berkhamsted": {"postcode": "HP4 2EZ", "uprn": "100081111531"},
-    "Tring": {"postcode": "HP23 6BE", "uprn": "100080716575"},
+    "Tring": {"postcode": "HP23 6BE", "uprn": "100080716575"},  # codespell: ignore
 }
 
 ICON_MAP = {

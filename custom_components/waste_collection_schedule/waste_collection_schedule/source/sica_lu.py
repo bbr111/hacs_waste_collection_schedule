@@ -92,7 +92,7 @@ class Source:
         try:
             data = r.json()
         except ValueError as e:
-            raise ValueError(f"Error decoding JSON from API: {e} - {r.text}")
+            raise ValueError(f"Error decoding JSON from API: {e} - {r.text}") from e
         return data
 
     def _get_municipality_id(self) -> None:

@@ -80,8 +80,9 @@ class Source:
             print(e.response.status_code)
             if e.response.status_code == 404:
                 cities = Source._get_all_elements(BASE_API_URL)
-                raise SourceArgumentNotFoundWithSuggestions("city", city, cities)
-            raise e
+                raise SourceArgumentNotFoundWithSuggestions("city", city, cities) from None
+            else:
+                raise e
 
     def fetch(self) -> list[Collection]:
         url = DATA_ULR.format(city=self._city, street=self._street)

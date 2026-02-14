@@ -150,7 +150,9 @@ class Source:
         self._street_name: str | None = None
 
     @staticmethod
-    def _get_id(action: str, compare_to: str, param_name: str, params: dict[str, str | int] = {}) -> tuple[int, str]:
+    def _get_id(action: str, compare_to: str, param_name: str, params: dict[str, str | int] | None = None) -> tuple[int, str]:
+        if params is None:
+            params = {}
         params = {"action": action, **params}
         original_compare_to = compare_to
         compare_to = make_comparable(compare_to)

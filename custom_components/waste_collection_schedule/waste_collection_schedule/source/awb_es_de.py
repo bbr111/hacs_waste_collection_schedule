@@ -49,7 +49,7 @@ class Source:
         r.raise_for_status()
         suggestsion = r.json()["suggestions"]
         for suggestion in suggestsion:
-            if suggestion["value"].lower() == self._street.lower():
+            if self._street and suggestion["value"].lower() == self._street.lower():
                 return
         raise SourceArgumentNotFoundWithSuggestions(
             "street",
@@ -76,7 +76,9 @@ class Source:
         ics_urls = list()
         for download in downloads:
             href = download.get("href")
-            if "t=ics" in href and href not in ics_urls:  # The website lists the same url multiple times, we only want it once
+            if (
+                href and "t=ics" in href and href not in ics_urls
+            ):  # The website lists the same url multiple times, we only want it once
                 ics_urls.append(href)
 
         if not ics_urls:
