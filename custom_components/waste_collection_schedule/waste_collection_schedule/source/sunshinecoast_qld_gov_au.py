@@ -33,9 +33,7 @@ ICON_MAP = {
 
 
 class Source:
-    def __init__(
-        self, street_name
-    ):  # argX correspond to the args dict in the source configuration
+    def __init__(self, street_name):  # argX correspond to the args dict in the source configuration
         self.street_name = street_name
 
     def fetch(self):
@@ -57,12 +55,8 @@ class Source:
         today = datetime.today()
 
         general_dates = rrule.rrule(rrule.WEEKLY, dtstart=day).xafter(today, 10, True)
-        recycling_dates = rrule.rrule(rrule.WEEKLY, interval=2, dtstart=day).xafter(
-            today, 10, True
-        )
-        garden_dates = rrule.rrule(
-            rrule.WEEKLY, interval=2, dtstart=day + timedelta(weeks=1)
-        ).xafter(today, 10, True)
+        recycling_dates = rrule.rrule(rrule.WEEKLY, interval=2, dtstart=day).xafter(today, 10, True)
+        garden_dates = rrule.rrule(rrule.WEEKLY, interval=2, dtstart=day + timedelta(weeks=1)).xafter(today, 10, True)
 
         entries = []
         for text, dates in [

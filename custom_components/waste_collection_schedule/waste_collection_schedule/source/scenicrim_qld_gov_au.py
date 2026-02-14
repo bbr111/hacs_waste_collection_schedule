@@ -13,11 +13,11 @@ TEST_CASES = {
     "Red Week": {
         "address": "The Old Avocado Farm 77A Long Road TAMBORINE MOUNTAIN  QLD 4272",
     },
-    "Blue Week": {
-        "address": "Elysian Fields 2/3043 Beaudesert-Nerang Road WONGLEPONG  QLD 4275"
-    },
+    "Blue Week": {"address": "Elysian Fields 2/3043 Beaudesert-Nerang Road WONGLEPONG  QLD 4275"},
 }
-API_URL = "https://srrcwastebinserviceday.blob.core.windows.net/wastebinservicedayexport/WasteBinServiceDay_SRRCWebsiteSearch.csv"
+API_URL = (
+    "https://srrcwastebinserviceday.blob.core.windows.net/wastebinservicedayexport/WasteBinServiceDay_SRRCWebsiteSearch.csv"
+)
 ICON_MAP = {
     "GENERAL WASTE": "mdi:trash-can",
     "RECYCLING": "mdi:recycle",
@@ -63,9 +63,7 @@ class Source:
     def __init__(self, address: str):
         self._address: str = address.upper()
 
-    def generate_dates(
-        self, weekday: int, date_start: datetime, interval: int, date_end: datetime
-    ) -> list:
+    def generate_dates(self, weekday: int, date_start: datetime, interval: int, date_end: datetime) -> list:
         rr = rrule(
             freq=WEEKLY,
             interval=interval,
@@ -83,9 +81,7 @@ class Source:
         csv_file = s.get(API_URL)
         csv_decoded = csv_file.content.decode("utf-8")
         address_list: list = csv.reader(csv_decoded.splitlines(), delimiter=",")
-        address_list = [
-            [element.upper() for element in address] for address in address_list
-        ]
+        address_list = [[element.upper() for element in address] for address in address_list]
 
         # extract service day and recycling code
         for item in address_list:
@@ -101,9 +97,7 @@ class Source:
         service_days = self.generate_dates(DAYS[service_day], start_date, 1, end_date)
         service_days = [["GENERAL WASTE", day] for day in service_days]
         # generate recycling dates
-        recycling_days = self.generate_dates(
-            DAYS[service_day], START_DATES[recycling_code], 2, end_date
-        )
+        recycling_days = self.generate_dates(DAYS[service_day], START_DATES[recycling_code], 2, end_date)
         recycling_days = [["RECYCLING", day] for day in recycling_days]
         # combine to create collection schedule
         collection_days: list = service_days + recycling_days

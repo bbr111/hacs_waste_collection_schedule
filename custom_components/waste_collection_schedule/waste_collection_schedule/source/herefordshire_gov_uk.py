@@ -44,11 +44,7 @@ class Source:
         )
         r.raise_for_status()
         addresses = r.json()
-        if (
-            ("error" in addresses and addresses["error"])
-            or "results" not in addresses
-            or len(addresses["results"]) == 0
-        ):
+        if ("error" in addresses and addresses["error"]) or "results" not in addresses or len(addresses["results"]) == 0:
             raise SourceArgumentNotFound("post_code", self._post_code)
 
         # cast PAO fields to str to avoid .lower() on non-strings (some APIs return ints)
@@ -56,28 +52,18 @@ class Source:
         address_ids = [
             x
             for x in addresses["results"]
-            if (
-                x["LPI"].get("PAO_TEXT") is not None
-                and str(x["LPI"]["PAO_TEXT"]).lower() == target
-            )
-            or (
-                x["LPI"].get("PAO_START_NUMBER") is not None
-                and str(x["LPI"]["PAO_START_NUMBER"]).lower() == target
-            )
+            if (x["LPI"].get("PAO_TEXT") is not None and str(x["LPI"]["PAO_TEXT"]).lower() == target)
+            or (x["LPI"].get("PAO_START_NUMBER") is not None and str(x["LPI"]["PAO_START_NUMBER"]).lower() == target)
         ]
 
         if len(address_ids) == 0:
             numbers = {x["LPI"].get("PAO_TEXT") for x in addresses["results"]}
-            numbers.update(
-                {x["LPI"].get("PAO_START_NUMBER") for x in addresses["results"]}
-            )
+            numbers.update({x["LPI"].get("PAO_START_NUMBER") for x in addresses["results"]})
             numbers -= {None}
             raise SourceArgumentNotFoundWithSuggestions("number", self._number, numbers)
 
         q = str(API_URLS["collection"])
-        r = requests.get(
-            q, headers=HEADER, params={"blpu_uprn": address_ids[0]["LPI"]["UPRN"]}
-        )
+        r = requests.get(q, headers=HEADER, params={"blpu_uprn": address_ids[0]["LPI"]["UPRN"]})
         r.raise_for_status()
 
         # --- Updated DOM parsing (site changed) ---
@@ -87,9 +73,7 @@ class Source:
             # fall back to legacy wrapper if council reverts
             legacy = soup.find(id="wasteCollectionDates")
             if not legacy:
-                raise Exception(
-                    "Could not find bin collection section on the council page (IDs changed)."
-                )
+                raise Exception("Could not find bin collection section on the council page (IDs changed).")
             container = legacy
 
         # Extract first <li> date under each heading
@@ -106,9 +90,7 @@ class Source:
                             # strip any "(next collection)" etc.
                             text = li.get_text(strip=True)
                             cut = text.find("(")
-                            resulsts.append(
-                                text[:cut].strip() if cut != -1 else text.strip()
-                            )
+                            resulsts.append(text[:cut].strip() if cut != -1 else text.strip())
             return resulsts
 
         waste_date_strs = first_li_after_heading("general rubbish")

@@ -66,9 +66,7 @@ PARAM_TRANSLATIONS = {
 
 
 class Source:
-    def __init__(
-        self, city: str, street: str, house_number: int, address_suffix: str = ""
-    ):
+    def __init__(self, city: str, street: str, house_number: int, address_suffix: str = ""):
         self._city = city
         self._street = street
         self._hnr = house_number
@@ -92,11 +90,7 @@ class Source:
             input_elements = soup.find_all("input", {"name": "Zeitraum"})
 
             # Extract values
-            values = [
-                input_elem.get("value")
-                for input_elem in input_elements
-                if input_elem.get("value")
-            ]
+            values = [input_elem.get("value") for input_elem in input_elements if input_elem.get("value")]
             return values
 
         except requests.exceptions.RequestException:

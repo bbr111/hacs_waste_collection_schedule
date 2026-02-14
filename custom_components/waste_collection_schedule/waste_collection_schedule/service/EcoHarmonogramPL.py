@@ -1,5 +1,6 @@
+from collections.abc import Mapping
 from random import randrange
-from typing import Literal, Mapping, TypedDict, get_args
+from typing import Literal, TypedDict, get_args
 
 import requests
 
@@ -21,7 +22,7 @@ SUPPORTED_APPS_LITERAL = Literal[
     "slupsk",
     "trzebownisko",
     "zory",
-    "opole"
+    "opole",
 ]
 
 SUPPORTED_APPS = get_args(SUPPORTED_APPS_LITERAL)
@@ -140,9 +141,7 @@ class Ecoharmonogram:
         self._app = app if app else None
         self._client_id = hex(randrange(0x1000000000000000, 0xFFFFFFFFFFFFFFFF))[2:]
 
-    def do_request(
-        self, action: str, payload: Mapping[str, str | int], url: str = API_URL
-    ) -> requests.Response:
+    def do_request(self, action: str, payload: Mapping[str, str | int], url: str = API_URL) -> requests.Response:
         params = dict(payload)
         params["action"] = action
         if self._app:
@@ -258,11 +257,7 @@ def print_markdown_table() -> None:
                     duplicates_count[app] = 0
                 duplicates_count[app] += 1
 
-    duplicates_with_total = {
-        k: {"duplicates": v, "total": len(table_data[k])}
-        for k, v in duplicates_count.items()
-        if v > 0
-    }
+    duplicates_with_total = {k: {"duplicates": v, "total": len(table_data[k])} for k, v in duplicates_count.items() if v > 0}
     if len(duplicates_with_total) > 0:
         print(f"duplicate Towns with No App: {duplicates_with_total}")
 

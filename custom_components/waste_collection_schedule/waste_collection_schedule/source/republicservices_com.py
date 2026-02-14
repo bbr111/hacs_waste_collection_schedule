@@ -147,10 +147,7 @@ class Source:
             for item in schedule:
                 if "RECYCLE" in schedule[item]["waste_description"]:
                     icon = "mdi:recycle"
-                elif (
-                    "YARD" in schedule[item]["waste_description"]
-                    or "ORGANICS" in schedule[item]["waste_description"]
-                ):
+                elif "YARD" in schedule[item]["waste_description"] or "ORGANICS" in schedule[item]["waste_description"]:
                     icon = "mdi:leaf"
                 else:
                     icon = "mdi:trash-can"
@@ -161,14 +158,9 @@ class Source:
                         icon=icon,
                     ),
                 )
-        elif (
-            self._method == 2
-        ):  # Updated to report yard waste as a separate category to recycling
+        elif self._method == 2:  # Updated to report yard waste as a separate category to recycling
             for item in schedule:
-                if (
-                    "YARD" in schedule[item]["waste_description"]
-                    or "ORGANICS" in schedule[item]["waste_description"]
-                ):
+                if "YARD" in schedule[item]["waste_description"] or "ORGANICS" in schedule[item]["waste_description"]:
                     icon = "mdi:leaf"
                     schedule[item]["waste_type"] = "Yard Waste"
                 elif "BULK SERVICE" in schedule[item]["waste_description"]:

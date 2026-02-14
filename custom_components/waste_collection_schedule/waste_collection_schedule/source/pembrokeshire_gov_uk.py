@@ -47,9 +47,7 @@ PARAM_DESCRIPTIONS = {  # Optional dict to describe the arguments, will be shown
 
 
 class Source:
-    def __init__(
-        self, uprn: str
-    ):  # argX correspond to the args dict in the source configuration
+    def __init__(self, uprn: str):  # argX correspond to the args dict in the source configuration
         self._uprn = uprn
 
     def fetch(self) -> list[Collection]:

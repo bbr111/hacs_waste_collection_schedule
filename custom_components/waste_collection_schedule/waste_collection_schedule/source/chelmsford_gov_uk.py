@@ -70,9 +70,7 @@ class Source:
                             year = heading.split()[1]
                             break
 
-                    date = datetime.strptime(
-                        f"{date} {month} {year}", "%d %B %Y"
-                    ).date()
+                    date = datetime.strptime(f"{date} {month} {year}", "%d %B %Y").date()
                     for i in items.split(","):
                         waste_type = i.strip()
                         entries.append(

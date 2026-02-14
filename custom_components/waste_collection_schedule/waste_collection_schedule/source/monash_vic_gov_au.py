@@ -63,9 +63,7 @@ class Source:
         )
 
         if r.status_code != requests.codes.ok:
-            raise Exception(
-                "Error Accessing Waste Services API"
-            )  # DO NOT JUST return []
+            raise Exception("Error Accessing Waste Services API")  # DO NOT JUST return []
         html = r.json()["responseContent"]
         soup = BeautifulSoup(html, "html.parser")
 
@@ -73,9 +71,7 @@ class Source:
         for article in soup.find_all("article"):
             waste_type = article.find("h3").get_text(strip=True)
 
-            next_date_str = article.find("div", class_="next-service").get_text(
-                strip=True
-            )
+            next_date_str = article.find("div", class_="next-service").get_text(strip=True)
             next_date = datetime.datetime.strptime(next_date_str, "%a %d/%m/%Y").date()
             entries.append(
                 Collection(

@@ -69,9 +69,7 @@ class Source:
 
     def fetch(self):
         baseUrl = f"https://services.infeo.at/awm/api/{self._customer}/wastecalendar"
-        issueUrl = (
-            "https://github.com/mampfes/hacs_waste_collection_schedule/issues/new"
-        )
+        issueUrl = "https://github.com/mampfes/hacs_waste_collection_schedule/issues/new"
 
         params = {
             "showUnpublishedCalendars": "false",
@@ -87,9 +85,7 @@ class Source:
         # data validation
         response = response.json()
         if len(response) <= 0:
-            raise Exception(
-                f"no calendars found, please file an issue at {issueUrl} and mention @dm82m"
-            )
+            raise Exception(f"no calendars found, please file an issue at {issueUrl} and mention @dm82m")
 
         entries = []
 
@@ -102,7 +98,7 @@ class Source:
                 "calendarId": calendarYearId,
             }
 
-            if self._zone != None:
+            if self._zone is not None:
                 # get available zones for calendar year
                 url = f"{baseUrl}/zones"
                 response = requests.get(url, params=params)

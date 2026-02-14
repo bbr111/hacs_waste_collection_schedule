@@ -26,9 +26,7 @@ class Source:
 
     def fetch(self):
         # get json file
-        r = requests.get(
-            f"https://pgh.st/locate/{self._house_number}/{quote(self._street_name)}/{self._zipcode}"
-        )
+        r = requests.get(f"https://pgh.st/locate/{self._house_number}/{quote(self._street_name)}/{self._zipcode}")
 
         # extract data from json
         data = json.loads(r.text)
@@ -39,9 +37,7 @@ class Source:
         try:
             entries.append(
                 Collection(
-                    date=datetime.datetime.strptime(
-                        data[0]["next_pickup_date"], "%m-%d-%Y"
-                    ).date(),
+                    date=datetime.datetime.strptime(data[0]["next_pickup_date"], "%m-%d-%Y").date(),
                     t="Trash",
                     icon="mdi:trash-can",
                 )
@@ -52,9 +48,7 @@ class Source:
         try:
             entries.append(
                 Collection(
-                    date=datetime.datetime.strptime(
-                        data[0]["next_recycling_date"], "%m-%d-%Y"
-                    ).date(),
+                    date=datetime.datetime.strptime(data[0]["next_recycling_date"], "%m-%d-%Y").date(),
                     t="Recycling",
                     icon="mdi:recycle",
                 )
@@ -65,9 +59,7 @@ class Source:
         try:
             entries.append(
                 Collection(
-                    date=datetime.datetime.strptime(
-                        data[0]["next_yard_date"], "%m-%d-%Y"
-                    ).date(),
+                    date=datetime.datetime.strptime(data[0]["next_yard_date"], "%m-%d-%Y").date(),
                     t="Yard Waste",
                     icon="mdi:leaf",
                 )

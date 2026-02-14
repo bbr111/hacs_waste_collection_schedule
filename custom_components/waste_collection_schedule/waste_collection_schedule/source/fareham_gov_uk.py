@@ -1,6 +1,6 @@
 import re
+from collections.abc import Iterable
 from datetime import date
-from typing import Iterable
 
 import requests
 from dateutil.parser import parse as date_parse
@@ -33,13 +33,9 @@ ICON_MAP = {
 class Source:
     def __init__(self, road_name: str, postcode: str):
         if not road_name or not road_name.strip():
-            raise SourceArgumentRequired(
-                "road_name", "please provide the road name as listed by the council"
-            )
+            raise SourceArgumentRequired("road_name", "please provide the road name as listed by the council")
         if not postcode or not postcode.strip():
-            raise SourceArgumentRequired(
-                "postcode", "please provide the postcode recognised by the council"
-            )
+            raise SourceArgumentRequired("postcode", "please provide the postcode recognised by the council")
 
         self._road_name = road_name.strip()
         self._postcode = postcode.strip()
@@ -86,9 +82,7 @@ class Source:
 
     def _request_rows(self, query: str):
         if not query:
-            raise SourceArgumentRequired(
-                "postcode", "please provide the postcode recognised by the council"
-            )
+            raise SourceArgumentRequired("postcode", "please provide the postcode recognised by the council")
         params = {
             "type": "JSON",
             "list": API_LIST,

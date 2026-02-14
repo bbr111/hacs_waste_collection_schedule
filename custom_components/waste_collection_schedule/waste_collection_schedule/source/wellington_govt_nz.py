@@ -72,9 +72,7 @@ class Source:
         r = requests.get(url, params=params, headers=HEADERS)
 
         if not r.text.startswith("BEGIN:VCALENDAR"):
-            raise SourceArgumentException(
-                "streetId", f"{self._streetId} is not a valid streetID"
-            )
+            raise SourceArgumentException("streetId", f"{self._streetId} is not a valid streetID")
 
         dates = self._ics.convert(r.text)
 

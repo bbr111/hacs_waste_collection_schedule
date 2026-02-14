@@ -61,9 +61,7 @@ class Source:
                 street_id = street["id"]
                 break
         if street_id is None:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "street_name", self._street_name, [x["street"] for x in streets]
-            )
+            raise SourceArgumentNotFoundWithSuggestions("street_name", self._street_name, [x["street"] for x in streets])
         addresses_url = f"{API_URL}/address-points/{street_id}"
         r = requests.get(addresses_url)
         r.raise_for_status()

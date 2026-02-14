@@ -48,9 +48,7 @@ PARAM_TRANSLATIONS = {
 
 
 class Source:
-    def __init__(
-        self, street: str, house_number: str | int, object_number: str | int = ""
-    ):
+    def __init__(self, street: str, house_number: str | int, object_number: str | int = ""):
         self._street: str = street
         self._house_number: str = str(house_number)
         self._object_number: str = str(object_number)

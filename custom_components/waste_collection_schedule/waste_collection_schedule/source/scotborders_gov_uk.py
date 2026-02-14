@@ -8,9 +8,7 @@ from waste_collection_schedule import Collection
 
 TITLE = "Scottish Borders Council"
 DESCRIPTION = "Source for Scottish Borders Council (Bartec Municipal)"
-URL = (
-    "https://scotborders-live-portal.bartecmunicipal.com/Embeddable/CollectionCalendar"
-)
+URL = "https://scotborders-live-portal.bartecmunicipal.com/Embeddable/CollectionCalendar"
 TEST_CASES = {"Test": {"uprn": "116073632", "postcode": "TD9 9HL"}}
 
 _LOGGER = logging.getLogger(__name__)
@@ -95,13 +93,9 @@ class Source:
                     try:
                         dt = datetime.fromisoformat(date_str).date()
                     except ValueError:
-                        dt = datetime.strptime(
-                            date_str.split("T")[0], "%Y-%m-%d"
-                        ).date()
+                        dt = datetime.strptime(date_str.split("T")[0], "%Y-%m-%d").date()
 
-                    entries.append(
-                        Collection(date=dt, t=subject, icon=self.get_icon(subject))
-                    )
+                    entries.append(Collection(date=dt, t=subject, icon=self.get_icon(subject)))
                 break  # Stop looking after finding the right block
 
             except json.JSONDecodeError:
@@ -113,14 +107,10 @@ class Source:
         return entries
 
     def _get_token(self, html):
-        match = re.search(
-            r'name="__RequestVerificationToken" type="hidden" value="([^"]+)"', html
-        )
+        match = re.search(r'name="__RequestVerificationToken" type="hidden" value="([^"]+)"', html)
         if match:
             return match.group(1)
-        match = re.search(
-            r"name='__RequestVerificationToken' type='hidden' value='([^']+)'", html
-        )
+        match = re.search(r"name='__RequestVerificationToken' type='hidden' value='([^']+)'", html)
         if match:
             return match.group(1)
         raise Exception("Could not find Verification Token.")

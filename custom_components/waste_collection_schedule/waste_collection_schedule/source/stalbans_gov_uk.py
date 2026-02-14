@@ -34,12 +34,7 @@ class Source:
         r.raise_for_status()
 
         data = r.json()
-        if (
-            not data
-            or not isinstance(data, dict)
-            or "d" not in data
-            or not isinstance(data["d"], list)
-        ):
+        if not data or not isinstance(data, dict) or "d" not in data or not isinstance(data["d"], list):
             raise ValueError("Got invalid response from API")
 
         entries = []
@@ -59,11 +54,7 @@ class Source:
                     continue
                 bin_type = bin_type.removeprefix("Collect ")
                 icon = ICON_MAP.get(
-                    bin_type.lower()
-                    .replace("domestic", "")
-                    .replace("communal", "")
-                    .replace("paid", "")
-                    .strip()
+                    bin_type.lower().replace("domestic", "").replace("communal", "").replace("paid", "").strip()
                 )
                 for date_key in ("Last", "Next"):
                     date_str = header.get(date_key)

@@ -25,9 +25,7 @@ class Source:
 
     def fetch(self):
         s = requests.Session()
-        r = s.get(
-            f"https://service.folkestone-hythe.gov.uk/webapp/myarea/index.php?uprn={self._uprn}"
-        )
+        r = s.get(f"https://service.folkestone-hythe.gov.uk/webapp/myarea/index.php?uprn={self._uprn}")
         r.raise_for_status()
 
         soup = BeautifulSoup(r.text, "html.parser")
@@ -41,9 +39,7 @@ class Source:
             for li in schedules[idx].findAll("li"):
                 entries.append(
                     Collection(
-                        date=datetime.strptime(
-                            re.compile(REGEX_ORDINALS).sub(" ", li.text), "%A %d %B %Y"
-                        ).date(),
+                        date=datetime.strptime(re.compile(REGEX_ORDINALS).sub(" ", li.text), "%A %d %B %Y").date(),
                         t=item.text,
                         icon=ICON_MAP.get(item.text),
                     )

@@ -63,9 +63,7 @@ class Source:
                 break
 
         if suburb_id == 0:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "suburb", self.suburb, [x["name"] for x in data["localities"]]
-            )
+            raise SourceArgumentNotFoundWithSuggestions("suburb", self.suburb, [x["name"] for x in data["localities"]])
 
         # Retrieve the streets in our suburb
         r = requests.get(
@@ -81,9 +79,7 @@ class Source:
                 break
 
         if street_id == 0:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "street_name", self.street_name, [x["name"] for x in data["streets"]]
-            )
+            raise SourceArgumentNotFoundWithSuggestions("street_name", self.street_name, [x["name"] for x in data["streets"]])
 
         # Retrieve the properties in our street
         r = requests.get(
@@ -108,9 +104,7 @@ class Source:
                     if f" {self.street_name} {self.suburb}" in x["name"]
                 ],
             )
-            raise Exception(
-                f"{self.street_number} {self.street_name} {self.suburb} not found"
-            )
+            raise Exception(f"{self.street_number} {self.street_name} {self.suburb} not found")
 
         # Retrieve the upcoming collections for our property
         r = requests.get(
@@ -133,16 +127,10 @@ class Source:
             if item["event_type"] not in ["recycle", "organic"]:
                 continue
             # Every collection day includes rubbish
-            entries.append(
-                Collection(date=collection_date, t="Rubbish", icon="mdi:trash-can")
-            )
+            entries.append(Collection(date=collection_date, t="Rubbish", icon="mdi:trash-can"))
             if item["event_type"] == "recycle":
-                entries.append(
-                    Collection(date=collection_date, t="Recycling", icon="mdi:recycle")
-                )
+                entries.append(Collection(date=collection_date, t="Recycling", icon="mdi:recycle"))
             if item["event_type"] == "organic":
-                entries.append(
-                    Collection(date=collection_date, t="Garden", icon="mdi:leaf")
-                )
+                entries.append(Collection(date=collection_date, t="Garden", icon="mdi:leaf"))
 
         return entries

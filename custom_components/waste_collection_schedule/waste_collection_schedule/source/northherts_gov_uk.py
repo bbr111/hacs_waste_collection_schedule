@@ -1,6 +1,7 @@
 import re
+from collections.abc import Sequence
 from datetime import date, datetime
-from typing import Any, Dict, List, Optional, Sequence, Set, Tuple, cast
+from typing import Any, cast
 
 import requests
 from waste_collection_schedule import Collection
@@ -69,8 +70,8 @@ BASE_HEADERS = {
 POSTCODE_PATTERN = re.compile(r"([A-Z]{1,2}\d[A-Z\d]?)\s*(\d[A-Z]{2})", re.IGNORECASE)
 ISO_DATE_PATTERN = re.compile(r"\d{4}-\d{2}-\d{2}")
 
-Address = Dict[str, Any]
-JSONDict = Dict[str, Any]
+Address = dict[str, Any]
+JSONDict = dict[str, Any]
 ADDRESS_FIELDS = (
     "fullAddress",
     "singleLineAddress",
@@ -87,11 +88,11 @@ ADDRESS_FIELDS = (
 )
 
 
-def build_headers() -> Dict[str, str]:
+def build_headers() -> dict[str, str]:
     return dict(BASE_HEADERS)
 
 
-def normalise_postcode(text: Optional[str]) -> Optional[str]:
+def normalise_postcode(text: str | None) -> str | None:
     if not text:
         return None
     match = POSTCODE_PATTERN.search(text)
@@ -101,12 +102,7 @@ def normalise_postcode(text: Optional[str]) -> Optional[str]:
 
 
 def _address_to_string(address: Address) -> str:
-    return " ".join(
-        str(value)
-        for key in ADDRESS_FIELDS
-        for value in [address.get(key)]
-        if value not in (None, "")
-    ).strip()
+    return " ".join(str(value) for key in ADDRESS_FIELDS for value in [address.get(key)] if value not in (None, "")).strip()
 
 
 def _clean_type_name(name: str) -> str:
@@ -118,7 +114,7 @@ def _clean_type_name(name: str) -> str:
     return cleaned or name
 
 
-def _icon_for(label: str) -> Optional[str]:
+def _icon_for(label: str) -> str | None:
     if label in ICON_MAP:
         return ICON_MAP[label]
     lowered = label.lower()
@@ -128,7 +124,7 @@ def _icon_for(label: str) -> Optional[str]:
     return None
 
 
-def _parse_date_string(value: Any) -> Optional[date]:
+def _parse_date_string(value: Any) -> date | None:
     """Handle the varied date formats returned by the Cloud 9 API."""
     if value is None:
         return None
@@ -160,51 +156,40 @@ def _parse_date_string(value: Any) -> Optional[date]:
     return None
 
 
-def _extract_dates(details: Dict[str, Any]) -> List[date]:
+def _extract_dates(details: dict[str, Any]) -> list[date]:
     """Collect date fields from the different container schemas the API returns."""
-    values: List[Any] = [
-        details.get(key)
-        for key in ("collectionDate", "nextCollectionDate", "nextCollection")
-    ]
+    values: list[Any] = [details.get(key) for key in ("collectionDate", "nextCollectionDate", "nextCollection")]
     values.extend(details.get("collectionDates") or [])
     values.extend(
         (
-            (
-                entry.get("collectionDate")
-                or entry.get("nextCollectionDate")
-                or entry.get("date")
-            )
+            (entry.get("collectionDate") or entry.get("nextCollectionDate") or entry.get("date"))
             if isinstance(entry, dict)
             else entry
         )
         for entry in details.get("futureCollections") or []
     )
-    next_collection = cast(Dict[str, Any], details.get("nextCollection") or {})
+    next_collection = cast(dict[str, Any], details.get("nextCollection") or {})
     values.append(
-        next_collection.get("collectionDate")
-        or next_collection.get("nextCollectionDate")
-        or next_collection.get("date")
+        next_collection.get("collectionDate") or next_collection.get("nextCollectionDate") or next_collection.get("date")
     )
 
-    return sorted(
-        {parsed for parsed in map(_parse_date_string, values) if parsed is not None}
-    )
+    return sorted({parsed for parsed in map(_parse_date_string, values) if parsed is not None})
 
 
 class Source:
     def __init__(
         self,
-        address_name_numer: Optional[str] = None,
-        address_street: Optional[str] = None,
-        street_town: Optional[str] = None,
-        address_postcode: Optional[str] = None,
+        address_name_numer: str | None = None,
+        address_street: str | None = None,
+        street_town: str | None = None,
+        address_postcode: str | None = None,
     ):
         self._address_name_numer = address_name_numer
         self._address_street = address_street
         self._street_town = street_town
         self._address_postcode = address_postcode
 
-    def fetch(self) -> List[Collection]:
+    def fetch(self) -> list[Collection]:
         headers = build_headers()
         session = requests.Session()
 
@@ -232,25 +217,21 @@ class Source:
             self._street_town,
             self._address_postcode,
         ]
-        return " ".join(
-            part.strip() for part in parts if isinstance(part, str) and part.strip()
-        )
+        return " ".join(part.strip() for part in parts if isinstance(part, str) and part.strip())
 
     def _lookup_addresses(
         self,
         session: requests.Session,
-        headers: Dict[str, str],
+        headers: dict[str, str],
         query: str,
-        postcode: Optional[str],
-    ) -> List[Address]:
+        postcode: str | None,
+    ) -> list[Address]:
         address_line = " ".join(
-            part.strip()
-            for part in (self._address_name_numer, self._address_street)
-            if isinstance(part, str) and part.strip()
+            part.strip() for part in (self._address_name_numer, self._address_street) if isinstance(part, str) and part.strip()
         )
         url = f"{API_DOMAIN}/{AUTHORITY}{API_BASE}{ADDRESSES_PATH}"
-        seen: Set[Tuple[str, str]] = set()
-        attempts: List[Tuple[str, Optional[str]]] = [
+        seen: set[tuple[str, str]] = set()
+        attempts: list[tuple[str, str | None]] = [
             ("postcode", postcode),
             ("postcode", self._address_postcode),
             ("address", query),
@@ -274,12 +255,10 @@ class Source:
                 timeout=REQUEST_TIMEOUT,
             )
             response.raise_for_status()
-            payload_json = cast(JSONDict, response.json())
-            addresses_data = cast(
-                Optional[List[Address]], payload_json.get("addresses")
-            )
-            if addresses_data:
-                return [cast(Address, address) for address in addresses_data]
+            payload_json: JSONDict = response.json()
+            addresses_data = payload_json.get("addresses")
+            if isinstance(addresses_data, list):
+                return addresses_data
 
         raise ValueError("No matching addresses were returned by the API.")
 
@@ -287,7 +266,7 @@ class Source:
         self,
         addresses: Sequence[Address],
         query: str,
-        postcode: Optional[str],
+        postcode: str | None,
     ) -> Address:
         """Choose the best candidate using simple scoring heuristics since we need the UPRN."""
         if not addresses:
@@ -297,7 +276,7 @@ class Source:
         postcode_lower = postcode.lower() if postcode else None
 
         best_score = -1
-        best_address: Optional[Address] = None
+        best_address: Address | None = None
 
         for address in addresses:
             full = _address_to_string(address)
@@ -305,11 +284,7 @@ class Source:
             score = 0
 
             candidate_postcode = normalise_postcode(address.get("postcode"))
-            if (
-                postcode_lower
-                and candidate_postcode
-                and candidate_postcode.lower() == postcode_lower
-            ):
+            if postcode_lower and candidate_postcode and candidate_postcode.lower() == postcode_lower:
                 score += 100
             elif postcode_lower and postcode_lower in lowered:
                 score += 60
@@ -344,7 +319,7 @@ class Source:
     def _fetch_waste_collections(
         self,
         session: requests.Session,
-        headers: Dict[str, str],
+        headers: dict[str, str],
         uprn: str,
     ) -> JSONDict:
         url = f"{API_DOMAIN}/{AUTHORITY}{API_BASE}{WASTE_PATH}/{uprn}"
@@ -352,25 +327,20 @@ class Source:
         response.raise_for_status()
         return cast(JSONDict, response.json())
 
-    def _build_collections(self, payload: JSONDict) -> List[Collection]:
+    def _build_collections(self, payload: JSONDict) -> list[Collection]:
         collection_data = cast(
             JSONDict,
-            payload.get("wasteCollectionDates")
-            or payload.get("WasteCollectionDates")
-            or payload,
+            payload.get("wasteCollectionDates") or payload.get("WasteCollectionDates") or payload,
         )
 
-        entries: List[Collection] = []
-        seen: Set[Tuple[date, str]] = set()
+        entries: list[Collection] = []
+        seen: set[tuple[date, str]] = set()
 
         for key, details in self._collection_items(collection_data):
             if not details:
                 continue
             raw_label = (
-                details.get("containerDescription")
-                or details.get("containerName")
-                or details.get("collectionType")
-                or key
+                details.get("containerDescription") or details.get("containerName") or details.get("collectionType") or key
             )
             if not isinstance(raw_label, str):
                 raw_label = str(raw_label)
@@ -388,20 +358,18 @@ class Source:
     @staticmethod
     def _collection_items(
         collection_data: JSONDict,
-    ) -> List[Tuple[str, Dict[str, Any]]]:
-        collections_section = cast(
-            Optional[Dict[str, Dict[str, Any]]], collection_data.get("collections")
-        )
+    ) -> list[tuple[str, dict[str, Any]]]:
+        collections_section = cast(dict[str, dict[str, Any]] | None, collection_data.get("collections"))
         if collections_section:
             return list(collections_section.items())
-        items: List[Tuple[str, Dict[str, Any]]] = []
+        items: list[tuple[str, dict[str, Any]]] = []
         for key, value in collection_data.items():
             if not key.lower().endswith("collectiondetails"):
                 continue
             if isinstance(value, list):
                 for idx, entry in enumerate(value, start=1):
                     if entry:
-                        items.append((f"{key}_{idx}", cast(Dict[str, Any], entry)))
+                        items.append((f"{key}_{idx}", cast(dict[str, Any], entry)))
             elif value:
-                items.append((key, cast(Dict[str, Any], value)))
+                items.append((key, cast(dict[str, Any], value)))
         return items

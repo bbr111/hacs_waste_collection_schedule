@@ -38,12 +38,7 @@ class Source:
         r.raise_for_status()
 
         soup = BeautifulSoup(r.text, "html.parser")
-        rows = (
-            soup.find("div", class_="widget-bin-collection")
-            .find("table")
-            .find("tbody")
-            .find_all("tr")
-        )
+        rows = soup.find("div", class_="widget-bin-collection").find("table").find("tbody").find_all("tr")
 
         entries = []
         for row in rows:

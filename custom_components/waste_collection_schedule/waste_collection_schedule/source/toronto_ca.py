@@ -1,5 +1,4 @@
 import csv
-import json
 from datetime import datetime, timedelta
 
 import requests
@@ -17,9 +16,7 @@ TEST_CASES = {
 
 CSV_URL = "https://www.toronto.ca/ext/swms/collection_calendar.csv"
 PROPERTY_LOOKUP_URL = "https://map.toronto.ca/cotgeocoder/rest/geocoder/suggest"
-SCHEDULE_LOOKUP_URL = (
-    "https://map.toronto.ca/cotgeocoder/rest/geocoder/findAddressCandidates"
-)
+SCHEDULE_LOOKUP_URL = "https://map.toronto.ca/cotgeocoder/rest/geocoder/findAddressCandidates"
 
 ICON_MAP = {
     "GreenBin": "mdi:compost",
@@ -88,9 +85,7 @@ class Source:
             timeout=30,
         )
 
-        schedule_cursor = self.get_first_result(
-            schedule_response.json(), "AREACURSOR1"
-        )
+        schedule_cursor = self.get_first_result(schedule_response.json(), "AREACURSOR1")
 
         if not schedule_cursor:
             return entries
@@ -101,10 +96,7 @@ class Source:
         reader = csv.DictReader(csv_response.text.splitlines())
 
         # normalize fieldnames (strip whitespace)
-        reader.fieldnames = [
-            name.strip() if name else name
-            for name in reader.fieldnames
-        ]
+        reader.fieldnames = [name.strip() if name else name for name in reader.fieldnames]
 
         csv_lines = list(reader)
 
@@ -137,9 +129,7 @@ class Source:
                 if not isinstance(cell, str) or cell not in days_of_week:
                     continue
 
-                waste_day = pickup_date + timedelta(
-                    days=days_of_week.index(cell) - start_weekday
-                )
+                waste_day = pickup_date + timedelta(days=days_of_week.index(cell) - start_weekday)
 
                 entries.append(
                     Collection(

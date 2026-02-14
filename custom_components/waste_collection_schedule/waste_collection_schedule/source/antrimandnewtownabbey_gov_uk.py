@@ -26,9 +26,7 @@ ICON_MAP = {
 }
 
 
-REGULAR_API_URL = (
-    "https://antrimandnewtownabbey.gov.uk/residents/bins-recycling/bins-schedule/"
-)
+REGULAR_API_URL = "https://antrimandnewtownabbey.gov.uk/residents/bins-recycling/bins-schedule/"
 RECYCLING_API_URL = "https://www.brysonrecycling.org/northern-ireland/kerbside-collections/collection-day"
 RECYCLING_HOLYDAY_API_URL = "https://www.brysonrecycling.org/northern-ireland/kerbside-collections/bank-holidays/"
 
@@ -97,9 +95,7 @@ class Source:
             replace_date_td = cols[1 + council_idx]
             if "No Collection" not in replace_date_td.text:
                 continue
-            raplace_date_str = replace_date_td.text.strip().split(
-                "Alternative collection"
-            )[1]
+            raplace_date_str = replace_date_td.text.strip().split("Alternative collection")[1]
 
             try:
                 raplace_date = parse(raplace_date_str, default=datetime.now()).date()

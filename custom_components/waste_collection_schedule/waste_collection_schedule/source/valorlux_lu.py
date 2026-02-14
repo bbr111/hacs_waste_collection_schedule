@@ -56,9 +56,7 @@ class Source:
         # Step 2: If commune is provided, check if it's valid
         if self._commune not in communes:
             commune_names = sorted(list(communes.keys()))
-            raise SourceArgumentNotFoundWithSuggestions(
-                "commune", self._commune, commune_names
-            )
+            raise SourceArgumentNotFoundWithSuggestions("commune", self._commune, commune_names)
 
         # Step 3: Check for zones/tours for the selected commune
         commune_data = communes[self._commune]

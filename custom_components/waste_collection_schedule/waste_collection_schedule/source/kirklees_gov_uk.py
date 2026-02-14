@@ -32,9 +32,7 @@ PARAMS = {
     "ctl00$ctl00$cphPageBody$cphContent$hdnBinUPRN": "",
 }
 
-COLLECTION_REGEX = (
-    "(Recycling|Domestic|Garden Waste).*collection date ([0-3][0-9] [a-zA-Z]* [0-9]{4})"
-)
+COLLECTION_REGEX = "(Recycling|Domestic|Garden Waste).*collection date ([0-3][0-9] [a-zA-Z]* [0-9]{4})"
 
 ICON_MAP = {
     "DOMESTIC": "mdi:trash-can",
@@ -44,9 +42,7 @@ ICON_MAP = {
 
 
 class Source:
-    def __init__(
-        self, door_num: str | int, postcode: str, uprn: str | int | None = None
-    ):
+    def __init__(self, door_num: str | int, postcode: str, uprn: str | int | None = None):
         self._door_num = door_num
         self._postcode = postcode
         self._uprn = uprn
@@ -56,44 +52,30 @@ class Source:
     def _update_params(self, soup: BeautifulSoup) -> None:
         self._params = {k: v for k, v in PARAMS.items()}
 
-        self._params["__VIEWSTATE"] = (
-            soup.select_one("input#__VIEWSTATE") or dict[str, str]()
-        ).get("value")
-        self._params["__VIEWSTATEGENERATOR"] = (
-            soup.select_one("input#__VIEWSTATEGENERATOR") or dict[str, str]()
-        ).get("value")
-        self._params["__EVENTVALIDATION"] = (
-            soup.select_one("input#__EVENTVALIDATION") or dict[str, str]()
-        ).get("value")
+        self._params["__VIEWSTATE"] = (soup.select_one("input#__VIEWSTATE") or dict[str, str]()).get("value")
+        self._params["__VIEWSTATEGENERATOR"] = (soup.select_one("input#__VIEWSTATEGENERATOR") or dict[str, str]()).get("value")
+        self._params["__EVENTVALIDATION"] = (soup.select_one("input#__EVENTVALIDATION") or dict[str, str]()).get("value")
 
         if soup.find(
             "input",
             {"name": "ctl00$ctl00$cphPageBody$cphContent$thisGeoSearch$txtGeoPremises"},
         ):
-            self._params[
-                "ctl00$ctl00$cphPageBody$cphContent$thisGeoSearch$txtGeoPremises"
-            ] = self._door_num
-            self._params[
-                "ctl00$ctl00$cphPageBody$cphContent$thisGeoSearch$txtGeoSearch"
-            ] = self._postcode
-            self._params[
-                "ctl00$ctl00$cphPageBody$cphContent$thisGeoSearch$butGeoSearch"
-            ] = (soup.select_one("input#butGeoSearch") or dict[str, str]()).get("value")
+            self._params["ctl00$ctl00$cphPageBody$cphContent$thisGeoSearch$txtGeoPremises"] = self._door_num
+            self._params["ctl00$ctl00$cphPageBody$cphContent$thisGeoSearch$txtGeoSearch"] = self._postcode
+            self._params["ctl00$ctl00$cphPageBody$cphContent$thisGeoSearch$butGeoSearch"] = (
+                soup.select_one("input#butGeoSearch") or dict[str, str]()
+            ).get("value")
 
         if soup.select_one("table#dagAddressList"):
             self._params["ctl00$ctl00$cphPageBody$cphContent$hdnBinUPRN"] = self._uprn
             self._params["UPRN"] = self._uprn
-            self._params[
-                "ctl00$ctl00$cphPageBody$cphContent$thisGeoSearch$butSelectAddress"
-            ] = (soup.select_one("input#butSelectAddress") or dict[str, str]()).get(
-                "value"
-            )
+            self._params["ctl00$ctl00$cphPageBody$cphContent$thisGeoSearch$butSelectAddress"] = (
+                soup.select_one("input#butSelectAddress") or dict[str, str]()
+            ).get("value")
 
     def fetch(self):
         entries = []
-        self._session.cookies.set(
-            "cookiesacceptedGDPR", "true", domain=".kirklees.gov.uk"
-        )
+        self._session.cookies.set("cookiesacceptedGDPR", "true", domain=".kirklees.gov.uk")
 
         r0 = self._session.get(f"{BASE_URL}/default.aspx")
         r0.raise_for_status()
@@ -112,9 +94,7 @@ class Source:
             r1.raise_for_status()
             r1_bs4 = BeautifulSoup(r1.text, features="html.parser")
 
-        cal_link = r1_bs4.find(
-            "a", {"id": "cphPageBody_cphContent_wtcDomestic240__LnkCalendar"}
-        )["href"]
+        cal_link = r1_bs4.find("a", {"id": "cphPageBody_cphContent_wtcDomestic240__LnkCalendar"})["href"]
 
         r2 = self._session.get(f"{BASE_URL}/{cal_link}")
         r2.raise_for_status()

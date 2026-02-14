@@ -101,9 +101,7 @@ class Source:
     def get_ids(self):
         [village_id, _] = self.get_from_proxy(input=self._village)
         [street_id, _] = self.get_from_proxy(village=village_id, input=self._street)
-        [house_number_id, area_id] = self.get_from_proxy(
-            village=village_id, street=street_id, input=self._house_number
-        )
+        [house_number_id, area_id] = self.get_from_proxy(village=village_id, street=street_id, input=self._house_number)
         return [village_id, street_id, house_number_id, area_id]
 
     def fetch(self):

@@ -44,7 +44,6 @@ class Source:
         self._uprn = uprn
 
     def fetch(self):
-
         s = requests.Session()
 
         # Used https://github.com/robbrad/UKBinCollectionData/blob/master/uk_bin_collection/uk_bin_collection/councils/SouthOxfordshireCouncil.py
@@ -61,7 +60,7 @@ class Source:
 
         headers = {
             # latest chrome UA
-            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36",
         }
 
         # GET request returns schedule for matching uprn
@@ -87,7 +86,7 @@ class Source:
                 bin_date = bin_info[0].strip().replace("Your usual collection day is different this week", "")
                 bin_type = bin_info[1].strip()
             except Exception as ex:
-                raise ValueError(f"Error parsing bin data: {ex}")
+                raise ValueError(f"Error parsing bin data: {ex}") from ex
 
             for round_type in ICON_MAP:
                 if round_type in bin_type.upper():

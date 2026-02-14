@@ -34,9 +34,7 @@ class Source:
         r = s.get(f"https://recyclingservices.bromley.gov.uk/waste/{self._property}")
 
         for _ in range(MAX_COUNT):
-            r = s.get(
-                f"https://recyclingservices.bromley.gov.uk/waste/{self._property}/calendar.ics"
-            )
+            r = s.get(f"https://recyclingservices.bromley.gov.uk/waste/{self._property}/calendar.ics")
             try:
                 dates = self._ics.convert(r.text)
                 break

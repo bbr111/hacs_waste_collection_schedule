@@ -1,7 +1,7 @@
 import datetime
 import json
 import re
-from urllib.parse import urlparse, parse_qsl
+from urllib.parse import parse_qsl, urlparse
 
 import requests
 from waste_collection_schedule import Collection
@@ -19,13 +19,13 @@ ICON_MAP = {
     "tworzywa": "mdi:recycle",  # Plastic
     "BIO": "mdi:leaf",  # Organic
     "papier": "mdi:file-outline",  # Paper
-    "szkło": "mdi:glass-fragile"  # Glass
+    "szkło": "mdi:glass-fragile",  # Glass
 }
 
 API_URL = "https://ekosystem.wroc.pl/wp-admin/admin-ajax.php"
 
-MESSAGE_FIELD_NAME = 'wiadomosc'
-PARAMS_NUMBER_PARAM_NAME = 'params'
+MESSAGE_FIELD_NAME = "wiadomosc"
+PARAMS_NUMBER_PARAM_NAME = "params"
 WASTE_TYPE_PARAM_FORMAT = "co_{}"
 DATE_PARAM_FORMAT = "kiedy_{}"
 
@@ -33,11 +33,9 @@ DATE_PARAM_FORMAT = "kiedy_{}"
 class Source:
     def __init__(self, location_id):
         self._location_id = location_id
-        self._calendar_url_pattern = re.compile(
-            "<a href=\"(https://ekosystem\\.wroc\\.pl/download/\\?action=pdf[^\"]*)\"")
+        self._calendar_url_pattern = re.compile('<a href="(https://ekosystem\\.wroc\\.pl/download/\\?action=pdf[^"]*)"')
 
     def fetch(self):
-
         r = requests.post(API_URL, data=dict(action="waste_disposal_form_get_schedule", id_numeru=self._location_id))
         data = json.loads(r.text)
 
@@ -54,7 +52,7 @@ class Source:
                 Collection(
                     date=datetime.datetime.strptime(date_str, "%Y-%m-%d").date(),
                     t=type_str.capitalize(),
-                    icon=ICON_MAP.get(type_str)
+                    icon=ICON_MAP.get(type_str),
                 )
             )
 

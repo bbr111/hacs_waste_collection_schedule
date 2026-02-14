@@ -10,9 +10,7 @@ from waste_collection_schedule.service.ICS import ICS
 TITLE = "AWB Oldenburg"
 DESCRIPTION = "Source for 'Abfallwirtschaftsbetrieb Stadt Oldenburg (Oldb)'."
 URL = "https://www.oldenburg.de"
-TEST_CASES = {
-    "Polizeiinspektion Oldenburg": {"street": "Friedhofsweg", "house_number": 30}
-}
+TEST_CASES = {"Polizeiinspektion Oldenburg": {"street": "Friedhofsweg", "house_number": 30}}
 
 API_URL = "https://www.oldenburg.de/startseite/leben-umwelt/awb/awb-von-a-bis-z/abfuhrkalender.html"
 
@@ -43,12 +41,8 @@ class Source:
         args = {
             "tx_collectioncalendar_abfuhrkalender[action]": "exportIcs",
             "tx_collectioncalendar_abfuhrkalender[controller]": r"Frontend\Export",
-            "tx_collectioncalendar_abfuhrkalender[houseNumber]": str(
-                self._house_number
-            ).encode("utf-8"),
-            "tx_collectioncalendar_abfuhrkalender[street]": str(street_idx).encode(
-                "utf-8"
-            ),
+            "tx_collectioncalendar_abfuhrkalender[houseNumber]": str(self._house_number).encode("utf-8"),
+            "tx_collectioncalendar_abfuhrkalender[street]": str(street_idx).encode("utf-8"),
             "tx_collectioncalendar_abfuhrkalender[wasteTypes][1]": 1,
             "tx_collectioncalendar_abfuhrkalender[wasteTypes][2]": 2,
             "tx_collectioncalendar_abfuhrkalender[wasteTypes][3]": 3,
@@ -86,7 +80,7 @@ class Source:
         for item in items:
             streets.append(item.text)  # street name
             ids.append(item.attrs["value"])  # dropdown value
-        mapping = {k: v for (k, v) in zip(streets, ids)}
+        mapping = {k: v for (k, v) in zip(streets, ids, strict=False)}
 
         return mapping
 

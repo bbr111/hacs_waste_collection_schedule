@@ -46,17 +46,11 @@ class Source:
         r = requests.get(url)
         data = json.loads(r.text)
 
-        filtered = [
-            res["attributes"]
-            for res in data
-            if res["attributes"]["address"] == self._address
-        ]
+        filtered = [res["attributes"] for res in data if res["attributes"]["address"] == self._address]
         if len(filtered) == 0:
             raise Exception(f"No result found for address {self._address}")
         if len(filtered) > 1:
-            raise Exception(
-                f"More then one result returned for address {self._address}."
-            )
+            raise Exception(f"More then one result returned for address {self._address}.")
 
         result = filtered[0]
         bin_list = json.loads(result["bin_list"])

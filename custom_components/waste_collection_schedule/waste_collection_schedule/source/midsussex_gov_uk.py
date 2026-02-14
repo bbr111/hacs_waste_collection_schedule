@@ -7,9 +7,7 @@ from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 from waste_collection_schedule.exceptions import SourceArgumentNotFoundWithSuggestions
 
 TITLE = "Mid-Sussex District Council"
-DESCRIPTION = (
-    "Source for midsussex.gov.uk services for Mid-Sussex District Council, UK."
-)
+DESCRIPTION = "Source for midsussex.gov.uk services for Mid-Sussex District Council, UK."
 URL = "https://midsussex.gov.uk"
 
 TEST_CASES = {
@@ -35,9 +33,7 @@ REGEX = r"([A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2})"  # regex for UK postcode format
 
 
 class Source:
-    def __init__(
-        self, house_name="", house_number="", street="", postcode="", address=""
-    ):
+    def __init__(self, house_name="", house_number="", street="", postcode="", address=""):
         self._house_name = str(house_name).upper()
         self._house_number = str(house_number)
         self._street = str(street).upper()
@@ -92,9 +88,7 @@ class Source:
         return entries
 
     def _apply_christmas_changes(self, soup, entries):
-        christmas_heading = soup.find(
-            "strong", text=re.compile("Christmas Bin Collection Calendar")
-        )
+        christmas_heading = soup.find("strong", text=re.compile("Christmas Bin Collection Calendar"))
         if not christmas_heading:
             return entries
         try:

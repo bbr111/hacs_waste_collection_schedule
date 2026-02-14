@@ -19,11 +19,7 @@ TEST_CASES = {
     "unknown_uprn_business": {"postcode": "RG18 4GE", "housenumberorname": "3"},
 }
 
-ICON_MAP = {
-    "RUBBISH": "mdi:trash-can",
-    "RECYCLING": "mdi:recycle",
-    "FOODWASTE": "mdi:food-apple"
-}
+ICON_MAP = {"RUBBISH": "mdi:trash-can", "RECYCLING": "mdi:recycle", "FOODWASTE": "mdi:food-apple"}
 
 SEARCH_URLS = {
     "uprn_search": "https://www.westberks.gov.uk/apiserver/ajaxlibrary",
@@ -114,18 +110,10 @@ class Source:
             waste_type = "Rubbish"
             if "nextRubbishDateSubText" in rubbish_data["result"]:
                 if not rubbish_data["result"]["nextRubbishDateSubText"]:
-                    dt_str = (
-                        rubbish_data["result"]["nextRubbishDateText"]
-                        + " "
-                        + str(date.today().year)
-                    )
+                    dt_str = rubbish_data["result"]["nextRubbishDateText"] + " " + str(date.today().year)
                 else:
                     if len(rubbish_data["result"]["nextRubbishDateText"]) < 12:
-                        dt_str = (
-                            rubbish_data["result"]["nextRubbishDateSubText"]
-                            + " "
-                            + str(date.today().year)
-                        )
+                        dt_str = rubbish_data["result"]["nextRubbishDateSubText"] + " " + str(date.today().year)
                 dt_zulu = datetime.strptime(dt_str, "%A %d %B %Y")
                 dt_local = dt_zulu.astimezone(None)
                 entries.append(
@@ -139,18 +127,10 @@ class Source:
             waste_type = "Recycling"
             if "nextRecyclingDateSubText" in recycling_data["result"]:
                 if not recycling_data["result"]["nextRecyclingDateSubText"]:
-                    dt_str = (
-                        recycling_data["result"]["nextRecyclingDateText"]
-                        + " "
-                        + str(date.today().year)
-                    )
+                    dt_str = recycling_data["result"]["nextRecyclingDateText"] + " " + str(date.today().year)
                 else:
                     if len(recycling_data["result"]["nextRecyclingDateText"]) < 12:
-                        dt_str = (
-                            recycling_data["result"]["nextRecyclingDateSubText"]
-                            + " "
-                            + str(date.today().year)
-                        )
+                        dt_str = recycling_data["result"]["nextRecyclingDateSubText"] + " " + str(date.today().year)
                 dt_zulu = datetime.strptime(dt_str, "%A %d %B %Y")
                 dt_local = dt_zulu.astimezone(None)
                 entries.append(
@@ -164,18 +144,10 @@ class Source:
             waste_type = "FoodWaste"
             if "nextFoodWasteDateSubText" in food_data["result"]:
                 if not food_data["result"]["nextFoodWasteDateSubText"]:
-                    dt_str = (
-                        food_data["result"]["nextFoodWasteDateText"]
-                        + " "
-                        + str(date.today().year)
-                    )
+                    dt_str = food_data["result"]["nextFoodWasteDateText"] + " " + str(date.today().year)
                 else:
                     if len(food_data["result"]["nextFoodWasteDateText"]) < 12:
-                        dt_str = (
-                            food_data["result"]["nextFoodWasteDateSubText"]
-                            + " "
-                            + str(date.today().year)
-                        )
+                        dt_str = food_data["result"]["nextFoodWasteDateSubText"] + " " + str(date.today().year)
                 dt_zulu = datetime.strptime(dt_str, "%A %d %B %Y")
                 dt_local = dt_zulu.astimezone(None)
                 entries.append(

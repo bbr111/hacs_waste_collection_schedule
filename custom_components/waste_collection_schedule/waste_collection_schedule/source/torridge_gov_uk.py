@@ -85,9 +85,7 @@ class Source:
             headers=HEADERS,
             json=payload,
         )
-        rowdata = json.loads(schedule_request.content)["integration"]["transformed"][
-            "rows_data"
-        ]
+        rowdata = json.loads(schedule_request.content)["integration"]["transformed"]["rows_data"]
 
         # Extract bin types and next collection dates
         entries: list[Collection] = []
@@ -128,11 +126,7 @@ class Source:
                         raise ValueError(f"Unknown month: {bin_month}")
 
                     # Handle year rollover
-                    bin_year = (
-                        current_year
-                        if MONTHS[bin_month] >= MONTHS[current_month]
-                        else current_year + 1
-                    )
+                    bin_year = current_year if MONTHS[bin_month] >= MONTHS[current_month] else current_year + 1
 
                     # Convert to date object
                     dt = f"{bin_day_num} {bin_month} {bin_year}"

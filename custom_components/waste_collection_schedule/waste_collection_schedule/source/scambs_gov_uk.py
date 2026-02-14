@@ -9,9 +9,7 @@ from waste_collection_schedule.exceptions import (
 )
 
 TITLE = "South Cambridgeshire District Council (Deprecated)"
-DESCRIPTION = (
-    "Source for scambs.gov.uk services for South Cambridgeshire District Council"
-)
+DESCRIPTION = "Source for scambs.gov.uk services for South Cambridgeshire District Council"
 URL = "https://scambs.gov.uk"
 TEST_CASES = {
     "houseNumber": {"post_code": "CB236GZ", "number": 53},
@@ -43,21 +41,15 @@ class Source:
 
     def fetch(self):
         # fetch location id
-        r = requests.get(
-            API_URLS["address_search"], params={"postCode": self._post_code}
-        )
+        r = requests.get(API_URLS["address_search"], params={"postCode": self._post_code})
         if r.status_code == 400:
             raise SourceArgumentNotFound("post_code", self._post_code)
         r.raise_for_status()
         addresses = r.json()
-        address_ids = [
-            x["id"] for x in addresses if x["houseNumber"].capitalize() == self._number
-        ]
+        address_ids = [x["id"] for x in addresses if x["houseNumber"].capitalize() == self._number]
 
         if len(address_ids) == 0:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "number", self._number, [x["houseNumber"] for x in addresses]
-            )
+            raise SourceArgumentNotFoundWithSuggestions("number", self._number, [x["houseNumber"] for x in addresses])
 
         q = str(API_URLS["collection"]).format(address_ids[0])
         r = requests.get(q)
@@ -70,12 +62,8 @@ class Source:
             for round_type in collection["roundTypes"]:
                 entries.append(
                     Collection(
-                        date=datetime.strptime(
-                            collection["date"], "%Y-%m-%dT%H:%M:%SZ"
-                        ).date(),
-                        t=ROUNDS.get(
-                            round_type, round_type.title()
-                        ),  # returns concise values: Black Bin, Blue Bin, Green Bin
+                        date=datetime.strptime(collection["date"], "%Y-%m-%dT%H:%M:%SZ").date(),
+                        t=ROUNDS.get(round_type, round_type.title()),  # returns concise values: Black Bin, Blue Bin, Green Bin
                         # t = round_type.title(),  # returns standard Scambs values: Black Bin Collection, Blue Bin Collection, Green Bin Collection
                         icon=ICON_MAP.get(round_type),
                     )

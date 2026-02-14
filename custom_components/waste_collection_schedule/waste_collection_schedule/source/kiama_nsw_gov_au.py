@@ -46,9 +46,7 @@ class Source:
         self._geolocationid = geolocationid
 
     def fetch(self):
-        data = {
-            "Referer": "https://www.kiama.nsw.gov.au/Services/Waste-and-recycling/Find-my-bin-collection-dates"
-        }
+        data = {"Referer": "https://www.kiama.nsw.gov.au/Services/Waste-and-recycling/Find-my-bin-collection-dates"}
 
         pageurl = f"https://www.kiama.nsw.gov.au/ocapi/Public/myarea/wasteservices?geolocationid={self._geolocationid}&ocsvclang=en-AU"
         response = requests.get(f"{pageurl}", data=data)
@@ -74,11 +72,7 @@ class Source:
 
                 # Get next service date from <div class="next-service">
                 next_service = result.find("div", class_="next-service")
-                day = (
-                    next_service.get_text(strip=True)
-                    if next_service
-                    else "No date provided"
-                )
+                day = next_service.get_text(strip=True) if next_service else "No date provided"
 
                 # Only print if a date is available
                 if day and day != "":

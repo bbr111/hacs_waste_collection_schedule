@@ -95,30 +95,19 @@ class Source:
         return list({m["wojewodztwo"] for m in self.municipalities})
 
     def get_districts_list(self):
-        return list(
-            {
-                m["powiat"]
-                for m in self.municipalities
-                if m["wojewodztwo"].lower() == self.voivodeship.lower()
-            }
-        )
+        return list({m["powiat"] for m in self.municipalities if m["wojewodztwo"].lower() == self.voivodeship.lower()})
 
     def get_municipalities_list(self):
         return [
             m["gmina"]
             for m in self.municipalities
-            if m["wojewodztwo"].lower() == self.voivodeship.lower()
-            and m["powiat"].lower() == self.district.lower()
+            if m["wojewodztwo"].lower() == self.voivodeship.lower() and m["powiat"].lower() == self.district.lower()
         ]
 
     def get_streets_list(self):
         try:
             streets = get_json(
-                "dostepne_gminy?wojewodztwo={}&powiat={}&gmina={}".format(
-                    urllib.parse.quote(self.voivodeship),
-                    urllib.parse.quote(self.district),
-                    urllib.parse.quote(self.municipality),
-                )
+                f"dostepne_gminy?wojewodztwo={urllib.parse.quote(self.voivodeship)}&powiat={urllib.parse.quote(self.district)}&gmina={urllib.parse.quote(self.municipality)}"
             )["listaUlic"]
             streets = [s["ulica"] for s in streets]
         except Exception:
@@ -137,12 +126,7 @@ class Source:
     def get_schedule(self):
         try:
             schedule = get_json(
-                "lista_terminow/v6?wojewodztwo={}&powiat={}&gmina={}&ulica={}".format(
-                    urllib.parse.quote(self.voivodeship),
-                    urllib.parse.quote(self.district),
-                    urllib.parse.quote(self.municipality),
-                    urllib.parse.quote(self.street),
-                )
+                f"lista_terminow/v6?wojewodztwo={urllib.parse.quote(self.voivodeship)}&powiat={urllib.parse.quote(self.district)}&gmina={urllib.parse.quote(self.municipality)}&ulica={urllib.parse.quote(self.street)}"
             )["listaTerminow"]
 
         except Exception:
@@ -156,9 +140,7 @@ class Source:
         for entry in self.schedule:
             entries.append(
                 Collection(
-                    date=datetime.datetime.strptime(
-                        entry["dataOdbioru"], "%Y-%m-%d"
-                    ).date(),
+                    date=datetime.datetime.strptime(entry["dataOdbioru"], "%Y-%m-%d").date(),
                     t=entry["nazwaTypuSmieci"],
                     icon=ICON_MAP.get(entry["nazwaTypuSmieci"], "mdi:trash-can"),
                 )

@@ -62,18 +62,12 @@ class Source:
         else:
             waste_types = []
             # Build list of collection categories
-            for item in json_data["Fields"][
-                3:-1
-            ]:  # limit to those entries containing collection info
+            for item in json_data["Fields"][3:-1]:  # limit to those entries containing collection info
                 waste_types.append(item["FieldName"].replace("Next_", "").split("_")[0])
             # Build list of collection days/dates
             waste_dates = []
-            action_day = datetime.now().replace(
-                hour=0, minute=0, second=0, microsecond=0
-            )
-            for item in json_data["Records"][0][
-                3:-1
-            ]:  # limit to those entries containing collection info
+            action_day = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+            for item in json_data["Records"][0][3:-1]:  # limit to those entries containing collection info
                 if item != "Not Available":  # ignore missing collections
                     if "day" in item:  # convert day of week into next collection date
                         while action_day.strftime("%A") != item:
@@ -81,7 +75,7 @@ class Source:
                         waste_dates.append(action_day.date())
                     else:
                         waste_dates.append(datetime.strptime(item, "%b %d, %Y").date())
-            schedule = list(zip(waste_types, waste_dates))
+            schedule = list(zip(waste_types, waste_dates, strict=False))
 
             entries = []
             for waste in schedule:

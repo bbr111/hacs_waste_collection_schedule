@@ -41,16 +41,12 @@ class Source:
 
         suburbs = {}
         for entry in data:
-            suburbs[entry["Suburb"].strip().upper().replace(" ", "")] = entry[
-                "SuburbKey"
-            ]
+            suburbs[entry["Suburb"].strip().upper().replace(" ", "")] = entry["SuburbKey"]
 
         # check if suburb exists
         suburb_search = self._suburb.strip().upper().replace(" ", "")
         if suburb_search not in suburbs:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "suburb", self._suburb, suburbs.keys()
-            )
+            raise SourceArgumentNotFoundWithSuggestions("suburb", self._suburb, suburbs.keys())
         suburb_key = suburbs[suburb_search]
 
         # get list of streets for selected suburb
@@ -59,16 +55,12 @@ class Source:
 
         streets = {}
         for entry in data:
-            streets[entry["Street"].strip().upper().replace(" ", "")] = entry[
-                "StreetKey"
-            ]
+            streets[entry["Street"].strip().upper().replace(" ", "")] = entry["StreetKey"]
 
         # check if street exists
         street_search = self._street.strip().upper().replace(" ", "")
         if street_search not in streets:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "street", self._street, streets.keys()
-            )
+            raise SourceArgumentNotFoundWithSuggestions("street", self._street, streets.keys())
         street_key = streets[street_search]
 
         # get list of house numbers for selected street
@@ -82,18 +74,13 @@ class Source:
         house_numbers = {}
         for entry in data:
             house_numbers[
-                (str(int(entry["HouseNo"])) + entry.get("HouseSuffix", "").strip())
-                .strip()
-                .upper()
-                .replace(" ", "")
+                (str(int(entry["HouseNo"])) + entry.get("HouseSuffix", "").strip()).strip().upper().replace(" ", "")
             ] = entry["PropertyKey"]
 
         # check if house number exists
         houseNo_search = self._houseNo.strip().upper().replace(" ", "")
         if houseNo_search not in house_numbers:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "houseNo", self._houseNo, house_numbers.keys()
-            )
+            raise SourceArgumentNotFoundWithSuggestions("houseNo", self._houseNo, house_numbers.keys())
         property_key = house_numbers[houseNo_search]
 
         # get collection schedule

@@ -58,9 +58,7 @@ class Source:
         entries = []
         for item in soup.select("li.waste-collection__day"):
             waste_date = item.select_one("time")["datetime"]
-            waste_type = item.select_one(".waste-collection__day--colour").get_text(
-                strip=True
-            )
+            waste_type = item.select_one(".waste-collection__day--colour").get_text(strip=True)
             entries.append(
                 Collection(
                     date=datetime.strptime(waste_date, "%Y-%m-%d").date(),

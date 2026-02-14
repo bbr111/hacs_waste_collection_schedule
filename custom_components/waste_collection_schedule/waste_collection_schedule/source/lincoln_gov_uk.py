@@ -91,9 +91,7 @@ class Source:
             json=payload,
         )
 
-        rowdata = json.loads(schedule_request.content)["integration"]["transformed"][
-            "rows_data"
-        ]
+        rowdata = json.loads(schedule_request.content)["integration"]["transformed"]["rows_data"]
 
         # Extract bin types and next collection dates
         entries = []

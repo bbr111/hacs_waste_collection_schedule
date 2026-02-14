@@ -3,7 +3,6 @@ import logging
 import requests
 from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 from waste_collection_schedule.exceptions import (
-    SourceArgumentNotFound,
     SourceArgumentNotFoundWithSuggestions,
 )
 from waste_collection_schedule.service.ICS import ICS
@@ -38,41 +37,28 @@ class Source:
         cities = r.json()
 
         # create city to id map from retrieved cities
-        city_to_id = {
-            city["ortsbezeichnung"]: city["ortsnummer"] for (city) in cities["orte"]
-        }
+        city_to_id = {city["ortsbezeichnung"]: city["ortsnummer"] for (city) in cities["orte"]}
 
         if self._city not in city_to_id:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "city", self._city, city_to_id.keys()
-            )
+            raise SourceArgumentNotFoundWithSuggestions("city", self._city, city_to_id.keys())
 
         cityId = city_to_id[self._city]
 
         # retrieve list of streets
-        r = requests.get(
-            f"https://www.awsh.de/api_v2/collection_dates/1/ort/{cityId}/strassen"
-        )
+        r = requests.get(f"https://www.awsh.de/api_v2/collection_dates/1/ort/{cityId}/strassen")
         r.raise_for_status()
         streets = r.json()
 
         # create street to id map from retrieved cities
-        street_to_id = {
-            street["strassenbezeichnung"]: street["strassennummer"]
-            for (street) in streets["strassen"]
-        }
+        street_to_id = {street["strassenbezeichnung"]: street["strassennummer"] for (street) in streets["strassen"]}
 
         if self._street not in street_to_id:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "street", self._street, street_to_id.keys()
-            )
+            raise SourceArgumentNotFoundWithSuggestions("street", self._street, street_to_id.keys())
 
         streetId = street_to_id[self._street]
 
         # retrieve list of waste types
-        r = requests.get(
-            f"https://www.awsh.de/api_v2/collection_dates/1/ort/{cityId}/abfallarten"
-        )
+        r = requests.get(f"https://www.awsh.de/api_v2/collection_dates/1/ort/{cityId}/abfallarten")
         r.raise_for_status()
         waste_types = r.json()
         wt = "-".join([t["id"] for t in waste_types["abfallarten"]])

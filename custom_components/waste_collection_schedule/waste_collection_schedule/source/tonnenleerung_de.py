@@ -6,18 +6,12 @@ import requests
 from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 
 TITLE = "tonnenleerung.de LK Aichach-Friedberg + Neuburg-Schrobenhausen"
-DESCRIPTION = (
-    "Source for tonnenleerung.de LK Aichach-Friedberg + Neuburg-Schrobenhausen."
-)
+DESCRIPTION = "Source for tonnenleerung.de LK Aichach-Friedberg + Neuburg-Schrobenhausen."
 URL = "https://tonnenleerung.de"
 TEST_CASES = {
-    "nd-sob/neuburg-donau/abbevillestrasse/": {
-        "url": "nd-sob/neuburg-donau/abbevillestrasse/"
-    },
+    "nd-sob/neuburg-donau/abbevillestrasse/": {"url": "nd-sob/neuburg-donau/abbevillestrasse/"},
     "aic-fdb/affing/": {"url": "https://tonnenleerung.de/aic-fdb/affing"},
-    "nd-sob/schrobenhausen/albertus-magnus-weg/": {
-        "url": "/nd-sob/schrobenhausen/albertus-magnus-weg/"
-    },
+    "nd-sob/schrobenhausen/albertus-magnus-weg/": {"url": "/nd-sob/schrobenhausen/albertus-magnus-weg/"},
 }
 
 

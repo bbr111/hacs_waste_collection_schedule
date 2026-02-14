@@ -32,7 +32,7 @@ FRENSH_DAYS = {
 }
 
 
-API_URL = "https://www.ittre.be/ma-commune/services-communaux/environnement/gestion-des-dechets/collecte-des-dechets-menagers"
+API_URL = "https://www.ittre.be/ma-commune/services-communaux/environnement/gestion-des-dechets/collecte-des-dechets-menagers"  # codespell: ignore
 
 
 def clean_string(text: str) -> str:
@@ -44,8 +44,7 @@ def clean_string(text: str) -> str:
 
 
 class Source:
-    def __init__(self):
-        ...
+    def __init__(self): ...
 
     def fetch(self) -> list[Collection]:
         r = requests.get(API_URL)
@@ -76,11 +75,7 @@ class Source:
                 for br in brs:
                     br.replace_with(" ")
                 start_month = month
-                days = [
-                    int(day.strip())
-                    for day in td.text.replace("-", " ").split()
-                    if day.strip() and day.strip().isdigit()
-                ]
+                days = [int(day.strip()) for day in td.text.replace("-", " ").split() if day.strip() and day.strip().isdigit()]
                 dates = [date(datetime.now().year, month, day) for day in days]
 
                 if "colspan" in td.attrs:
@@ -101,8 +96,6 @@ class Source:
                             break
 
                 for date_ in dates:
-                    entries.append(
-                        Collection(date=date_, t=bin_type, icon=ICON_MAP.get(bin_type))
-                    )
+                    entries.append(Collection(date=date_, t=bin_type, icon=ICON_MAP.get(bin_type)))
 
         return entries

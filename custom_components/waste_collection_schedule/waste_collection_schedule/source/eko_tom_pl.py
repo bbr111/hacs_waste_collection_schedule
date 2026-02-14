@@ -10,9 +10,7 @@ from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 _LOOGGER = logging.getLogger(__name__)
 
 TITLE = "Czerwonak, Murowana Goślina, Oborniki"
-DESCRIPTION = (
-    "Source for eko-tom.pl. Municipalities: Czerwonak, Murowana Goślina, Oborniki"
-)
+DESCRIPTION = "Source for eko-tom.pl. Municipalities: Czerwonak, Murowana Goślina, Oborniki"
 URL = "https://www.eko-tom.pl"
 
 TEST_CASES = {
@@ -77,18 +75,12 @@ class Source:
                         .replace("nie.,", "")
                         .strip()
                     )
-                    date_str = str(
-                        datetime.datetime.strptime(
-                            cleaned_date_text, date_format
-                        ).date()
-                    )
+                    date_str = str(datetime.datetime.strptime(cleaned_date_text, date_format).date())
 
                     try:
                         entries.append(
                             Collection(
-                                date=datetime.datetime.strptime(
-                                    date_str, "%Y-%m-%d"
-                                ).date(),
+                                date=datetime.datetime.strptime(date_str, "%Y-%m-%d").date(),
                                 t=waste_type,
                                 icon=ICON_MAP.get(waste_type),
                             )

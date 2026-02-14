@@ -7,9 +7,7 @@ from bs4 import BeautifulSoup
 from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 
 TITLE = "Bradford Metropolitan District Council"
-DESCRIPTION = (
-    "Source for Bradford.gov.uk services for Bradford Metropolitan Council, UK."
-)
+DESCRIPTION = "Source for Bradford.gov.uk services for Bradford Metropolitan Council, UK."
 URL = "https://bradford.gov.uk"
 TEST_CASES = {
     "Ilkley": {"uprn": "100051250665"},
@@ -55,21 +53,15 @@ class Source:
         ctx.options |= 0x4
         s.mount("https://", CustomHttpAdapter(ctx))
 
-        s.cookies.set(
-            "COLLECTIONDATES", self._uprn, domain="onlineforms.bradford.gov.uk"
-        )
+        s.cookies.set("COLLECTIONDATES", self._uprn, domain="onlineforms.bradford.gov.uk")
         r = s.get(f"{API_URL}/collectiondates.eb")
 
         soup = BeautifulSoup(r.text, features="html.parser")
         div = soup.find_all("table", {"role": "region"})
         for region in div:
-            displayClass = list(
-                filter(lambda x: x.endswith("-Override-Panel"), region["class"])
-            )
+            displayClass = list(filter(lambda x: x.endswith("-Override-Panel"), region["class"]))
             if len(displayClass) > 0:
-                heading = region.find_all(
-                    "td", {"class": displayClass[0].replace("Panel", "Header")}
-                )
+                heading = region.find_all("td", {"class": displayClass[0].replace("Panel", "Header")})
                 type = "UNKNOWN"
                 if "General" in heading[0].text:
                     type = "REFUSE"
@@ -82,9 +74,7 @@ class Source:
                     try:
                         entries.append(
                             Collection(
-                                date=datetime.strptime(
-                                    entry.text.strip(), "%a %b %d %Y"
-                                ).date(),
+                                date=datetime.strptime(entry.text.strip(), "%a %b %d %Y").date(),
                                 t=type,
                                 icon=ICON_MAP.get(type),
                             )

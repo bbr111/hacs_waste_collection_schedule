@@ -51,7 +51,9 @@ class Source:
             raise ValueError(f"Failed to get address ID for {self._street_address}.")
 
         # Retrieve waste collection schedule
-        schedule_url = f"https://eservice431601.lund.se/Lund/FutureWeb/SimpleWastePickup/GetWastePickupSchedule?address={address_id}"
+        schedule_url = (
+            f"https://eservice431601.lund.se/Lund/FutureWeb/SimpleWastePickup/GetWastePickupSchedule?address={address_id}"
+        )
         schedule_response = s.get(schedule_url, headers=HEADERS)
         schedule_data = json.loads(schedule_response.text)
 
@@ -62,10 +64,6 @@ class Source:
             next_pickup = service.get("NextWastePickup", "")
             next_pickup_date = datetime.fromisoformat(next_pickup).date()
 
-            entries.append(
-                Collection(
-                    date=next_pickup_date, t=waste_type, icon=ICON_MAP.get(waste_type)
-                )
-            )
+            entries.append(Collection(date=next_pickup_date, t=waste_type, icon=ICON_MAP.get(waste_type)))
 
         return entries

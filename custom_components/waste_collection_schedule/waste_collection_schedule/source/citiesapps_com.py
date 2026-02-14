@@ -65,9 +65,7 @@ class Source:
         self._password: str = password
 
     def fetch(self):
-        cities_apps = CitiesApps(
-            email=self._email, phone=self._phone, password=self._password
-        )
+        cities_apps = CitiesApps(email=self._email, phone=self._phone, password=self._password)
 
         garbage_plans = cities_apps.fetch_garbage_plans(self._city, self._calendar)
 
@@ -82,9 +80,7 @@ class Source:
             bin_type = garbage_plan["garbageTypeSettings"]["displayName"]
             icon = ICON_MAP.get(bin_type.split(" ")[0])  # Collection icon
 
-            date = datetime.strptime(
-                garbage_plan["date"], "%Y-%m-%dT%H:%M:%S.%fZ"
-            ).date()
+            date = datetime.strptime(garbage_plan["date"], "%Y-%m-%dT%H:%M:%S.%fZ").date()
             entries.append(Collection(date=date, t=bin_type, icon=icon))
 
         return entries

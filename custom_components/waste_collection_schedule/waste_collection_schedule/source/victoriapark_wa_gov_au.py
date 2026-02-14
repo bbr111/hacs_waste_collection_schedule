@@ -14,9 +14,7 @@ TEST_CASES = {
         "predict": True,
     },  # Tuesday
     "Wednesday": {"address": "156 Oats St, Carlisle"},  # Wednesday
-    "Park Centre (Thurs)": {
-        "address": "789 Albany hwy, EAST VICTORIA PARK"
-    },  # Thursday
+    "Park Centre (Thurs)": {"address": "789 Albany hwy, EAST VICTORIA PARK"},  # Thursday
     "Aqualife (Thurs)": {"address": "42 Somerset St, East Victoria Park"},  # Thursday
     "Friday": {
         "address": "90 Canterbury Terrace, East Victoria Park",
@@ -57,9 +55,7 @@ class Source:
         address = address.strip()
         address = re.sub(" +", " ", address)
         address = re.sub("hwy", "highway", address, flags=re.IGNORECASE)
-        address = re.sub(
-            r"western australia (\d{4})", "WA \\1", address, flags=re.IGNORECASE
-        )
+        address = re.sub(r"western australia (\d{4})", "WA \\1", address, flags=re.IGNORECASE)
         address = re.sub(r" wa (\d{4})", "  WA  \\1", address, flags=re.IGNORECASE)
         self._address = address
         if not isinstance(predict, bool):
@@ -137,12 +133,8 @@ class Source:
 
         if self._predict:
             rub_dates = self.collect_dates(date_rubbish.date(), 1)
-            rec_dates = self.collect_dates(
-                datetime.strptime(date_recycling, "%d %b %Y").date(), 2
-            )
-            go_dates = self.collect_dates(
-                datetime.strptime(date_go, "%d %b %Y").date(), 2
-            )
+            rec_dates = self.collect_dates(datetime.strptime(date_recycling, "%d %b %Y").date(), 2)
+            go_dates = self.collect_dates(datetime.strptime(date_go, "%d %b %Y").date(), 2)
             grn_dates = [
                 datetime.strptime(date_green_waste, "%d %b %Y").date(),
                 datetime.strptime(date_green_waste2, "%d %b %Y").date(),

@@ -45,14 +45,10 @@ ICON_MAP = {
 
 
 class Source:
-    def __init__(
-        self, city: CITIES, street_number=None, street_name=None, house_number=""
-    ):
+    def __init__(self, city: CITIES, street_number=None, street_name=None, house_number=""):
         self.city = str(city)
         if city not in CITY_CODE_MAP:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "city", city, CITY_CODE_MAP.keys()
-            )
+            raise SourceArgumentNotFoundWithSuggestions("city", city, CITY_CODE_MAP.keys())
         self.city_code = CITY_CODE_MAP[city]
 
         if street_name is None and street_number is None:
@@ -96,14 +92,9 @@ class Source:
 
         streets = r.json()["d"]
         for street in streets:
-            if (
-                street["Name"].replace(" ", "").lower()
-                == self.street_name.replace(" ", "").lower()
-            ):
+            if street["Name"].replace(" ", "").lower() == self.street_name.replace(" ", "").lower():
                 return street["StrassenId"]
-        raise SourceArgumentNotFoundWithSuggestions(
-            "street_name", self.street_name, [x["Name"] for x in streets]
-        )
+        raise SourceArgumentNotFoundWithSuggestions("street_name", self.street_name, [x["Name"] for x in streets])
 
     def get_dates(self, year: int, month: int) -> list:
         current_calendar = self.get_calendar_from_site(year)
@@ -139,8 +130,4 @@ class Source:
 
         r.raise_for_status()
 
-        return base64.b64decode(
-            r.json()["d"]["ZeigeAbfallkalender"]["FileContents"]
-        ).decode(
-            "utf-8"
-        )
+        return base64.b64decode(r.json()["d"]["ZeigeAbfallkalender"]["FileContents"]).decode("utf-8")

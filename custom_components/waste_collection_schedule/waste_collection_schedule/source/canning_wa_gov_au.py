@@ -31,11 +31,9 @@ PARAM_DESCRIPTIONS = {  # Optional dict to describe the arguments, will be shown
 
 class Source:
     def __init__(self, address: str):
-
         self._address = address
 
     def fetch(self):
-
         s = requests.session()
 
         # get property key(s), assume first one is correct, then get schedule

@@ -5,9 +5,7 @@ from bs4 import BeautifulSoup
 from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 
 TITLE = "North Kesteven District Council"
-DESCRIPTION = (
-    "Source for n-kesteven.org.uk services for North Kesteven District Council, UK."
-)
+DESCRIPTION = "Source for n-kesteven.org.uk services for North Kesteven District Council, UK."
 URL = "https://n-kesteven.org.uk"
 TEST_CASES = {
     "Test_001": {"uprn": "100030860713"},
@@ -39,9 +37,7 @@ class Source:
         for idx in range(0, len(bin_type)):
             entries.append(
                 Collection(
-                    date=datetime.strptime(
-                        bin_dates[idx].text.split(", ")[1], "%d %B %Y"
-                    ).date(),
+                    date=datetime.strptime(bin_dates[idx].text.split(", ")[1], "%d %B %Y").date(),
                     t=bin_type[idx].text.upper(),
                     icon=ICON_MAP.get(bin_type[idx].text.upper()),
                 )

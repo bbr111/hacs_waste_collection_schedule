@@ -69,9 +69,7 @@ class Source:
         if frequency == 0:
             return entries
 
-        base_string = fields.get(
-            f"{bin_prefix}_week1", dt.datetime.min.strftime("%Y-%m-%d")
-        )
+        base_string = fields.get(f"{bin_prefix}_week1", dt.datetime.min.strftime("%Y-%m-%d"))
         basedate = parse_date_field(base_string)
 
         # Get number of days between basedate and a year from now
@@ -88,9 +86,7 @@ class Source:
         address = self._street
         for key in STREETNAMES.keys():
             regex = rf"\b{key.lower()}\b"
-            address = re.sub(
-                pattern=regex, repl=STREETNAMES[key], string=address.lower()
-            )
+            address = re.sub(pattern=regex, repl=STREETNAMES[key], string=address.lower())
 
         # get list of suburbs
         r = requests.get(

@@ -57,9 +57,7 @@ class Source:
     def _validate_params(self, terretories: list[Terretory]):
         matching_terretory: None | Terretory = None
         for terretory in terretories:
-            if terretory["id"].lower().replace(
-                " ", ""
-            ) == self._territory.lower().replace(" ", ""):
+            if terretory["id"].lower().replace(" ", "") == self._territory.lower().replace(" ", ""):
                 matching_terretory = terretory
                 self._territory = terretory["id"]
                 break
@@ -73,15 +71,9 @@ class Source:
 
         street_match = False
         for street in matching_terretory["streets"]:
-            if street.lower().replace(" ", "").replace("str.", "straße").replace(
-                "ß", "ss"
-            ).replace(".", "") == self._street.lower().replace(" ", "").replace(
-                "str.", "straße"
-            ).replace(
-                "ß", "ss"
-            ).replace(
+            if street.lower().replace(" ", "").replace("str.", "straße").replace("ß", "ss").replace(
                 ".", ""
-            ):
+            ) == self._street.lower().replace(" ", "").replace("str.", "straße").replace("ß", "ss").replace(".", ""):
                 street_match = True
                 self._street = street
                 break

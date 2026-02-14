@@ -100,9 +100,7 @@ class Source:
                         entries.extend(
                             self._get_collections_by_id(
                                 img.attrs.get("alt"),
-                                datetime.strptime(
-                                    f"{day} {month_year}", "%d %B %Y"
-                                ).date(),
+                                datetime.strptime(f"{day} {month_year}", "%d %B %Y").date(),
                             )
                         )
 
@@ -113,7 +111,5 @@ class Source:
         collections = []
         for k, v in self._bin_type_translation.items():
             if id_int & int(k, 2) != 0:
-                collections.append(
-                    Collection(date=date, t=v, icon=ICON_MAP.get(v.split()[0].lower()))
-                )
+                collections.append(Collection(date=date, t=v, icon=ICON_MAP.get(v.split()[0].lower())))
         return collections

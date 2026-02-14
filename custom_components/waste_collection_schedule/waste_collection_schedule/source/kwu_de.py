@@ -45,9 +45,7 @@ class Source:
     def fetch(self):
         session = requests.Session()
 
-        r = requests.get(
-            "https://kalender.kwu-entsorgung.de", headers=HEADERS, verify=True
-        )
+        r = requests.get("https://kalender.kwu-entsorgung.de", headers=HEADERS, verify=True)
 
         parsed_html = BeautifulSoup(r.text, "html.parser")
         Orte = parsed_html.find_all("option")
@@ -58,9 +56,7 @@ class Source:
                 OrtValue = Ort["value"]
                 break
         if OrtValue is None:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "city", self._city, [o.text.strip() for o in Orte]
-            )
+            raise SourceArgumentNotFoundWithSuggestions("city", self._city, [o.text.strip() for o in Orte])
 
         r = requests.get(
             "https://kalender.kwu-entsorgung.de/kal_str2ort.php",
@@ -78,9 +74,7 @@ class Source:
                 StrasseValue = Strasse["value"]
                 break
         if StrasseValue is None:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "street", self._street, [s.text.strip() for s in Strassen]
-            )
+            raise SourceArgumentNotFoundWithSuggestions("street", self._street, [s.text.strip() for s in Strassen])
 
         r = requests.get(
             "https://kalender.kwu-entsorgung.de/kal_str2ort.php",
@@ -98,9 +92,7 @@ class Source:
                 ObjektValue = obj["value"]
                 break
         if ObjektValue is None:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "number", self._number, [o.text.strip() for o in objects]
-            )
+            raise SourceArgumentNotFoundWithSuggestions("number", self._number, [o.text.strip() for o in objects])
 
         r = requests.post(
             "https://kalender.kwu-entsorgung.de/kal_uebersicht-2023.php",
@@ -124,10 +116,8 @@ class Source:
         if ics_url is None:
             raise Exception("ics url not found")
 
-        if "kwu.lokal" in ics_url:
-            ics_url = ics_url.replace(
-                "http://kalender.kwu.lokal", "https://kalender.kwu-entsorgung.de"
-            )
+        if "kwu.lokal" in ics_url:  # codespell: ignore
+            ics_url = ics_url.replace("http://kalender.kwu.lokal", "https://kalender.kwu-entsorgung.de")  # codespell: ignore
 
         # get ics file
         r = session.get(ics_url, headers=HEADERS, verify=True)

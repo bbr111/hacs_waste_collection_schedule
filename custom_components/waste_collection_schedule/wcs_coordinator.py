@@ -41,21 +41,13 @@ class WCSCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         self._shell = source_shell
         self._aggregator = CollectionAggregator([source_shell])
         self._separator = separator
-        fetch_time_new = (
-            dt_util.parse_time(fetch_time)
-            if isinstance(fetch_time, str)
-            else fetch_time
-        )
+        fetch_time_new = dt_util.parse_time(fetch_time) if isinstance(fetch_time, str) else fetch_time
         if not fetch_time_new:
             raise ValueError(f"Invalid fetch_time: {fetch_time}")
         self._fetch_time = fetch_time_new
         self._random_fetch_time_offset = random_fetch_time_offset
 
-        day_switch_time_new = (
-            dt_util.parse_time(day_switch_time)
-            if isinstance(day_switch_time, str)
-            else day_switch_time
-        )
+        day_switch_time_new = dt_util.parse_time(day_switch_time) if isinstance(day_switch_time, str) else day_switch_time
         if not day_switch_time_new:
             raise ValueError(f"Invalid day_switch_time: {day_switch_time}")
         self._day_switch_time = day_switch_time_new
@@ -134,7 +126,7 @@ class WCSCoordinator(DataUpdateCoordinator[dict[str, Any]]):
     async def _fetch_now(self, *_):
         if self.shell:
             await self._hass.async_add_executor_job(self.shell.fetch)
-            
+
             # Save device keys to storage after fetch
             device_store = get_device_key_store()
             if device_store:

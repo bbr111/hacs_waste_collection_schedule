@@ -2,7 +2,6 @@ import json
 import re
 from datetime import date
 from time import strptime
-from typing import List
 from urllib.parse import quote
 
 import requests
@@ -94,12 +93,12 @@ class Source:
         self._postcode = comparable(postcode) if postcode else None
         self._address = address if address else None
 
-    def fetch(self) -> List[Collection]:
+    def fetch(self) -> list[Collection]:
         if self._address_payload:
             return self.__fetch_by_payload()
         return self.__fetch_by_postcode_and_address()
 
-    def __fetch_by_postcode_and_address(self) -> List[Collection]:
+    def __fetch_by_postcode_and_address(self) -> list[Collection]:
         if not self._postcode or not self._address:
             errors = []
             if self._postcode:
@@ -120,9 +119,7 @@ class Source:
 
         args = {
             "Postcode": self._postcode,
-            "__RequestVerificationToken": page.find(
-                "input", {"name": "__RequestVerificationToken"}
-            )["value"],
+            "__RequestVerificationToken": page.find("input", {"name": "__RequestVerificationToken"})["value"],
         }
         r = session.post(URL + "FindAddress", data=args)
         r.raise_for_status()
@@ -132,9 +129,7 @@ class Source:
         if not addresses:
             raise SourceArgumentNotFound("postcode", self._postcode)
 
-        args["__RequestVerificationToken"] = page.find(
-            "input", {"name": "__RequestVerificationToken"}
-        )["value"]
+        args["__RequestVerificationToken"] = page.find("input", {"name": "__RequestVerificationToken"})["value"]
 
         found = False
         compare_address = self._address.replace(",", "").replace(" ", "").lower()
@@ -142,34 +137,27 @@ class Source:
         for address in addresses:
             address_text = comparable(address.text)
 
-            if (
-                address_text == compare_address
-                or address_text == compare_address.replace(self._postcode, "")
-            ):
+            if address_text == compare_address or address_text == compare_address.replace(self._postcode, ""):
                 args["UprnAddress"] = address["value"]
                 found = True
                 break
 
         if not found:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "address", self._address, [address.text for address in addresses]
-            )
+            raise SourceArgumentNotFoundWithSuggestions("address", self._address, [address.text for address in addresses])
 
         r = session.post(URL + "FindAddress/Submit", data=args)
         r.raise_for_status()
         return self.__get_data(r)
 
-    def __fetch_by_payload(self) -> List[Collection]:
+    def __fetch_by_payload(self) -> list[Collection]:
         r = requests.get(
             URL,
-            headers={
-                "Cookie": f"MyArea.Data={quote(json.dumps(self._address_payload))}"
-            },
+            headers={"Cookie": f"MyArea.Data={quote(json.dumps(self._address_payload))}"},
         )
         r.raise_for_status()
         return self.__get_data(r)
 
-    def __get_data(self, r: requests.Response) -> List[Collection]:
+    def __get_data(self, r: requests.Response) -> list[Collection]:
         page = soup(r.text, "html.parser")
         bins_card = page.find("h3", text="Bins").parent
         bin_categories = bins_card.find_all("div", {"class": "card-text"})

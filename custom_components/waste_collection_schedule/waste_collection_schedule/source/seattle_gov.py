@@ -12,7 +12,7 @@ TEST_CASES = {
     "City Hall": {"street_address": "600 4th Ave"},
     "Ballard Builders": {"street_address": "7022 12th Ave NW"},
     "Carmona Court": {"street_address": "1127 17th Ave E"},
-    "2111 E John St": {"street_address":"2111 E John St","prem_code": "DRMGcnGxUEg+gu8pN8vesQ=="}
+    "2111 E John St": {"street_address": "2111 E John St", "prem_code": "DRMGcnGxUEg+gu8pN8vesQ=="},
 }
 
 
@@ -22,12 +22,11 @@ def get_service_icon(service_name):
 
 
 class Source:
-    def __init__(self, street_address, prem_code = None):
+    def __init__(self, street_address, prem_code=None):
         self._street_address = street_address
         self._prem_code = prem_code
 
     def fetch(self):
-
         # Mimicking the same API calls the calendar lookup page uses:
         # 1. find account code
         # 2. find account ID for a given address
@@ -37,9 +36,7 @@ class Source:
 
         # step 1 - Look up premCode if it wasn't explicitly provided
         if self._prem_code is None:
-            find_address_payload = {
-                "address": {"addressLine1": self._street_address, "city": "", "zip": ""}
-            }
+            find_address_payload = {"address": {"addressLine1": self._street_address, "city": "", "zip": ""}}
 
             r = requests.post(
                 "https://myutilities.seattle.gov/rest/serviceorder/findaddress",
@@ -69,9 +66,7 @@ class Source:
             "password": "guest",
         }
 
-        r = requests.post(
-            "https://myutilities.seattle.gov/rest/auth/guest", data=token_payload
-        )
+        r = requests.post("https://myutilities.seattle.gov/rest/auth/guest", data=token_payload)
 
         token_info = json.loads(r.text)
         token = token_info["access_token"]
@@ -133,9 +128,7 @@ class Source:
             servicePointId = service["servicePointId"]
 
             for collection_date in calendar_info["calendar"][servicePointId]:
-                next_date = datetime.datetime.strptime(
-                    collection_date, "%m/%d/%Y"
-                ).date()
+                next_date = datetime.datetime.strptime(collection_date, "%m/%d/%Y").date()
                 service_icon = "mdi:" + get_service_icon(name)
 
                 entries.append(Collection(date=next_date, t=name, icon=service_icon))

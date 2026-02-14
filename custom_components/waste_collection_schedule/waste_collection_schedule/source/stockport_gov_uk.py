@@ -7,7 +7,9 @@ from bs4 import BeautifulSoup
 from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 
 TITLE = "Stockport Council"
-DESCRIPTION = "Source for bin collection services for Stockport Council, UK.\n Refactored with thanks from the Manchester equivalent"
+DESCRIPTION = (
+    "Source for bin collection services for Stockport Council, UK.\n Refactored with thanks from the Manchester equivalent"
+)
 URL = "https://stockport.gov.uk"
 TEST_CASES = {
     "domestic": {"uprn": "100011460157"},
@@ -28,16 +30,11 @@ class Source:
         self._uprn = uprn
 
     def fetch(self):
-
-        r = requests.get(
-            f"https://myaccount.stockport.gov.uk/bin-collections/show/{self._uprn}"
-        )
+        r = requests.get(f"https://myaccount.stockport.gov.uk/bin-collections/show/{self._uprn}")
 
         soup = BeautifulSoup(r.text, features="html.parser")
 
-        bins = soup.find_all(
-            "div", {"class": re.compile("service-item service-item-.*")}
-        )
+        bins = soup.find_all("div", {"class": re.compile("service-item service-item-.*")})
 
         bins = str(bins)
         header_string = "<h3>"

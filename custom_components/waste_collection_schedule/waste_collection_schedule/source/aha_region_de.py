@@ -75,28 +75,18 @@ class Source:
             raise Exception("No strasse set")
 
         # find strassen_id
-        r = requests.get(
-            API_URL, params={"gemeinde": self._gemeinde, "von": self._strasse.upper()[0]}
-        )
+        r = requests.get(API_URL, params={"gemeinde": self._gemeinde, "von": self._strasse.upper()[0]})
         r.raise_for_status()
 
         strassen_id = None
-        selects = (
-            BeautifulSoup(r.text, "html.parser")
-            .find("select", {"id": "strasse"})
-            .find_all("option")
-        )
+        selects = BeautifulSoup(r.text, "html.parser").find("select", {"id": "strasse"}).find_all("option")
         for select in selects:
-            if select.text.lower().replace(" ", "") == self._strasse.lower().replace(
-                " ", ""
-            ):
+            if select.text.lower().replace(" ", "") == self._strasse.lower().replace(" ", ""):
                 strassen_id = select["value"]
                 break
 
         if not strassen_id:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "strasse", self._strasse, [select.text for select in selects]
-            )
+            raise SourceArgumentNotFoundWithSuggestions("strasse", self._strasse, [select.text for select in selects])
 
         # request overview page
         args = {
@@ -112,7 +102,7 @@ class Source:
         r = requests.post(API_URL, data=args)
         r.raise_for_status()
         soup = BeautifulSoup(r.text, "html.parser")
-        ladeort_single = soup.find("input", {"name": "ladeort", "class" : "form-control"})
+        ladeort_single = soup.find("input", {"name": "ladeort", "class": "form-control"})
 
         if not ladeort_single:
             ladeort_select = soup.find("select", {"name": "ladeort"})
@@ -126,9 +116,7 @@ class Source:
                     [ladeort_option.text for ladeort_option in ladeort_options],
                 )
             for ladeort_option in ladeort_options:
-                if ladeort_option.text.lower().replace(
-                    " ", ""
-                ) == self._ladeort.lower().replace(" ", ""):
+                if ladeort_option.text.lower().replace(" ", "") == self._ladeort.lower().replace(" ", ""):
                     ladeort_single = ladeort_option
                     break
             if not ladeort_single:

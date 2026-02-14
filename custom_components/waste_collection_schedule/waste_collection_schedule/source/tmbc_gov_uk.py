@@ -40,21 +40,13 @@ class Source:
         }
 
     def fetch(self):
-        address_lookup = requests.post(
-            "https://www.tmbc.gov.uk/xfp/form/167", files=self.form_data
-        )
+        address_lookup = requests.post("https://www.tmbc.gov.uk/xfp/form/167", files=self.form_data)
         address_lookup.raise_for_status()
         addresses = {}
-        for address in BeautifulSoup(address_lookup.text, "html.parser").find_all(
-            "option"
-        ):
+        for address in BeautifulSoup(address_lookup.text, "html.parser").find_all("option"):
             if "..." not in address["value"]:
                 addresses[address["value"]] = address.text.strip()
-        id = [
-            address
-            for address in addresses
-            if addresses[address].startswith(self.address)
-        ]
+        id = [address for address in addresses if addresses[address].startswith(self.address)]
         if len(id) == 0:
             raise Exception("Address not found")
         if len(id) > 1:
@@ -63,9 +55,7 @@ class Source:
 
         self.form_data["q752eec300b2ffef2757e4536b77b07061842041a_1_0"] = (None, id)
         self.form_data["next"] = (None, "Next")
-        collection_lookup = requests.post(
-            "https://www.tmbc.gov.uk/xfp/form/167", files=self.form_data
-        )
+        collection_lookup = requests.post("https://www.tmbc.gov.uk/xfp/form/167", files=self.form_data)
         collection_lookup.raise_for_status()
         entries = []
         for rows in (

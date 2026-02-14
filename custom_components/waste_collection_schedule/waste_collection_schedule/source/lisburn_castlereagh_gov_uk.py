@@ -67,8 +67,8 @@ class Source:
             response.raise_for_status()
             try:
                 address_list = response.json().get("html")
-            except:
-                raise SourceArgumentNotFound("postcode", self._postcode)
+            except Exception as e:
+                raise SourceArgumentNotFound("postcode", self._postcode) from e
 
             soup = bs4.BeautifulSoup(address_list, features="html.parser")
 
@@ -81,33 +81,26 @@ class Source:
 
             all_addresses = list(address_by_id.values())
 
-            common = difflib.SequenceMatcher(
-                a=all_addresses[0], b=all_addresses[1]
-            ).find_longest_match()
+            common = difflib.SequenceMatcher(a=all_addresses[0], b=all_addresses[1]).find_longest_match()
             to_be_removed = all_addresses[0][common.a : common.a + common.size]
 
             ids_by_house_number = {
-                address.replace(to_be_removed, ""): property_id
-                for property_id, address in address_by_id.items()
+                address.replace(to_be_removed, ""): property_id for property_id, address in address_by_id.items()
             }
 
             self._property_id = ids_by_house_number.get(str(self._house_number))
 
             if not self._property_id:
-                raise SourceArgumentNotFoundWithSuggestions(
-                    "house_number", self._house_number, ids_by_house_number.keys()
-                )
+                raise SourceArgumentNotFoundWithSuggestions("house_number", self._house_number, ids_by_house_number.keys())
         today = datetime.today().date()
-        calendar_url = (
-            f"{API_URL}/calendar/{self._property_id}/{today.strftime('%Y-%m-%d')}"
-        )
+        calendar_url = f"{API_URL}/calendar/{self._property_id}/{today.strftime('%Y-%m-%d')}"
         response = session.get(calendar_url)
         response.raise_for_status()
 
         try:
             next_collections = response.json().get("nextCollections")
-        except:
-            raise ValueError("No collection data in response")
+        except Exception as e:
+            raise ValueError("No collection data in response") from e
 
         entries = []  # List that holds collection schedule
 

@@ -66,4 +66,4 @@ class Source:
                 if x["zip_city"] == self._city and x["address"] == self._address
             )
         except StopIteration:
-            raise Exception("Can't find plant id for address")
+            raise Exception("Can't find plant id for address") from None

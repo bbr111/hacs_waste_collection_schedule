@@ -130,9 +130,7 @@ class Source:
         until: datetime.date | str | None = None,
         count: int | None = None,
         excludes: list[datetime.date | str] | None = None,
-        weekdays: WEEKDAY_TYPE
-        | dict[WEEKDAY_TYPE | int, int | str | None]
-        | None = None,
+        weekdays: WEEKDAY_TYPE | dict[WEEKDAY_TYPE | int, int | str | None] | None = None,
     ):
         for d in dates or []:
             _LOGGER.debug(f"date: {d}")
@@ -160,35 +158,19 @@ class Source:
                 self._weekdays = None
 
         self._type = type
-        self._dates = [
-            d if isinstance(d, datetime.date) else parser.isoparse(d).date()
-            for d in dates or []
-        ]
+        self._dates = [d if isinstance(d, datetime.date) else parser.isoparse(d).date() for d in dates or []]
 
         freq = frequency.upper() if frequency else None
         self._recurrence = FREQNAMES.index(freq) if freq is not None else None
         self._interval = interval
-        self._start = (
-            start
-            if isinstance(start, datetime.date)
-            else parser.isoparse(start).date()
-            if start
-            else None
-        )
+        self._start = start if isinstance(start, datetime.date) else parser.isoparse(start).date() if start else None
         if until:
-            self._until: datetime.date | None = (
-                until
-                if isinstance(until, datetime.date)
-                else parser.isoparse(until).date()
-            )
+            self._until: datetime.date | None = until if isinstance(until, datetime.date) else parser.isoparse(until).date()
             self._count = None
         else:
             self._until = None
             self._count = count if count else 10
-        self._excludes = [
-            d if isinstance(d, datetime.date) else parser.isoparse(d).date()
-            for d in excludes or []
-        ]
+        self._excludes = [d if isinstance(d, datetime.date) else parser.isoparse(d).date() for d in excludes or []]
 
     def add_weekday(self, weekday, count: int):
         if self._weekdays is None:

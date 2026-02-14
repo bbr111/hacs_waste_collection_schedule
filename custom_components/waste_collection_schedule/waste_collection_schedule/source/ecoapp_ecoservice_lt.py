@@ -8,9 +8,7 @@ TITLE = "Ecoservice atliekos"
 DESCRIPTION = 'Source for UAB "Ecoservice".'
 URL = "https://ecoservice.lt/"
 TEST_CASES = {
-    "Jono Glaubico g. 10-1 (Vilnius)": {
-        "waste_object_ids": "'13-L-115261', 13-P-505460,13-S-500496"
-    },
+    "Jono Glaubico g. 10-1 (Vilnius)": {"waste_object_ids": "'13-L-115261', 13-P-505460,13-S-500496"},
     "Parko g. 1 (Pilies I k.)": {"waste_object_ids": "94-L-002776"},
     "D. Poškos g. 26 (Vilnius)": {"waste_object_ids": ["13-Z-001848"]},
     # "Empty list 1 - must fail>": {},
@@ -59,9 +57,7 @@ class Source:
 
         for obj_id in self._waste_object_ids:
             if not isinstance(obj_id, str):
-                raise ValueError(
-                    f"Waste object IDs must be strings, got: {type(obj_id)}"
-                )
+                raise ValueError(f"Waste object IDs must be strings, got: {type(obj_id)}")
 
             try:
                 # cleanup user string
@@ -111,22 +107,16 @@ class Source:
                         entries.append(
                             Collection(
                                 date=datetime.strptime(date, "%Y-%m-%d").date(),
-                                t=TYPE_MAP.get(
-                                    container[0]["Type"], {"name": container[0]["Type"]}
-                                ).get("name"),
+                                t=TYPE_MAP.get(container[0]["Type"], {"name": container[0]["Type"]}).get("name"),
                                 icon=TYPE_MAP.get(container[0]["Type"], {}).get("icon"),
                             )
                         )
 
                 if len(entries) == 0:
-                    raise Exception(
-                        f"Error: no collection schedule data found for container ID: {obj_id}"
-                    )
+                    raise Exception(f"Error: no collection schedule data found for container ID: {obj_id}")
 
             except Exception as e:
-                raise Exception(
-                    f"Error fetching data for waste object ID {obj_id}: {e}"
-                ) from e
+                raise Exception(f"Error fetching data for waste object ID {obj_id}: {e}") from e
 
         return entries
 

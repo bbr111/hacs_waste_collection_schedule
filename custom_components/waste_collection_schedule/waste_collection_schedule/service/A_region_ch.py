@@ -2,6 +2,7 @@ from typing import Literal
 
 import requests
 from bs4 import BeautifulSoup
+
 from waste_collection_schedule.exceptions import (
     SourceArgumentNotFoundWithSuggestions,
     SourceArgumentRequiredWithSuggestions,
@@ -64,12 +65,8 @@ class A_region_ch:
                 "hash": "606ee79ca61fc6eef434ab4fca0d5956",
                 "p": page,
             }
-            headers = {
-                "cookie": "PHPSESSID=71v67j0et4ih04qa142d402ebm;"
-            }  # TODO: get cookie from first request
-            r = session.get(
-                f"{self._base_url}/appl/ajax/index.php", params=params, headers=headers
-            )
+            headers = {"cookie": "PHPSESSID=71v67j0et4ih04qa142d402ebm;"}  # TODO: get cookie from first request
+            r = session.get(f"{self._base_url}/appl/ajax/index.php", params=params, headers=headers)
             r.raise_for_status()
             if r.text == "":
                 break
@@ -101,9 +98,7 @@ class A_region_ch:
         for download in downloads:
             # href ::= "/index.php?apid=12731252&amp;apparentid=5011362"
             href = download.get("href")
-            if download.find("div", class_="badgeIcon") or download.find(
-                "img", class_="rowImg"
-            ):
+            if download.find("div", class_="badgeIcon") or download.find("img", class_="rowImg"):
                 titles = download.find_all("div", class_="title")
                 if "PDF" in titles:
                     continue
@@ -134,22 +129,16 @@ class A_region_ch:
                 if title is not None:
                     # additional district found ->
                     district_name_split = title.string.split(": ")
-                    districts[
-                        district_name_split[1 if len(district_name_split) > 1 else 0]
-                    ] = href
+                    districts[district_name_split[1 if len(district_name_split) > 1 else 0]] = href
         if len(districts) > 0:
             if len(districts) == 1:
                 # only one district found -> use it
                 return self.get_ICS_sources(list(districts.values())[0], tour)
             if self._district is None:
-                raise SourceArgumentRequiredWithSuggestions(
-                    "district", districts.keys()
-                )
+                raise SourceArgumentRequiredWithSuggestions("district", districts.keys())
 
             if self._district not in districts:
-                raise SourceArgumentNotFoundWithSuggestions(
-                    "district", self._district, districts.keys()
-                )
+                raise SourceArgumentNotFoundWithSuggestions("district", self._district, districts.keys())
             return self.get_ICS_sources(districts[self._district], tour)
 
         dates = list()
@@ -186,9 +175,7 @@ def get_region_url_by_street(
             continue
         streets.append(a.get_text(strip=True))
 
-        if a.get_text(strip=True).lower().replace(" ", "") == street.lower().replace(
-            " ", ""
-        ):
+        if a.get_text(strip=True).lower().replace(" ", "") == street.lower().replace(" ", ""):
             return A_region_ch(service, href, district, regex)
 
     raise SourceArgumentNotFoundWithSuggestions("street", street, streets)

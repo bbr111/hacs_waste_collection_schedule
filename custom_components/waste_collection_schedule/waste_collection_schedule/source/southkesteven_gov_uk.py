@@ -53,25 +53,15 @@ class Source:
 
         # Find next collection
         # find p looks like                     <p>Your next bin collection date is <span class="alert__heading alpha">Wed 19 June 2024</span></p>
-        next_collection_p = soup.find(
-            lambda tag: tag.name == "p"
-            and "Your next bin collection date is" in tag.text
-        )
+        next_collection_p = soup.find(lambda tag: tag.name == "p" and "Your next bin collection date is" in tag.text)
         # above does not work so try this
 
         if next_collection_p is None:
-            _LOGGER.warning(
-                "No next collection text found, continuing to look for future collections"
-            )
+            _LOGGER.warning("No next collection text found, continuing to look for future collections")
         else:
             date_str = next_collection_p.find("span").text
-            date = (
-                date_translate.get(date_str)
-                or datetime.strptime(date_str, "%a %d %B %Y").date()
-            )
-            bin_type = NEXT_BIN_TYPE_REGEX.search(
-                next_collection_p.find_next("p").text
-            ).group(1)
+            date = date_translate.get(date_str) or datetime.strptime(date_str, "%a %d %B %Y").date()
+            bin_type = NEXT_BIN_TYPE_REGEX.search(next_collection_p.find_next("p").text).group(1)
             collections.append(Collection(date, bin_type, ICON_MAP.get(bin_type)))
 
         # Find all Future collections
@@ -79,40 +69,26 @@ class Source:
 
         for collections_list in s:
             collections_ul = collections_list.find_next_sibling("ul")
-            collection_futher_info_link = (
-                collections_ul.find_previous_sibling("ul").find("a")
-            )
-            if (collection_futher_info_link is None):
-                garden_check = (collections_ul.find_previous_sibling("ul").find("li").text)
+            collection_futher_info_link = collections_ul.find_previous_sibling("ul").find("a")
+            if collection_futher_info_link is None:
+                garden_check = collections_ul.find_previous_sibling("ul").find("li").text
                 if garden_check == "Leaves":
                     bin_type = "green"
             else:
-                bin_type = FUTURE_BIN_TYPE_REGEX.search(collection_futher_info_link.text).group(
-                    1
-                )
+                bin_type = FUTURE_BIN_TYPE_REGEX.search(collection_futher_info_link.text).group(1)
 
             for collection in collections_list.find_next_sibling("ul").find_all("li"):
                 # like: "Thu 29 August 2024"
                 date_str = collection.text
 
                 try:
-                    date = (
-                        date_translate.get(date_str)
-                        or datetime.strptime(date_str, "%a %d %B %Y").date()
-                    )
+                    date = date_translate.get(date_str) or datetime.strptime(date_str, "%a %d %B %Y").date()
                 except ValueError:
-                    _LOGGER.warning(
-                        f"Failed to parse date {date_str}, skipping this collection"
-                    )
+                    _LOGGER.warning(f"Failed to parse date {date_str}, skipping this collection")
                     continue
                 collections.append(Collection(date, bin_type, ICON_MAP.get(bin_type)))
 
         # filter out duplicate entries
-        collections = list(
-            {
-                (collection.date, collection.type): collection
-                for collection in collections
-            }.values()
-        )
+        collections = list({(collection.date, collection.type): collection for collection in collections}.values())
 
         return collections

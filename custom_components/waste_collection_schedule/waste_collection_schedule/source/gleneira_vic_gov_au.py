@@ -19,9 +19,7 @@ TEST_CASES = {
     # "Empty Address": {_STREET_ADDRESS_ARG_NAME: ""},
     # "Invalid Address": {_STREET_ADDRESS_ARG_NAME: "Blah blah i dont exist"},
     # "Ambiguous Address": {_STREET_ADDRESS_ARG_NAME: "55 Vi"},
-    "Elsternwick Library": {
-        _STREET_ADDRESS_ARG_NAME: "4 Staniland Grove ELSTERNWICK VIC 3185"
-    },
+    "Elsternwick Library": {_STREET_ADDRESS_ARG_NAME: "4 Staniland Grove ELSTERNWICK VIC 3185"},
 }
 
 SEARCH_PAGE_URL = "https://www.gleneira.vic.gov.au/our-city/in-your-area"
@@ -75,9 +73,7 @@ class Source:
 
     def fetch(self) -> list[Collection]:
         if not self._street_address:
-            raise SourceArgumentRequired(
-                _STREET_ADDRESS_ARG_NAME, "A street address was not provided."
-            )
+            raise SourceArgumentRequired(_STREET_ADDRESS_ARG_NAME, "A street address was not provided.")
 
         session = requests.Session()
         response = session.get(SEARCH_PAGE_URL)
@@ -120,8 +116,6 @@ class Source:
             when = child.find("p").get_text()
             if rubbish_type in ICON_MAP:
                 date = datetime.strptime(when, "%A %d %B %Y").date()
-                entries.append(
-                    Collection(date=date, t=rubbish_type, icon=ICON_MAP[rubbish_type])
-                )
+                entries.append(Collection(date=date, t=rubbish_type, icon=ICON_MAP[rubbish_type]))
 
         return entries

@@ -13,12 +13,8 @@ TITLE = "1Coast - Central Coast"
 DESCRIPTION = "Source for 1Coast - Central Coast."
 URL = "https://1coast.com.au/"
 TEST_CASES = {
-    "RHODIN DR, LONG JETTY, CENTRAL COAST 2261": {
-        "address": "9 RHODIN DR, LONG JETTY CENTRAL COAST 2261"
-    },
-    "GERMAINE AVE, BATEAU BAY, CENTRAL COAST 2261": {
-        "address": "12 GERMAINE AVE BATEAU BAY CENTRAL COAST 2261"
-    },
+    "RHODIN DR, LONG JETTY, CENTRAL COAST 2261": {"address": "9 RHODIN DR, LONG JETTY CENTRAL COAST 2261"},
+    "GERMAINE AVE, BATEAU BAY, CENTRAL COAST 2261": {"address": "12 GERMAINE AVE BATEAU BAY CENTRAL COAST 2261"},
 }
 
 
@@ -35,9 +31,7 @@ ICON_MAP = {
 
 
 SEARCH_URL = "https://1coast.com.au/ajax.php"
-COLLECTION_URL = (
-    "https://1coast.com.au/bin-collection/bin-collection-day-address-details"
-)
+COLLECTION_URL = "https://1coast.com.au/bin-collection/bin-collection-day-address-details"
 
 
 class Source:
@@ -61,11 +55,9 @@ class Source:
         for addr in data:
             addr_name = " ".join(addr["name"])
             address_names.append(addr_name)
-            if addr_name.lower().replace(" ", "").replace(",", "").replace(
-                ".", ""
-            ) == self._address.lower().replace(" ", "").replace(",", "").replace(
-                ".", ""
-            ):
+            if addr_name.lower().replace(" ", "").replace(",", "").replace(".", "") == self._address.lower().replace(
+                " ", ""
+            ).replace(",", "").replace(".", ""):
                 self._address_id = addr["id"]
                 self._address_formatted = ",".join(addr["name"])
                 self._collection_params = addr["collection"]
@@ -105,15 +97,9 @@ class Source:
         soup = BeautifulSoup(r.text, "html.parser")
 
         # extract limited set of waste collections from this page
-        legend_wrappers = soup.find_all(
-            "span", {"class": "booking-list--legend-wrapper"}
-        )
-        next_collections = soup.find_all(
-            "span", {"class": "booking-list--collection-grey"}
-        )
-        next_collections = [
-            item.text.split(", ")[1] for item in next_collections if "-" in item.text
-        ]
+        legend_wrappers = soup.find_all("span", {"class": "booking-list--legend-wrapper"})
+        next_collections = soup.find_all("span", {"class": "booking-list--collection-grey"})
+        next_collections = [item.text.split(", ")[1] for item in next_collections if "-" in item.text]
         entries = []
         for idx, item in enumerate(legend_wrappers):
             entries.append(
@@ -126,12 +112,7 @@ class Source:
 
         # look for link to ics file download option
         def check_tag(tag):
-            return (
-                isinstance(tag, Tag)
-                and tag.name == "a"
-                and tag.attrs.get("href")
-                and tag.attrs["href"].endswith("ics")
-            )
+            return isinstance(tag, Tag) and tag.name == "a" and tag.attrs.get("href") and tag.attrs["href"].endswith("ics")
 
         ics_url = (
             soup.find(

@@ -37,31 +37,19 @@ class Source:
         self._street_id: str | None = None
 
     def _match_district(self, district: str) -> bool:
-        return district.lower().replace(" ", "").replace('"', "").replace(
-            "-", ""
-        ) == self._district.lower().replace(" ", "").replace('"', "").replace("-", "")
+        return district.lower().replace(" ", "").replace('"', "").replace("-", "") == self._district.lower().replace(
+            " ", ""
+        ).replace('"', "").replace("-", "")
 
     def _match_street(self, street: str) -> bool:
         if self._street is None:
             return False
 
-        return street.lower().replace(" ", "").replace('"', "").replace(
-            "-", ""
-        ).replace("str.", "straße").replace("straße", "strasse").replace(
-            ".", ""
-        ) == self._street.lower().replace(
-            " ", ""
-        ).replace(
-            '"', ""
-        ).replace(
-            "-", ""
-        ).replace(
-            "str.", "straße"
-        ).replace(
+        return street.lower().replace(" ", "").replace('"', "").replace("-", "").replace("str.", "straße").replace(
             "straße", "strasse"
-        ).replace(
-            ".", ""
-        )
+        ).replace(".", "") == self._street.lower().replace(" ", "").replace('"', "").replace("-", "").replace(
+            "str.", "straße"
+        ).replace("straße", "strasse").replace(".", "")
 
     def fetch(self) -> list[Collection]:
         fresh_ids = False
@@ -109,7 +97,7 @@ class Source:
                 "datum_von": datetime(year, 1, 1).strftime("%d.%m.%Y"),
                 "datum_bis": datetime(year, 12, 31).strftime("%d.%m.%Y"),
             }
-        
+
         r = requests.post(
             "https://abfall.frankenberg.de/module/abfallkalender/generate_ical.php",
             data=data,
@@ -131,9 +119,7 @@ class Source:
         )
         r.raise_for_status()
         # f.ak_ortsteil.options[0].text = 'Bitte wählen';f.ak_ortsteil.length = 2;f.ak_ortsteil.options[1].value = '1-1';
-        result = r.text.split(";")[
-            1:-2
-        ]  # remove first element (Bitte wählen) and last element (selectedIndex)
+        result = r.text.split(";")[1:-2]  # remove first element (Bitte wählen) and last element (selectedIndex)
 
         self._district_id = None
         district_names = []
@@ -165,9 +151,7 @@ class Source:
         )
         r.raise_for_status()
 
-        result = r.text.split(";")[
-            1:-2
-        ]  # remove first element (Bitte wählen) and last element (selectedIndex)
+        result = r.text.split(";")[1:-2]  # remove first element (Bitte wählen) and last element (selectedIndex)
 
         names = []
         self._street_id = None
@@ -188,6 +172,4 @@ class Source:
                     suggestions=names,
                 )
             else:
-                raise SourceArgumentNotFoundWithSuggestions(
-                    argument="street", value=self._street, suggestions=names
-                )
+                raise SourceArgumentNotFoundWithSuggestions(argument="street", value=self._street, suggestions=names)

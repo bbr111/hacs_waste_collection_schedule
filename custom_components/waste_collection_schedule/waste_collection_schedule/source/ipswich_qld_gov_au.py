@@ -45,7 +45,6 @@ class IpswichGovAuParser(HTMLParser):
         return self._entries
 
     def handle_endtag(self, tag):
-
         if tag == "li":
             self._li_level -= 1
             self._loaded_date = None
@@ -54,7 +53,6 @@ class IpswichGovAuParser(HTMLParser):
             self._span_level -= 1
 
     def handle_starttag(self, tag, attrs):
-
         d = dict(attrs)
         cls = d.get("class", "")
 
@@ -82,18 +80,12 @@ class IpswichGovAuParser(HTMLParser):
             self._load_date = False
 
             items = data.strip().split("-")
-            self._loaded_date = datetime.date(
-                int(items[0]), int(items[1]), int(items[2])
-            )
+            self._loaded_date = datetime.date(int(items[0]), int(items[1]), int(items[2]))
 
         if self._load_bin:
             self._load_bin = False
 
-            self._entries.append(
-                Collection(
-                    self._loaded_date, data, icon=ICON_MAP.get(data)
-                )
-            )
+            self._entries.append(Collection(self._loaded_date, data, icon=ICON_MAP.get(data)))
 
 
 class Source:
@@ -102,7 +94,6 @@ class Source:
         self._suburb = suburb
 
     def fetch(self):
-
         address = urllib.parse.quote_plus(f"{self._street}, {self._suburb}")
         params = {
             "apiKey": "b8dbca0c-ad9c-4f8a-8b9c-080fd435c5e7",

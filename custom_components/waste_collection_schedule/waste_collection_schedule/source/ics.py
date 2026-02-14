@@ -145,18 +145,16 @@ class Source:
         split_at: str | None = None,
         version: int | None = None,
         verify_ssl: bool = True,
-        headers: dict = {},
+        headers: dict | None = None,
     ):
+        if headers is None:
+            headers = {}
         self._url = re.sub("^webcal", "https", url) if url else None
         self._file = file
         if bool(self._url is not None) == bool(self._file is not None):
-            raise SourceArgumentExceptionMultiple(
-                ("url", "file"), "Specify either url or file"
-            )
+            raise SourceArgumentExceptionMultiple(("url", "file"), "Specify either url or file")
         if version is not None:
-            _LOGGER.warning(
-                "The 'version' parameter is deprecated and has no effect anymore."
-            )
+            _LOGGER.warning("The 'version' parameter is deprecated and has no effect anymore.")
 
         self._ics = ICS(
             offset=offset,
@@ -211,13 +209,9 @@ class Source:
     def fetch_url(self, url, params=None):
         # get ics file
         if self._method == "GET":
-            r = requests.get(
-                url, params=params, headers=self._headers, verify=self._verify_ssl
-            )
+            r = requests.get(url, params=params, headers=self._headers, verify=self._verify_ssl)
         elif self._method == "POST":
-            r = requests.post(
-                url, data=params, headers=self._headers, verify=self._verify_ssl
-            )
+            r = requests.post(url, data=params, headers=self._headers, verify=self._verify_ssl)
         else:
             raise SourceArgumentNotFoundWithSuggestions(
                 "method",
@@ -241,9 +235,7 @@ class Source:
                 text = f.read()
         except FileNotFoundError as e:
             _LOGGER.error(f"Working directory: '{getcwd()}'")
-            raise SourceArgumentException(
-                "file", f"File '{path.resolve()}' not found"
-            ) from e
+            raise SourceArgumentException("file", f"File '{path.resolve()}' not found") from e
         return self._convert(text)
 
     def _convert(self, data):

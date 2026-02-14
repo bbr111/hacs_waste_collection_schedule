@@ -44,9 +44,7 @@ class Source:
         entries = []
         for entry in data:
             date = datetime.strptime(entry["next_collection_date"], "%Y-%m-%d").date()
-            icon = ICON_MAP.get(
-                entry["collection_type"].lower().replace("bin", "").strip()
-            )  # Collection icon
+            icon = ICON_MAP.get(entry["collection_type"].lower().replace("bin", "").strip())  # Collection icon
             type = entry["collection_type"]
             entries.append(Collection(date=date, t=type, icon=icon))
 

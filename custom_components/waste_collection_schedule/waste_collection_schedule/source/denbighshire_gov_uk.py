@@ -31,9 +31,7 @@ class Source:
         r = requests.get(X_CSRF_TOKEN_URL)
         r.raise_for_status()
 
-        r = requests.get(
-            API_URL.format(uprn=self._uprn), headers={"X-CSRF-TOKEN": r.json()["token"]}
-        )
+        r = requests.get(API_URL.format(uprn=self._uprn), headers={"X-CSRF-TOKEN": r.json()["token"]})
         r.raise_for_status()
 
         entries = []
@@ -47,8 +45,6 @@ class Source:
             date = datetime.strptime(value, "%d/%m/%Y").date()
 
             for bin_type in bin_types:
-                entries.append(
-                    Collection(date=date, t=bin_type, icon=ICON_MAP.get(bin_type))
-                )
+                entries.append(Collection(date=date, t=bin_type, icon=ICON_MAP.get(bin_type)))
 
         return entries

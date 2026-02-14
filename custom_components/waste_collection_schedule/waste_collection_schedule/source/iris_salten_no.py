@@ -61,9 +61,7 @@ class Source:
             },
         )
         r.raise_for_status()
-        r = s.get(
-            "https://www.iris-salten.no/xmlhttprequest.php?service=irisapi.estateempty"
-        )
+        r = s.get("https://www.iris-salten.no/xmlhttprequest.php?service=irisapi.estateempty")
         r.raise_for_status()
 
         entries = []

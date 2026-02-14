@@ -21,7 +21,6 @@ class Source:
         self._ics = ICS(regex="(.*?) \\- ", split_at=", ")
 
     def fetch(self):
-
         today = datetime.date.today()
         year = today.year
         # Get District
@@ -31,9 +30,7 @@ class Source:
             "send_street_and_nummber_data": "",
         }
 
-        r = requests.post(
-            "https://services.stadtservice-bruehl.de/abfallkalender/", data=data
-        )
+        r = requests.post("https://services.stadtservice-bruehl.de/abfallkalender/", data=data)
         r.raise_for_status()
 
         soup = BeautifulSoup(r.text, "html.parser")

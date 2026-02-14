@@ -34,11 +34,7 @@ HOW_TO_GET_ARGUMENTS_DESCRIPTION = {
     )
 }
 
-PARAM_DESCRIPTIONS = {
-    "en": {
-        "street_address": "Your complete street address without city/state (e.g. '22472 Denker Ave')"
-    }
-}
+PARAM_DESCRIPTIONS = {"en": {"street_address": "Your complete street address without city/state (e.g. '22472 Denker Ave')"}}
 
 
 class Source:
@@ -58,9 +54,7 @@ class Source:
             )
 
         self._street_address = street_address
-        self._api_key = (
-            "YsvfDePjTDKtLl041Vz25jCbfjExMtCh"  # Public API key from LA City website
-        )
+        self._api_key = "YsvfDePjTDKtLl041Vz25jCbfjExMtCh"  # Public API key from LA City website
         self._api_url = "https://api.lacity.org/boe_geoquery/addressvalidationservice"
 
     def fetch(self) -> list[Collection]:
@@ -77,7 +71,7 @@ class Source:
             data = response.json()
 
         except RequestException as ex:
-            raise Exception(f"Error fetching collection data: {str(ex)}")
+            raise Exception(f"Error fetching collection data: {str(ex)}") from ex
 
         # Verify Address was found
         if data["status"] != "exactMatch":

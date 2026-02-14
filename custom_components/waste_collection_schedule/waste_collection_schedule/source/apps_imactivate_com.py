@@ -100,46 +100,31 @@ class Source:
         street_matches = []
         for location in data:
             if (
-                location["Street"].lower().replace(" ", "").replace("road", "rd")
-                == self._street
+                location["Street"].lower().replace(" ", "").replace("road", "rd") == self._street
                 and location["Town"].lower().replace(" ", "") == self._town
             ):
                 street_matches.append(location)
 
         if len(street_matches) == 0:
             possibilities = {
-                location["Street"]
-                for location in data
-                if location["Town"].lower().replace(" ", "") == self._town
+                location["Street"] for location in data if location["Town"].lower().replace(" ", "") == self._town
             }
-            raise SourceArgumentNotFoundWithSuggestions(
-                "street", f"{self._street}, {self._town}", suggestions=possibilities
-            )
+            raise SourceArgumentNotFoundWithSuggestions("street", f"{self._street}, {self._town}", suggestions=possibilities)
 
         for location in street_matches:
             number1 = (
-                (location["Address1"].strip() + location["Address2"].strip())
-                .replace(" ", "")
-                .replace("\u0000", "")
-                .lower()
+                (location["Address1"].strip() + location["Address2"].strip()).replace(" ", "").replace("\u0000", "").lower()
             )
             number2 = (
-                (location["Address2"].strip() + location["Address1"].strip())
-                .replace(" ", "")
-                .replace("\u0000", "")
-                .lower()
+                (location["Address2"].strip() + location["Address1"].strip()).replace(" ", "").replace("\u0000", "").lower()
             )
             if number1 == self._number or number2 == self._number:
                 self._premises_id = location["PremiseID"]
                 self._local_authority = location["LocalAuthority"]
                 return
 
-        possibilities = {
-            location["Address1"] + location["Address2"] for location in street_matches
-        }
-        raise SourceArgumentNotFoundWithSuggestions(
-            "number", self._number, suggestions=possibilities
-        )
+        possibilities = {location["Address1"] + location["Address2"] for location in street_matches}
+        raise SourceArgumentNotFoundWithSuggestions("number", self._number, suggestions=possibilities)
 
     def _fetch_premise(self) -> list[Collection]:
         if self._premises_id is None or self._local_authority is None:

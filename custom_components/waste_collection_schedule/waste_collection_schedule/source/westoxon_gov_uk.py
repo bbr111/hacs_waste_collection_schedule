@@ -24,9 +24,7 @@ TITLE = "West Oxfordshire District Council"
 DESCRIPTION = "Source for West Oxfordshire District Council."
 URL = "https://westoxon.gov.uk/"
 TEST_CASES = {
-    "75 manor road woodstock, ox20 1xr": {
-        "address": "75 manor road woodstock, ox20 1xr"
-    },
+    "75 manor road woodstock, ox20 1xr": {"address": "75 manor road woodstock, ox20 1xr"},
     "test": {"address": "65 MAIN ROAD, LONG HANBOROUGH, WITNEY, OX29 8JX"},
 }
 
@@ -90,9 +88,7 @@ class Source:
             }
         )
 
-    def _request(
-        self, r: int, aura_method: str, message: str | dict
-    ) -> requests.Response:
+    def _request(self, r: int, aura_method: str, message: str | dict) -> requests.Response:
         if isinstance(message, dict):
             message = json.dumps(message)
         response = self._session.post(
@@ -116,9 +112,9 @@ class Source:
     def _match_address(self, address: str | None) -> bool:
         if address is None:
             return False
-        return self._address.lower().replace(" ", "").replace(".", "").replace(
-            ",", ""
-        ) == address.lower().replace(" ", "").replace(".", "").replace(",", "")
+        return self._address.lower().replace(" ", "").replace(".", "").replace(",", "") == address.lower().replace(
+            " ", ""
+        ).replace(".", "").replace(",", "")
 
     def fetch(self) -> list[Collection]:
         self._init_connection()
@@ -141,9 +137,7 @@ class Source:
             ]
         }
         r = self._request(5, "aura.FlowRuntimeConnect.startFlow", message1)
-        serialized_state = r.json()["actions"][0]["returnValue"]["response"][
-            "serializedEncodedState"
-        ]
+        serialized_state = r.json()["actions"][0]["returnValue"]["response"]["serializedEncodedState"]
 
         message2 = {
             "actions": [
@@ -159,18 +153,14 @@ class Source:
                         "q": self._address,
                         "searchType": "TypeAhead",
                         "targetApiName": "Property__c",
-                        "body": {
-                            "sourceRecord": {"apiName": "Case", "fields": {"Id": None}}
-                        },
+                        "body": {"sourceRecord": {"apiName": "Case", "fields": {"Id": None}}},
                     },
                 }
             ]
         }
         r = self._request(1, "aura.LookupController.lookupaura.Lookup.lookup", message2)
 
-        addresses = r.json()["actions"][0]["returnValue"]["lookupResults"][
-            "Property__c"
-        ]["records"]
+        addresses = r.json()["actions"][0]["returnValue"]["lookupResults"]["Property__c"]["records"]
         address_id = None
         address_name = None
         address_set = set()
@@ -238,9 +228,7 @@ class Source:
         }
 
         r = self._request(26, "aura.FlowRuntimeConnect.navigateFlow", message4)
-        serialized_state = r.json()["actions"][0]["returnValue"]["response"][
-            "serializedEncodedState"
-        ]
+        serialized_state = r.json()["actions"][0]["returnValue"]["response"]["serializedEncodedState"]
 
         message5 = {
             "actions": [
@@ -262,9 +250,7 @@ class Source:
         }
 
         r = self._request(27, "aura.FlowRuntimeConnect.navigateFlow", message5)
-        serialized_state = r.json()["actions"][0]["returnValue"]["response"][
-            "serializedEncodedState"
-        ]
+        serialized_state = r.json()["actions"][0]["returnValue"]["response"]["serializedEncodedState"]
 
         message6 = {
             "actions": [
@@ -286,9 +272,7 @@ class Source:
         }
         r = self._request(28, "aura.FlowRuntimeConnect.navigateFlow", message6)
 
-        table_value = r.json()["actions"][0]["returnValue"]["response"]["fields"][1][
-            "inputs"
-        ][3]["value"]
+        table_value = r.json()["actions"][0]["returnValue"]["response"]["fields"][1]["inputs"][3]["value"]
 
         table = json.loads(table_value)
 

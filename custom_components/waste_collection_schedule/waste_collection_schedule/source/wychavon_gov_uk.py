@@ -1,7 +1,6 @@
 import logging
 
-from waste_collection_schedule.source.roundlookup_uk import \
-    Source as Roundlookup  # type: ignore[attr-defined]
+from waste_collection_schedule.source.roundlookup_uk import Source as Roundlookup  # type: ignore[attr-defined]
 
 _LOGGER = logging.getLogger(__name__)
 TITLE = "Wychavon District Council (Deprecated)"
@@ -24,6 +23,4 @@ ICON_MAP = {
 class Source(Roundlookup):
     def __init__(self, uprn: str | int):
         super().__init__(uprn, "Wychavon")
-        _LOGGER.warning(
-            "This source is deprecated, please use the 'roundlookup_uk' source instead"
-        )
+        _LOGGER.warning("This source is deprecated, please use the 'roundlookup_uk' source instead")

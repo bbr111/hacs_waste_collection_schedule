@@ -4,7 +4,7 @@
 
 
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import requests
 from waste_collection_schedule import Collection  # type: ignore[attr-defined]
@@ -16,9 +16,7 @@ TEST_CASES = {
     "100030987513": {"uprn": 100030987513},
     "100030987514": {"uprn": 100030987514},
     "10093005361": {"uprn": "10093005361"},
-    "Castle Farm House Main Street Rockingham North Northamptonshire LE16 8TG": {
-        "uprn": "100030993903"
-    },
+    "Castle Farm House Main Street Rockingham North Northamptonshire LE16 8TG": {"uprn": "100030993903"},
 }
 
 
@@ -39,14 +37,7 @@ class Source:
 
     def fetch(self):
         entries = []
-        today = (
-            int(
-                datetime.now(timezone.utc)
-                .replace(hour=23, minute=59, second=59)
-                .timestamp()
-            )
-            * 1000
-        )
+        today = int(datetime.now(UTC).replace(hour=23, minute=59, second=59).timestamp()) * 1000
         dateforurl = datetime.now().strftime("%Y-%m-%d")
         dateforurl2 = (datetime.now() + timedelta(days=42)).strftime("%Y-%m-%d")
         headers = {
@@ -63,11 +54,7 @@ class Source:
 
         json_response = json.loads(response.text)
 
-        output_json = [
-            x
-            for x in json_response
-            if int("".join(filter(str.isdigit, x["start"]))) >= today
-        ]
+        output_json = [x for x in json_response if int("".join(filter(str.isdigit, x["start"]))) >= today]
 
         # output_json.sort(key=myFunc)
 
@@ -85,7 +72,7 @@ class Source:
             else:
                 bin_type = sov
             dateofbin = int("".join(filter(str.isdigit, output_json[i]["start"])))
-            day = datetime.fromtimestamp(dateofbin / 1000, timezone.utc).date()
+            day = datetime.fromtimestamp(dateofbin / 1000, UTC).date()
             collection_data = Collection(
                 t=bin_type,
                 date=day,

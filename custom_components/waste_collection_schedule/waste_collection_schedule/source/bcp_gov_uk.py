@@ -57,9 +57,7 @@ class Source:
             response = requests.post(api_url, headers=headers, json=payload)
             response.raise_for_status()
         except requests.exceptions.RequestException as e:
-            raise Exception(
-                f"BCP API request failed: {e} (status: {response.status_code})"
-            ) from e
+            raise Exception(f"BCP API request failed: {e} (status: {response.status_code})") from e
 
         bin_data = response.json().get("data", [])
         if not bin_data:
@@ -75,9 +73,7 @@ class Source:
             for date_str in date_list:
                 try:
                     collection_date = datetime.strptime(date_str, "%Y-%m-%d").date()
-                    entries.append(
-                        Collection(date=collection_date, t=bin_type, icon=icon)
-                    )
+                    entries.append(Collection(date=collection_date, t=bin_type, icon=icon))
                 except ValueError:
                     _LOGGER.error("Invalid date format: %s", date_str)
 

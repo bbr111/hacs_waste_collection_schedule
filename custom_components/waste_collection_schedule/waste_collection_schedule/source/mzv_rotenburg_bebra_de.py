@@ -35,8 +35,8 @@ ICON_MAP = {
 PARAM_TRANSLATIONS = {
     "de": {
         "city": "Ort",
-        "yellow_route": "Gelbe Tonne Rute",
-        "paper_route": "Papier Rute",
+        "yellow_route": "Gelbe Tonne Route",
+        "paper_route": "Papier Route",
     }
 }
 
@@ -58,9 +58,7 @@ API_URL = "https://www.mzv-rotenburg-bebra.de/entsorgung.php"
 
 
 class Source:
-    def __init__(
-        self, city: str, yellow_route: str | None = None, paper_route: str | None = None
-    ):
+    def __init__(self, city: str, yellow_route: str | None = None, paper_route: str | None = None):
         self._city: str = city
         self._yellow_route: str | None = yellow_route
         self._paper_route: str | None = paper_route
@@ -74,12 +72,7 @@ class Source:
         r.raise_for_status()
 
         soup = BeautifulSoup(r.content, "html.parser")
-        links = soup.find_all(
-            lambda tag: tag
-            and tag.name == "a"
-            and tag.get("href")
-            and "entsorgung.php?ort=" in tag["href"]
-        )
+        links = soup.find_all(lambda tag: tag and tag.name == "a" and tag.get("href") and "entsorgung.php?ort=" in tag["href"])
         return [link["href"].split("?ort=")[1] for link in links]
 
     def fetch(self) -> list[Collection]:
@@ -99,12 +92,12 @@ class Source:
                     "city",
                     self._city,
                     "make sure the city is spelled exactly like in the link of the website https://www.mzv-rotenburg-bebra.de//webapp.html",
-                )
+                ) from None
             raise SourceArgumentNotFoundWithSuggestions(
                 "city",
                 self._city,
                 cities,
-            )
+            ) from None
 
         entries = []
 

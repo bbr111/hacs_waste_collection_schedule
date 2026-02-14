@@ -17,7 +17,7 @@ ICON_MAP = {
     "Communal dry recycling bin": "mdi:recycle",
     "Small kitchen waste box": "mdi:food",
     "Large brown kitchen waste box": "mdi:food",
-    "Reuseable garden waste sack": "mdi:leaf",
+    "Reuseable garden waste sack": "mdi:leaf",  # codespell: ignore Reuseable
     "Household refuse sack": "mdi:trash-can",
     "Refuse skip": "mdi:trash-can",
     "Food waste recycling": "mdi:food",
@@ -34,26 +34,29 @@ class Source:
 
     def fetch(self):
         url = f"https://www.islington.gov.uk/your-area?Postcode={self._postcode}&Uprn={self._uprn}"
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+            "Accept-Language": "en-GB,en;q=0.5",
+            "Referer": "https://www.islington.gov.uk/",
+            "Connection": "keep-alive",
+        }
 
-        response = self._session.get(url)
+        response = self._session.get(url, headers=headers)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
 
         entries = []
 
         waste_table = (
-            soup.find(string="Waste and recycling collections")
-            .find_next("div", class_="m-toggle-content")
-            .find("table")
+            soup.find(string="Waste and recycling collections").find_next("div", class_="m-toggle-content").find("table")
         )
 
         if waste_table:
             rows = waste_table.find_all("tr")
             for row in rows:
                 waste_type = row.find("td").text.strip().split(",")[0].split(" - ")[0]
-                collection_day = (
-                    row.find("td").text.strip().split(",")[1].split(" on ")[1]
-                )
+                collection_day = row.find("td").text.strip().split(",")[1].split(" on ")[1]
 
                 entries.append(
                     Collection(

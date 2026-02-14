@@ -43,21 +43,13 @@ class Source:
         entries = []
 
         # Find section with bins in
-        sections = (
-            soup.find("div", {"class": "container results-table-wrapper"})
-            .find("tbody")
-            .find_all("tr")
-        )
+        sections = soup.find("div", {"class": "container results-table-wrapper"}).find("tbody").find_all("tr")
 
         # For each bin section, get the text and the list elements
         for item in sections:
             words = item.find_next("a").text.split()[:-1]
             bin_type = " ".join(words).capitalize()
-            date = (
-                item.find("td", {"class": "next-service"})
-                .find_next("span")
-                .next_sibling.strip()
-            )
+            date = item.find("td", {"class": "next-service"}).find_next("span").next_sibling.strip()
             next_collection = datetime.strptime(date, "%d/%m/%Y").date()
             entries.append(
                 Collection(

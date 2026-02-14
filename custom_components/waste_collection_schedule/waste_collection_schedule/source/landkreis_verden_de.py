@@ -53,9 +53,7 @@ class Source:
         self.city: str = city
         self.street: str = street
         self.house_number: str | int = house_number
-        self.house_number_addition: str = (
-            house_number_addition if house_number_addition else ""
-        )
+        self.house_number_addition: str = house_number_addition if house_number_addition else ""
         self._ics = ICS()
 
     def fetch(self) -> list[Collection]:

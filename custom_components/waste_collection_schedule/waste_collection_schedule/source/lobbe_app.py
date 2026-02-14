@@ -150,9 +150,9 @@ class Source:
         self._street_name: str | None = None
 
     @staticmethod
-    def _get_id(
-        action: str, compare_to: str, param_name: str, params: dict[str, str | int] = {}
-    ) -> tuple[int, str]:
+    def _get_id(action: str, compare_to: str, param_name: str, params: dict[str, str | int] | None = None) -> tuple[int, str]:
+        if params is None:
+            params = {}
         params = {"action": action, **params}
         original_compare_to = compare_to
         compare_to = make_comparable(compare_to)
@@ -171,12 +171,8 @@ class Source:
 
     def _get_ids(self) -> None:
         self._state_id, self._state_name = self._get_id("state", self._state, "state")
-        self._city_id, self._city_name = self._get_id(
-            "place", self._city, "city", {"id": self._state_id}
-        )
-        self._street_id, self._street_name = self._get_id(
-            "street", self._street, "street", {"id": self._city_id}
-        )
+        self._city_id, self._city_name = self._get_id("place", self._city, "city", {"id": self._state_id})
+        self._street_id, self._street_name = self._get_id("street", self._street, "street", {"id": self._city_id})
 
     def fetch(self) -> list[Collection]:
         now = datetime.now()
@@ -227,9 +223,7 @@ class Source:
         dates = self._ics.convert(r.text)
         entries = []
         for d in dates:
-            entries.append(
-                Collection(d[0], d[1], ICON_MAP.get(d[1].split()[0].lower()))
-            )
+            entries.append(Collection(d[0], d[1], ICON_MAP.get(d[1].split()[0].lower())))
         return entries
 
 

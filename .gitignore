@@ -9,3 +9,9 @@ custom_components/waste_collection_schedule/waste_collection_schedule/test/secre
 .venv/
 .idea/
 .python-version
+.devcontainer/.*
+.devcontainer/blue*
+.devcontainer/scrip*
+.devcontainer/a*
+.devcontainer/home*
+hacs_waste_collection_schedule.egg-info/

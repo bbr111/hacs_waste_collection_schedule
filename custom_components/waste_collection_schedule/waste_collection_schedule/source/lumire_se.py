@@ -43,12 +43,10 @@ class Source:
 
         r = requests.post(API_URL, data=data, headers=HEADERS)
         r.raise_for_status()
-        if "Den adress du har angivit finns inte" in r.text:
+        if "Den adress du har angivit finns inte" in r.text:  # codespell: ignore addresse
             raise ValueError("Address not found")
 
-        clean_html = (
-            r.text.encode().decode("unicode_escape").replace(r"\/", "/").strip('"')
-        )
+        clean_html = r.text.encode().decode("unicode_escape").replace(r"\/", "/").strip('"')
 
         soup = BeautifulSoup(clean_html, "html.parser")
         results = soup.find("div", {"class": "waste-result-list"})

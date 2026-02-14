@@ -7,9 +7,7 @@ from bs4 import BeautifulSoup
 from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 
 TITLE = "Hartlepool Borough Council"
-DESCRIPTION = (
-    "Source for www.hertlepool.gov.uk services for Hartlepool Borough Council."
-)
+DESCRIPTION = "Source for www.hertlepool.gov.uk services for Hartlepool Borough Council."
 URL = "https://www.hartlepool.gov.uk"
 TEST_CASES = {
     "Test_001": {
@@ -56,7 +54,6 @@ class Source:
         self._uprn = str(uprn)
 
     def fetch(self):
-
         s = requests.Session()
 
         # set up session
@@ -77,20 +74,16 @@ class Source:
 
         # now query using the uprn
         timestamp = time.time_ns() // 1_000_000  # epoch time in milliseconds
-        payload = {
-            "formValues": {
-                "Section 1": {"collectionLocationUPRN": {"value": self._uprn}}
-            }
-        }
+        payload = {"formValues": {"Section 1": {"collectionLocationUPRN": {"value": self._uprn}}}}
         scheduleRequest = s.post(
             f"https://online.hartlepool.gov.uk/apibroker/runLookup?id=5ec67e019ffdd&repeat_against=&noRetry=true&getOnlyTokens=undefined&log_id=&app_name=AF-Renderer::Self&_={timestamp}&sid={sessionKey}",
             headers=HEADERS,
             json=payload,
         )
         scheduleRequest.raise_for_status()
-        rowdata = json.loads(scheduleRequest.content)["integration"]["transformed"][
-            "rows_data"
-        ]["0"]["HTMLCollectionDatesText"]
+        rowdata = json.loads(scheduleRequest.content)["integration"]["transformed"]["rows_data"]["0"][
+            "HTMLCollectionDatesText"
+        ]
         soup = BeautifulSoup(rowdata, "html.parser")
         divs = soup.find_all("div")
 

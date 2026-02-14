@@ -89,9 +89,7 @@ class Source:
         # Check if municipality is in list
         municipalities = MUNICIPALITIES
         if municipality not in municipalities:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "municipality", municipality, list(municipalities.keys())
-            )
+            raise SourceArgumentNotFoundWithSuggestions("municipality", municipality, list(municipalities.keys()))
 
         self._api_url = f"https://www.insert-it.de/{municipalities[municipality]}"
         self._ics = ICS(regex=REGEX_MAP.get(municipality))
@@ -132,9 +130,7 @@ class Source:
                 street_id = element["ID"]
                 return street_id
 
-        raise SourceArgumentNotFoundWithSuggestions(
-            "street", self._street, [x["Name"] for x in result]
-        )
+        raise SourceArgumentNotFoundWithSuggestions("street", self._street, [x["Name"] for x in result])
 
     def get_location_id(self, street_id):
         """Return ID of first matching location"""
@@ -148,18 +144,14 @@ class Source:
 
         result = json.loads(r.text)
         if not result:
-            raise Exception(
-                f"No locations found for Street ID {street_id} and House number {self._hnr}"
-            )
+            raise Exception(f"No locations found for Street ID {street_id} and House number {self._hnr}")
 
         for element in result:
             if element["StreetId"] == street_id and element["Text"] == str(self._hnr):
                 location_id = element["ID"]
                 return location_id
 
-        raise SourceArgumentNotFound(
-            "hnr", self._hnr, [x["Text"] for x in result if x["StreetId"] == street_id]
-        )
+        raise SourceArgumentNotFound("hnr", self._hnr, [x["Text"] for x in result if x["StreetId"] == street_id])
 
     def fetch(self):
         if not (self._uselocation):

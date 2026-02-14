@@ -48,9 +48,9 @@ class Source:
         year += 1
         try:
             return entries + self._get_collections(year)
-        except Exception:
+        except Exception as e:
             if exception:
-                raise exception
+                raise exception from e
             return entries
 
     def _get_collections(self, year) -> list[Collection]:
@@ -64,11 +64,7 @@ class Source:
         r = requests.get(API_URL, params=args)
         r.raise_for_status()
         data = r.json()
-        if not (
-            "data" in data
-            and "items" in data["data"]
-            and len(data["data"]["items"]) > 0
-        ):
+        if not ("data" in data and "items" in data["data"] and len(data["data"]["items"]) > 0):
             raise ValueError("No data found, check your arguments")
 
         entries = []

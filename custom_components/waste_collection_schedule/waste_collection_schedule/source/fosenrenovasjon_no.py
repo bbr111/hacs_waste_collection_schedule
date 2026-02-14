@@ -72,8 +72,6 @@ class Source:
         entries: list[Collection] = []
         for d in data["disposals"]:
             date = datetime.strptime(d["date"], "%Y-%m-%dT%H:%M:%S").date()
-            entries.append(
-                Collection(date=date, t=d["fraction"], icon=ICON_MAP.get(d["fraction"]))
-            )
+            entries.append(Collection(date=date, t=d["fraction"], icon=ICON_MAP.get(d["fraction"])))
 
         return entries

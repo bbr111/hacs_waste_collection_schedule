@@ -63,8 +63,6 @@ class Source:
 
             for img in tag.find_all("img"):
                 waste_type = img.get("title")
-                entries.append(
-                    Collection(date, waste_type, icon=ICON_MAP.get(waste_type))
-                )
+                entries.append(Collection(date, waste_type, icon=ICON_MAP.get(waste_type)))
 
         return entries

@@ -57,9 +57,7 @@ class Source:
 
         bin_type_str = tag.text.split(":")[1].strip()
 
-        return bin_type_str, rrule(
-            WEEKLY, byweekday=weekday, dtstart=dtstart, until=dtstop
-        )
+        return bin_type_str, rrule(WEEKLY, byweekday=weekday, dtstart=dtstart, until=dtstop)
 
     @staticmethod
     def _parse_flowtext(tag: Tag) -> tuple[str | None, rrule | None]:
@@ -67,9 +65,7 @@ class Source:
         dtstop = datetime.now() + timedelta(days=365)
 
         text = tag.text.strip()
-        if not text.lower().startswith("the collection") or text.lower().startswith(
-            "the collection times timetable"
-        ):
+        if not text.lower().startswith("the collection") or text.lower().startswith("the collection times timetable"):
             return None, None
 
         words = text.split()

@@ -47,10 +47,7 @@ class Source:
         timestamp = time_ns() // 1_000_000  # epoch time in milliseconds
         payload = {
             "formValues": {
-                "Property": {
-                    key: {"value": self._uprn}
-                    for key in ["addressPicker", "propertyReference", "siteReference"]
-                }
+                "Property": {key: {"value": self._uprn} for key in ["addressPicker", "propertyReference", "siteReference"]}
             }
         }
         schedule_request = s.post(
@@ -67,9 +64,7 @@ class Source:
             entries.append(
                 Collection(
                     t=bin_type,
-                    date=datetime.strptime(
-                        item["nextDateUnformatted"], "%d/%m/%Y"
-                    ).date(),
+                    date=datetime.strptime(item["nextDateUnformatted"], "%d/%m/%Y").date(),
                     icon=ICON_MAP.get(bin_type.upper()),
                 )
             )

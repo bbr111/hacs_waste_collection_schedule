@@ -59,9 +59,11 @@ def get_id(
     url_key: str,
     val_key: str,
     name: str,
-    params: dict = {},
+    params: dict | None = None,
     init_param_name: str | None = None,
 ):
+    if params is None:
+        params = {}
     response = s.get(API_URLS[url_key], params=params, headers=HEADERS)
     data = json.loads(response.text)
     for val in data[val_key]:
@@ -69,9 +71,7 @@ def get_id(
             return val["id"]
     if init_param_name is None:
         raise ValueError(f"Could not find {name} in {url_key}")
-    raise SourceArgumentNotFoundWithSuggestions(
-        init_param_name, name, [x["name"] for x in data[val_key]]
-    )
+    raise SourceArgumentNotFoundWithSuggestions(init_param_name, name, [x["name"] for x in data[val_key]])
 
 
 class Source:
@@ -90,9 +90,7 @@ class Source:
         entries = []
 
         request = requests.Session()
-        locality_id = get_id(
-            request, "Localities", "localities", self.suburb, init_param_name="suburb"
-        )
+        locality_id = get_id(request, "Localities", "localities", self.suburb, init_param_name="suburb")
         street_id = get_id(
             request,
             "Streets",
@@ -127,8 +125,6 @@ class Source:
             else:
                 event_name = ROUNDS.get(event_type)
             if event_type in TRACKED_EVENTS:
-                entries.append(
-                    Collection(date=date, t=event_name, icon=ICON_MAP.get(event_type))
-                )
+                entries.append(Collection(date=date, t=event_name, icon=ICON_MAP.get(event_type)))
 
         return entries

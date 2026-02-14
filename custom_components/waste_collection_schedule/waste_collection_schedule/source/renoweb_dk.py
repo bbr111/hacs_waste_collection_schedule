@@ -4,7 +4,6 @@ import json
 import logging
 import re
 from datetime import datetime
-from typing import List
 
 import requests
 from waste_collection_schedule import Collection  # type: ignore[attr-defined]
@@ -78,8 +77,7 @@ class Source:
 
         self._session = requests.Session()
         self._session.headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) "
-            + "Gecko/20100101 Firefox/115.0",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) " + "Gecko/20100101 Firefox/115.0",
             "Accept-Encoding": "gzip, deflate",
             "Accept": "*/*",
             "Connection": "keep-alive",
@@ -110,7 +108,7 @@ class Source:
 
         return self.__address_id
 
-    def fetch(self) -> List[Collection]:
+    def fetch(self) -> list[Collection]:
         """Fetch data from RenoWeb."""
         _LOGGER.debug("Source.fetch()")
 
@@ -153,13 +151,8 @@ class Source:
             raise ValueError("No waste schemes found, check address or address_id")
 
         for entry in waste_schemes:
-            include_entry = (
-                self._include_ordered_pickup_entries
-                or not entry["afhentningsbestillingmateriel"]
-            )
-            if include_entry and re.search(
-                r"dag den \d{2}-\d{2}-\d{4}", entry["toemningsdato"]
-            ):
+            include_entry = self._include_ordered_pickup_entries or not entry["afhentningsbestillingmateriel"]
+            if include_entry and re.search(r"dag den \d{2}-\d{2}-\d{4}", entry["toemningsdato"]):
                 response = self._session.post(
                     url=self._api_url.format(endpoint="GetCalender_mitAffald"),
                     json={"materialid": entry["id"]},
@@ -167,9 +160,7 @@ class Source:
 
                 response.raise_for_status()
 
-                entry["name"] = " - ".join(
-                    [entry["ordningnavn"], entry["materielnavn"]]
-                )
+                entry["name"] = " - ".join([entry["ordningnavn"], entry["materielnavn"]])
 
                 for date in [
                     datetime.strptime(date_string.split()[-1], "%d-%m-%Y").date()

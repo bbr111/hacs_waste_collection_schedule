@@ -180,7 +180,7 @@ class Source:
     def __init__(
         self,
         town,
-        app: SUPPORTED_APPS_LITERAL = None,
+        app: SUPPORTED_APPS_LITERAL | None = None,
         district="",
         street="",
         house_number="",
@@ -228,9 +228,7 @@ class Source:
         if self.community_input == "":
             town_data = self._ecoharmonogram_pl.fetch_town(self.town_input)
         else:
-            town_data = self._ecoharmonogram_pl.fetch_town_with_community(
-                self.community_input
-            )
+            town_data = self._ecoharmonogram_pl.fetch_town_with_community(self.community_input)
 
         matching_towns = list(
             filter(
@@ -265,8 +263,7 @@ class Source:
             for town_district in matching_towns_district:
                 if (
                     self.town_input.lower() == town_district.get("name").lower()
-                    and self.district_input.lower()
-                    == town_district.get("district").lower()
+                    and self.district_input.lower() == town_district.get("district").lower()
                 ):
                     match = True
                     town = town_district
@@ -274,17 +271,12 @@ class Source:
             if not match:
                 matches = list(
                     map(
-                        lambda x: "town: "
-                        + x.get("name")
-                        + ", district:"
-                        + x.get("district"),
+                        lambda x: "town: " + x.get("name") + ", district:" + x.get("district"),
                         matching_towns_district,
                     )
                 )
 
-                raise Exception(
-                    f"Found multiple matches but no exact match found {matches}"
-                )
+                raise Exception(f"Found multiple matches but no exact match found {matches}")
 
         schedule_periods_data = self._ecoharmonogram_pl.fetch_scheduled_periods(town)
         schedule_periods = schedule_periods_data.get("schedulePeriods")
@@ -363,10 +355,7 @@ class Source:
                     self.additional_sides_matcher_input,
                     {x["sides"] for x in streets["streets"]},
                 )
-            elif (
-                street["sides"].lower().casefold()
-                == self.additional_sides_matcher_input.lower().casefold()
-            ):
+            elif street["sides"].lower().casefold() == self.additional_sides_matcher_input.lower().casefold():
                 to_return.append(street)
 
         if len(to_return) == 0:
@@ -384,18 +373,11 @@ class Source:
         entries: list[Collection] = []
         for street in streets["streets"]:
             for streetId in street["id"].split(","):
-                schedules_response = self._ecoharmonogram_pl.fetch_schedules(
-                    sp, streetId
-                )
+                schedules_response = self._ecoharmonogram_pl.fetch_schedules(sp, streetId)
                 schedules_raw = schedules_response["schedules"]
-                if (
-                    self.additional_sides_matcher_input.lower()
-                    in schedules_response["street"]["sides"].lower()
-                ):
+                if self.additional_sides_matcher_input.lower() in schedules_response["street"]["sides"].lower():
                     schedules_descriptions_dict = dict[str, ScheduleDescription]()
-                    schedules_descriptions_raw = schedules_response[
-                        "scheduleDescription"
-                    ]
+                    schedules_descriptions_raw = schedules_response["scheduleDescription"]
 
                     for sd in schedules_descriptions_raw:
                         schedules_descriptions_dict[sd["id"]] = sd
@@ -403,9 +385,7 @@ class Source:
                     schedules: list[ScheduleWithName] = []
                     for sr in schedules_raw:
                         z: ScheduleWithName = cast(ScheduleWithName, sr.copy())
-                        z["name"] = schedules_descriptions_dict[
-                            sr["scheduleDescriptionId"]
-                        ]["name"]
+                        z["name"] = schedules_descriptions_dict[sr["scheduleDescriptionId"]]["name"]
                         schedules.append(z)
 
                     for sch in schedules:

@@ -48,16 +48,12 @@ PARAM_TRANSLATIONS = {  # Optional dict to translate the arguments, will be show
 
 
 class Source:
-    def __init__(
-        self, uprn: str | int
-    ):  # argX correspond to the args dict in the source configuration
+    def __init__(self, uprn: str | int):  # argX correspond to the args dict in the source configuration
         self._uprn = str(uprn)
 
     def fetch(self) -> list[Collection]:
         s = requests.Session()
-        response = s.get(
-            f"https://www.dundee-mybins.co.uk/get_calendar.php?rn={self._uprn}"
-        )
+        response = s.get(f"https://www.dundee-mybins.co.uk/get_calendar.php?rn={self._uprn}")
         response.raise_for_status()
         schedule = json.loads(response.text)
 

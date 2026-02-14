@@ -128,9 +128,7 @@ class Source:
             next_letter = chr(ord(letter) + 1)
             return (letter, next_letter)
 
-    def _load_streets_for_letter(
-        self, session: requests.Session, letter: str
-    ) -> dict[str, str]:
+    def _load_streets_for_letter(self, session: requests.Session, letter: str) -> dict[str, str]:
         """Load all streets starting with the given letter."""
         von, bis = self._get_alphabet_range(letter)
         r = session.get(BASE_URL, params={"von": von, "bis": bis})
@@ -162,11 +160,7 @@ class Source:
                 return street_value, von, bis
 
         # Try partial match - collect all matches
-        partial_matches = {
-            name: value
-            for name, value in streets.items()
-            if street_lower in name.lower()
-        }
+        partial_matches = {name: value for name, value in streets.items() if street_lower in name.lower()}
 
         # If exactly one partial match, use it
         if len(partial_matches) == 1:

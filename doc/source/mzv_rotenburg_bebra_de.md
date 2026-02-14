@@ -10,8 +10,8 @@ waste_collection_schedule:
     - name: mzv_rotenburg_bebra_de
       args:
         city: CITY (Stadt/Ort)
-        yellow_route: "YELLOW ROUTE (Rutennummer für Gelbe Tonne)"
-        paper_route: PAPER ROUTE (Rute für Blaue Tonne)
+        yellow_route: "YELLOW ROUTE (Routennummer für Gelbe Tonne)"
+        paper_route: PAPER ROUTE (Route für Blaue Tonne)
         
 ```
 

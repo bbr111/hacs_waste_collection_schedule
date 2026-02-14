@@ -1,6 +1,6 @@
 from datetime import datetime
-import urllib3
 
+import urllib3
 from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 from waste_collection_schedule.service.SSLError import get_legacy_session
 
@@ -45,7 +45,7 @@ class Source:
         year = date.year
         month = date.month
         entries = []
-        for i in range(1, 13):
+        for _i in range(1, 13):
             PARAMS = {
                 "month": month,
                 "year": year,
@@ -66,9 +66,7 @@ class Source:
                     for collection in collection_day:
                         entries.append(
                             Collection(
-                                date=datetime.fromisoformat(
-                                    collection["CollectionDate"]
-                                ).date(),
+                                date=datetime.fromisoformat(collection["CollectionDate"]).date(),
                                 t=collection["BinType"],
                                 icon=ICON_MAP.get(collection["BinType"].split(" ")[0]),
                             )

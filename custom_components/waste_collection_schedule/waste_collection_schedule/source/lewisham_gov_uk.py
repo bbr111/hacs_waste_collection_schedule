@@ -33,10 +33,7 @@ ICON_MAP = {
 }
 
 ID_SEPERATOR = "-----------------------------{rand_id}"
-PAYLOAD_SECTION_TEMPLATE = (
-    ID_SEPERATOR
-    + """\r\nContent-Disposition: form-data; name="{name}"\r\n\r\n{value}\r\n"""
-)
+PAYLOAD_SECTION_TEMPLATE = ID_SEPERATOR + """\r\nContent-Disposition: form-data; name="{name}"\r\n\r\n{value}\r\n"""
 
 HEADERS = {"User-Agent": "Mozilla/5.0"}
 
@@ -65,22 +62,12 @@ class Source:
             addresses = r.json()
 
             if self._name:
-                self._uprn = [
-                    x["Uprn"]
-                    for x in addresses
-                    if (x["Title"]).upper().startswith(self._name.upper())
-                ][0]
+                self._uprn = [x["Uprn"] for x in addresses if (x["Title"]).upper().startswith(self._name.upper())][0]
             elif self._number:
-                self._uprn = [
-                    x["Uprn"]
-                    for x in addresses
-                    if (x["Title"]).startswith(str(self._number))
-                ][0]
+                self._uprn = [x["Uprn"] for x in addresses if (x["Title"]).startswith(str(self._number))][0]
 
             if not self._uprn:
-                raise Exception(
-                    f"Could not find address {self._post_code} {self._number}{self._name}"
-                )
+                raise Exception(f"Could not find address {self._post_code} {self._number}{self._name}")
 
     def fetch(self) -> list[Collection]:
         if not self._uprn:
@@ -117,9 +104,7 @@ class Source:
             if name:
                 if name.endswith("Value"):
                     value = self._uprn
-                payload += PAYLOAD_SECTION_TEMPLATE.format(
-                    rand_id=rand_id, name=name, value=value
-                )
+                payload += PAYLOAD_SECTION_TEMPLATE.format(rand_id=rand_id, name=name, value=value)
 
         payload += ID_SEPERATOR.format(rand_id=rand_id) + "--\r\n"
         headers = {
@@ -158,15 +143,9 @@ class Source:
             if sibling.name == "strong":
                 if waste_type is not None:
                     try:
-                        entries.extend(
-                            self._calculate_collections(
-                                waste_type, frequency, week_day, date
-                            )
-                        )
+                        entries.extend(self._calculate_collections(waste_type, frequency, week_day, date))
                     except InsufficientDataError as e:
-                        _LOGGER.warning(
-                            f"Could not calculate collection got exception: {e}"
-                        )
+                        _LOGGER.warning(f"Could not calculate collection got exception: {e}")
                     waste_type = None
                     frequency = None
                     week_day = None
@@ -181,14 +160,10 @@ class Source:
                         week_day = day
                         break
                 if result := re.search(DATE_REGEX, sibling.text):
-                    date = datetime.datetime.strptime(
-                        result.group(1), "%d/%m/%Y"
-                    ).date()
+                    date = datetime.datetime.strptime(result.group(1), "%d/%m/%Y").date()
 
         try:
-            entries.extend(
-                self._calculate_collections(waste_type, frequency, week_day, date)
-            )
+            entries.extend(self._calculate_collections(waste_type, frequency, week_day, date))
         except InsufficientDataError as e:
             _LOGGER.warning(f"Could not calculate collection got exception: {e}")
 
@@ -216,9 +191,7 @@ class Source:
         collection_dates: list[datetime.date] = []
         if date is None:
             d = datetime.date.today()
-            date = d + datetime.timedelta(
-                (DAYS.index(week_day.upper()) + 1 - d.isoweekday()) % 7
-            )
+            date = d + datetime.timedelta((DAYS.index(week_day.upper()) + 1 - d.isoweekday()) % 7)
         if frequency == "FORTNIGHTLY":
             collection_dates = [date + datetime.timedelta(i * 14) for i in range(5)]
         else:

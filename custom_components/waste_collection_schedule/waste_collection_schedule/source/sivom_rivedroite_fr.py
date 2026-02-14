@@ -31,7 +31,9 @@ ICON_MAP = {
 }
 
 
-API_URL = "https://www.google.com/maps/d/embed?mid=192kaU1tycR1QLrQuF_1hhIdtwghc1GDg&ll=44.90521499253571,-0.5239428999999873&z=13"
+API_URL = (
+    "https://www.google.com/maps/d/embed?mid=192kaU1tycR1QLrQuF_1hhIdtwghc1GDg&ll=44.90521499253571,-0.5239428999999873&z=13"
+)
 PAGE_DATA_REGEX = r'var _pageData\s+=\s*"(\[.*?\])";'
 
 
@@ -54,10 +56,8 @@ class Source:
                 and data[1][0] == "description"
             ):
                 to_return = {data[0][1][0].lower(): data[1][1][0]}
-                for nom in data[0][1][0].lower().split(" et "):
-                    to_return.update(
-                        {d: data[1][1][0] for d in data[0][1][0].lower().split(" et ")}
-                    )
+                for _nom in data[0][1][0].lower().split(" et "):
+                    to_return.update({d: data[1][1][0] for d in data[0][1][0].lower().split(" et ")})
 
             for d in data:
                 to_return.update(self.get_descriptions(d))
@@ -78,9 +78,7 @@ class Source:
 
         descriptions = self.get_descriptions(data)
         if self._district.lower() not in descriptions:
-            raise Exception(
-                f"District {self._district} not found, use one of {list(descriptions.keys())}"
-            )
+            raise Exception(f"District {self._district} not found, use one of {list(descriptions.keys())}")
 
         entries = []
         description = descriptions[self._district.lower()]

@@ -5,18 +5,18 @@ import logging
 import types
 from datetime import date, datetime
 from pathlib import Path
-from typing import Any, Literal, Tuple, TypedDict, Union, cast, get_origin
+from typing import Any, Literal, TypedDict, Union, cast, get_origin
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant.config_entries import (
     ConfigEntry,
     ConfigFlow,
-    ConfigFlowResult,
     OptionsFlow,
 )
 from homeassistant.const import CONF_NAME, CONF_VALUE_TEMPLATE
 from homeassistant.core import callback
+from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers.selector import (
     DurationSelector,
     DurationSelectorConfig,
@@ -34,6 +34,7 @@ from homeassistant.helpers.selector import (
 )
 from homeassistant.helpers.translation import async_get_translations
 from voluptuous.schema_builder import UNDEFINED
+
 from waste_collection_schedule.collection import Collection
 from waste_collection_schedule.exceptions import (
     SourceArgumentException,
@@ -128,9 +129,7 @@ SUPPORTED_ARG_TYPES = {
     list[str] | str: TextSelector(TextSelectorConfig(multiple=True)),
     list[str] | str | None: TextSelector(TextSelectorConfig(multiple=True)),
     list[str | int]: TextSelector(TextSelectorConfig(multiple=True)),
-    list[date | str]: TextSelector(
-        TextSelectorConfig(multiple=True, type=TextSelectorType.DATE)
-    ),
+    list[date | str]: TextSelector(TextSelectorConfig(multiple=True, type=TextSelectorType.DATE)),
     date | str: TextSelector(TextSelectorConfig(type=TextSelectorType.DATE)),
     date | str | None: TextSelector(TextSelectorConfig(type=TextSelectorType.DATE)),
     dict: ObjectSelector(),
@@ -140,13 +139,13 @@ SUPPORTED_ARG_TYPES = {
 }
 
 
-def get_customize_schema(defaults: dict[str, Any] = {}):
+def get_customize_schema(defaults: dict[str, Any] | None = None):
+    if defaults is None:
+        defaults = {}
     schema = {
         vol.Optional(CONF_ALIAS, default=defaults.get(CONF_ALIAS, UNDEFINED)): str,
         vol.Optional(CONF_SHOW, default=defaults.get(CONF_SHOW, True)): cv.boolean,
-        vol.Optional(
-            CONF_ICON, default=defaults.get(CONF_ICON, UNDEFINED)
-        ): IconSelector(),
+        vol.Optional(CONF_ICON, default=defaults.get(CONF_ICON, UNDEFINED)): IconSelector(),
         vol.Optional(CONF_PICTURE, default=defaults.get(CONF_PICTURE, UNDEFINED)): str,
         vol.Optional(
             CONF_USE_DEDICATED_CALENDAR,
@@ -160,90 +159,74 @@ def get_customize_schema(defaults: dict[str, Any] = {}):
     return schema
 
 
-def get_sensor_schema(fetched_types, add_delete=False, defaults: dict = {}):
-    schema = {
+def get_sensor_schema(fetched_types, add_delete=False, defaults: dict | None = None):
+    if defaults is None:
+        defaults = {}
+    schema: dict = {
         vol.Optional(CONF_NAME, default=defaults.get(CONF_NAME, UNDEFINED)): cv.string,
     }
     if add_delete:
-        schema[vol.Optional("delete")] = cv.boolean
+        schema[vol.Optional("delete", default=False)] = cv.boolean
 
-    schema.update(
-        {
-            vol.Optional(
-                CONF_DETAILS_FORMAT,
-                default=defaults.get(CONF_DETAILS_FORMAT, "upcoming"),
-            ): SelectSelector(
-                SelectSelectorConfig(
-                    options=[
-                        SelectOptionDict(
-                            label=k,
-                            value=k,
-                        )
-                        for k in DetailsFormat.__members__.keys()
-                    ],
-                    translation_key="details_format",
-                )
-            ),
-            vol.Optional(
-                CONF_COUNT, default=defaults.get(CONF_COUNT, UNDEFINED)
-            ): vol.All(vol.Coerce(int), vol.Range(min=1)),
-            vol.Optional(
-                CONF_LEADTIME, default=defaults.get(CONF_LEADTIME, UNDEFINED)
-            ): int,
-            vol.Optional(
-                CONF_VALUE_TEMPLATE + "_preset",
-                default=defaults.get(CONF_VALUE_TEMPLATE + "_preset", UNDEFINED),
-            ): SelectSelector(
-                SelectSelectorConfig(
-                    options=[
-                        SelectOptionDict(label=f"{k}: {v}", value=v)
-                        for k, v in EXAMPLE_VALUE_TEMPLATES.items()
-                    ],
-                    mode=SelectSelectorMode.DROPDOWN,
-                    custom_value=False,
-                    multiple=False,
-                )
-            ),
-            vol.Optional(
-                CONF_VALUE_TEMPLATE,
-                default=defaults.get(CONF_VALUE_TEMPLATE, UNDEFINED),
-            ): TemplateSelector(),
-            vol.Optional(
-                CONF_DATE_TEMPLATE, default=defaults.get(CONF_DATE_TEMPLATE, UNDEFINED)
-            ): SelectSelector(
-                SelectSelectorConfig(
-                    options=[
-                        SelectOptionDict(label=f"{k}: {v}", value=v)
-                        for k, v in EXAMPLE_DATE_TEMPLATES.items()
-                    ],
-                    mode=SelectSelectorMode.DROPDOWN,
-                    custom_value=True,
-                    multiple=False,
-                )
-            ),
-            vol.Optional(
-                CONF_DATE_TEMPLATE + "_preset",
-                default=defaults.get(CONF_DATE_TEMPLATE + "_preset", UNDEFINED),
-            ): TemplateSelector(),
-            vol.Optional(
-                CONF_ADD_DAYS_TO, default=defaults.get(CONF_ADD_DAYS_TO, UNDEFINED)
-            ): cv.boolean,
-            vol.Optional(
-                CONF_EVENT_INDEX, default=defaults.get(CONF_EVENT_INDEX, UNDEFINED)
-            ): int,
-            vol.Optional(
-                CONF_COLLECTION_TYPES,
-                default=defaults.get(CONF_COLLECTION_TYPES, UNDEFINED),
-            ): SelectSelector(
-                SelectSelectorConfig(
-                    options=fetched_types,
-                    mode=SelectSelectorMode.DROPDOWN,
-                    custom_value=True,
-                    multiple=True,
-                )
-            ),
-        }
-    )
+    schema |= {
+        vol.Optional(
+            CONF_DETAILS_FORMAT,
+            default=defaults.get(CONF_DETAILS_FORMAT, "upcoming"),
+        ): SelectSelector(
+            SelectSelectorConfig(
+                options=[
+                    SelectOptionDict(
+                        label=k,
+                        value=k,
+                    )
+                    for k in DetailsFormat.__members__.keys()
+                ],
+                translation_key="details_format",
+            )
+        ),
+        vol.Optional(CONF_COUNT, default=defaults.get(CONF_COUNT, UNDEFINED)): vol.All(vol.Coerce(int), vol.Range(min=1)),
+        vol.Optional(CONF_LEADTIME, default=defaults.get(CONF_LEADTIME, UNDEFINED)): int,
+        vol.Optional(
+            CONF_VALUE_TEMPLATE + "_preset",
+            default=defaults.get(CONF_VALUE_TEMPLATE + "_preset", UNDEFINED),
+        ): SelectSelector(
+            SelectSelectorConfig(
+                options=[SelectOptionDict(label=f"{k}: {v}", value=v) for k, v in EXAMPLE_VALUE_TEMPLATES.items()],
+                mode=SelectSelectorMode.DROPDOWN,
+                custom_value=False,
+                multiple=False,
+            )
+        ),
+        vol.Optional(
+            CONF_VALUE_TEMPLATE,
+            default=defaults.get(CONF_VALUE_TEMPLATE, UNDEFINED),
+        ): TemplateSelector(),
+        vol.Optional(CONF_DATE_TEMPLATE, default=defaults.get(CONF_DATE_TEMPLATE, UNDEFINED)): SelectSelector(
+            SelectSelectorConfig(
+                options=[SelectOptionDict(label=f"{k}: {v}", value=v) for k, v in EXAMPLE_DATE_TEMPLATES.items()],
+                mode=SelectSelectorMode.DROPDOWN,
+                custom_value=True,
+                multiple=False,
+            )
+        ),
+        vol.Optional(
+            CONF_DATE_TEMPLATE + "_preset",
+            default=defaults.get(CONF_DATE_TEMPLATE + "_preset", UNDEFINED),
+        ): TemplateSelector(),
+        vol.Optional(CONF_ADD_DAYS_TO, default=defaults.get(CONF_ADD_DAYS_TO, UNDEFINED)): bool,
+        vol.Optional(CONF_EVENT_INDEX, default=defaults.get(CONF_EVENT_INDEX, UNDEFINED)): int,
+        vol.Optional(
+            CONF_COLLECTION_TYPES,
+            default=defaults.get(CONF_COLLECTION_TYPES, UNDEFINED),
+        ): SelectSelector(
+            SelectSelectorConfig(
+                options=fetched_types,
+                mode=SelectSelectorMode.DROPDOWN,
+                custom_value=True,
+                multiple=True,
+            )
+        ),
+    }
     if not add_delete:
         schema[vol.Optional("skip", default=False)] = cv.boolean
         schema[vol.Optional("additional", default=False)] = cv.boolean
@@ -251,9 +234,7 @@ def get_sensor_schema(fetched_types, add_delete=False, defaults: dict = {}):
     return vol.Schema(schema)
 
 
-def validate_sensor_user_input(
-    sensor_input: dict[str, Any], existing_sensors
-) -> Tuple[dict[str, Any], dict[str, str]]:
+def validate_sensor_user_input(sensor_input: dict[str, Any], existing_sensors) -> tuple[dict[str, Any], dict[str, str]]:
     """
     Validate sensor user input.
 
@@ -337,7 +318,7 @@ class WasteCollectionConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call
 
     _options: dict = {}
     _sources: dict[str, list[SourceDict]] = {}
-    _error_suggestions: dict[str, list[Any]]
+    _error_suggestions: dict[str, list[Any]] = {}
 
     async def _async_setup_sources(self) -> None:
         if len(self._sources) > 0:
@@ -366,9 +347,7 @@ class WasteCollectionConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call
                 )
 
     # Step 1: User selects country
-    async def async_step_user(
-        self, info: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
+    async def async_step_user(self, info: dict[str, Any] | None = None) -> FlowResult:
         await self._async_setup_sources()
 
         if info is not None:
@@ -386,12 +365,13 @@ class WasteCollectionConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call
                 )
             }
         )
-        return self.async_show_form(step_id="user", data_schema=SCHEMA)
+        return cast(
+            FlowResult,
+            self.async_show_form(step_id="user", data_schema=SCHEMA),
+        )
 
     # Step 2: User selects source
-    async def async_step_source(
-        self, info: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
+    async def async_step_source(self, info: dict[str, Any] | None = None) -> FlowResult:
         self._country = cast(str, self._country)
         sources = self._sources[self._country]
         sources_options = [SelectOptionDict(value="", label="")] + [
@@ -419,9 +399,7 @@ class WasteCollectionConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call
         errors = {}
         if info is not None:
             if not (
-                "\t" in info[CONF_SOURCE_NAME]
-                and info[CONF_SOURCE_NAME].split("\t")[0]
-                in [x["module"] for x in sources]
+                "\t" in info[CONF_SOURCE_NAME] and info[CONF_SOURCE_NAME].split("\t")[0] in [x["module"] for x in sources]
             ):
                 errors[CONF_SOURCE_NAME] = "invalid_source"
             else:
@@ -432,33 +410,27 @@ class WasteCollectionConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call
                     (
                         x["default_params"]
                         for x in self._sources[self._country]
-                        if info[CONF_SOURCE_NAME].startswith(
-                            f"{x['module']}\t{x['title']}"
-                        )
+                        if info[CONF_SOURCE_NAME].startswith(f"{x['module']}\t{x['title']}")
                     ),
                     {},
                 )
                 return await self.async_step_args()
 
-        return self.async_show_form(step_id="source", data_schema=SCHEMA, errors=errors)
+        return cast(
+            FlowResult,
+            self.async_show_form(step_id="source", data_schema=SCHEMA, errors=errors),
+        )
 
     async def __get_simple_annotation_type(self, annotation: Any) -> Any:
         if annotation in SUPPORTED_ARG_TYPES:
             return SUPPORTED_ARG_TYPES[annotation]
-        if (
-            isinstance(annotation, types.GenericAlias)
-            and annotation.__origin__ in SUPPORTED_ARG_TYPES
-        ):
+        if isinstance(annotation, types.GenericAlias) and annotation.__origin__ in SUPPORTED_ARG_TYPES:
             return SUPPORTED_ARG_TYPES[annotation.__origin__]
 
         if getattr(annotation, "__origin__", None) is Literal:
             return SelectSelector(
                 SelectSelectorConfig(
-                    options=[
-                        SelectOptionDict(label=x, value=x)
-                        for x in annotation.__args__
-                        if x is not None
-                    ],
+                    options=[SelectOptionDict(label=x, value=x) for x in annotation.__args__ if x is not None],
                     custom_value=False,
                     multiple=False,
                 )
@@ -470,19 +442,14 @@ class WasteCollectionConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call
             return a
         if (
             (isinstance(annotation, types.GenericAlias))
-            or (
-                get_origin(annotation) is not None and hasattr(annotation, "__origin__")
-            )
+            or (get_origin(annotation) is not None and hasattr(annotation, "__origin__"))
             and (a := await self.__get_simple_annotation_type(annotation.__origin__))
         ):
             return a
         return_val = None
         is_string = False
 
-        if (
-            isinstance(annotation, types.UnionType)
-            or getattr(annotation, "__origin__", None) is Union
-        ):
+        if isinstance(annotation, types.UnionType) or getattr(annotation, "__origin__", None) is Union:
             for arg in annotation.__args__:
                 if a := await self.__get_type_by_annotation(arg):
                     if isinstance(a, ObjectSelector):
@@ -498,7 +465,7 @@ class WasteCollectionConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call
         pre_filled: dict[str, Any],
         args_input: dict[str, Any] | None,
         include_title=True,
-    ) -> Tuple[vol.Schema, types.ModuleType]:
+    ) -> tuple[vol.Schema, types.ModuleType]:
         """Get schema for source arguments.
 
         Args:
@@ -512,21 +479,15 @@ class WasteCollectionConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call
         """
         suggestions: dict[str, list[Any]] = {}
         if hasattr(self, "_error_suggestions"):
-            suggestions = {
-                key: value
-                for key, value in self._error_suggestions.items()
-                if len(value) > 0
-            }
+            suggestions = {key: value for key, value in self._error_suggestions.items() if len(value) > 0}
 
         # Import source and get arguments
-        module = await self.hass.async_add_executor_job(
-            importlib.import_module, f"waste_collection_schedule.source.{source}"
-        )
+        module = await self.hass.async_add_executor_job(importlib.import_module, f"waste_collection_schedule.source.{source}")
 
         args = dict(inspect.signature(module.Source.__init__).parameters)
         del args["self"]  # Remove self
         # Convert schema for vol
-        vol_args = {}
+        vol_args: dict[Any, Any] = {}
         title = source  # Default title Should probably be overwritten by the module
         if hasattr(module, "TITLE") and isinstance(module.TITLE, str):
             title = module.TITLE
@@ -536,9 +497,7 @@ class WasteCollectionConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call
         if include_title:
             description = None
             if args_input is not None and CONF_SOURCE_CALENDAR_TITLE in args_input:
-                description = {
-                    "suggested_value": args_input[CONF_SOURCE_CALENDAR_TITLE]
-                }
+                description = {"suggested_value": args_input[CONF_SOURCE_CALENDAR_TITLE]}
             vol_args = {
                 vol.Optional(
                     CONF_SOURCE_CALENDAR_TITLE,
@@ -547,9 +506,7 @@ class WasteCollectionConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call
                 ): str,
             }
 
-        MODULE_FLOW_TYPES = (
-            module.CONFIG_FLOW_TYPES if hasattr(module, "CONFIG_FLOW_TYPES") else {}
-        )
+        MODULE_FLOW_TYPES = module.CONFIG_FLOW_TYPES if hasattr(module, "CONFIG_FLOW_TYPES") else {}
 
         for arg in args:
             default = args[arg].default
@@ -560,20 +517,14 @@ class WasteCollectionConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call
             description = None
             if args_input is not None and arg_name in args_input:
                 description = {"suggested_value": args_input[arg_name]}
-                _LOGGER.debug(
-                    f"Setting suggested value for {arg_name} to {args_input[arg_name]} (previously filled in)"
-                )
+                _LOGGER.debug(f"Setting suggested value for {arg_name} to {args_input[arg_name]} (previously filled in)")
             elif arg_name in pre_filled:
-                _LOGGER.debug(
-                    f"Setting default value for {arg_name} to {pre_filled[arg_name]}"
-                )
+                _LOGGER.debug(f"Setting default value for {arg_name} to {pre_filled[arg_name]}")
                 description = {
                     "suggested_value": pre_filled[arg_name],
                 }
             if annotation != inspect._empty:
-                field_type = (
-                    await self.__get_type_by_annotation(annotation) or field_type
-                )
+                field_type = await self.__get_type_by_annotation(annotation) or field_type
             _LOGGER.debug(
                 f"Default for {arg_name}: {type(default) if default is not inspect.Signature.empty else inspect.Signature.empty}"
             )
@@ -583,10 +534,7 @@ class WasteCollectionConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call
                 if flow_type.get("type") == "SELECT":
                     field_type = SelectSelector(
                         SelectSelectorConfig(
-                            options=[
-                                SelectOptionDict(label=x, value=x)
-                                for x in flow_type.get("values")
-                            ],
+                            options=[SelectOptionDict(label=x, value=x) for x in flow_type.get("values")],
                             translation_key="custom_flow_types",
                             mode=SelectSelectorMode.DROPDOWN,
                             multiple=flow_type.get("multiple", False),
@@ -601,21 +549,15 @@ class WasteCollectionConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call
                 or (
                     isinstance(field_type, TextSelector)
                     and "multiple" in field_type.config
-                    and field_type.config.get("type", TextSelectorType.TEXT)
-                    == TextSelectorType.TEXT
+                    and field_type.config.get("type", TextSelectorType.TEXT) == TextSelectorType.TEXT
                     and field_type.config["multiple"]
                 )
             ) and args[arg].name in suggestions:
-                _LOGGER.debug(
-                    f"Adding suggestions to {arg_name}: {suggestions[arg_name]}"
-                )
+                _LOGGER.debug(f"Adding suggestions to {arg_name}: {suggestions[arg_name]}")
                 # Add suggestions to the field if fetch/init raised an Exception with suggestions
                 field_type = SelectSelector(
                     SelectSelectorConfig(
-                        options=[
-                            SelectOptionDict(label=x, value=x)
-                            for x in suggestions[arg_name]
-                        ],
+                        options=[SelectOptionDict(label=x, value=x) for x in suggestions[arg_name]],
                         mode=SelectSelectorMode.DROPDOWN,
                         custom_value=True,
                         multiple=isinstance(field_type, TextSelector),
@@ -623,9 +565,7 @@ class WasteCollectionConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call
                 )
 
             if default == inspect.Signature.empty:
-                vol_args[vol.Required(arg_name, description=description)] = (
-                    field_type or str
-                )
+                vol_args[vol.Required(arg_name, description=description)] = field_type or str
 
             elif field_type or (default is None):
                 # Handle boolean, int, string, date, datetime, list defaults
@@ -635,20 +575,16 @@ class WasteCollectionConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call
                         default=UNDEFINED if default is None else default,
                         description=description,
                     )
-                ] = (
-                    field_type or cv.string
-                )
+                ] = field_type or cv.string
             else:
-                _LOGGER.debug(
-                    f"Unsupported type: {type(default)}: {arg_name}: {default}: {field_type}"
-                )
+                _LOGGER.debug(f"Unsupported type: {type(default)}: {arg_name}: {default}: {field_type}")
 
         schema = vol.Schema(vol_args)
         return schema, module
 
     async def __validate_args_user_input(
         self, source: str, args_input: dict[str, Any], module: types.ModuleType
-    ) -> Tuple[dict[str, str], dict[str, str], dict[str, Any]]:
+    ) -> tuple[dict[str, str], dict[str, str], dict[str, Any]]:
         """Validate user input for source arguments.
 
         Args:
@@ -668,21 +604,15 @@ class WasteCollectionConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call
 
         # Pop title if provided
         if CONF_SOURCE_CALENDAR_TITLE in args_input:
-            options[CONF_SOURCE_CALENDAR_TITLE] = args_input.pop(
-                CONF_SOURCE_CALENDAR_TITLE
-            )
+            options[CONF_SOURCE_CALENDAR_TITLE] = args_input.pop(CONF_SOURCE_CALENDAR_TITLE)
 
         await self.async_set_unique_id(source + json.dumps(args_input))
         self._abort_if_unique_id_configured()
 
         try:
-            instance = await self.hass.async_add_executor_job(
-                self._get_source_instance, module, args_input
-            )
+            instance = await self.hass.async_add_executor_job(self._get_source_instance, module, args_input)
 
-            resp: list[Collection] = await self.hass.async_add_executor_job(
-                instance.fetch
-            )
+            resp: list[Collection] = await self.hass.async_add_executor_job(instance.fetch)
 
             if len(resp) == 0:
                 errors["base"] = "fetch_empty"
@@ -690,10 +620,10 @@ class WasteCollectionConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call
         except SourceArgumentSuggestionsExceptionBase as e:
             if not hasattr(self, "_error_suggestions"):
                 self._error_suggestions = {}
-            self._error_suggestions.update({e.argument: e.suggestions})
+            self._error_suggestions.update({e.argument: list(e.suggestions)})
             errors[e.argument] = "invalid_arg"
             description_placeholders["invalid_arg_message"] = e.simple_message
-            if e.suggestion_type != str and e.suggestion_type != int:
+            if e.suggestion_type is not str and e.suggestion_type is not int:
                 description_placeholders["invalid_arg_message"] = e.message
         except SourceArgumentRequired as e:
             errors[e.argument] = "invalid_arg"
@@ -703,7 +633,7 @@ class WasteCollectionConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call
             description_placeholders["invalid_arg_message"] = e.message
         except SourceArgumentExceptionMultiple as e:
             description_placeholders["invalid_arg_message"] = e.message
-            if len(e.arguments) == 0:
+            if len(list(e.arguments)) == 0:
                 errors["base"] = "invalid_arg"
             else:
                 for arg in e.arguments:
@@ -728,13 +658,12 @@ class WasteCollectionConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call
             # Try to get howto for the current language
             hass = getattr(self, "hass", None)
             language = getattr(getattr(hass, "config", None), "language", "en")
-            placeholders["howto"] = howto_dict.get(
-                language, howto_dict.get("en", ""))
+            placeholders["howto"] = howto_dict.get(language, howto_dict.get("en", ""))
             if placeholders["howto"]:
                 placeholders["howto"] = placeholders["howto"].rstrip("\n") + "\n\n"
         return placeholders
 
-    async def async_source_selected(self) -> None:
+    async def async_source_selected(self) -> FlowResult:
         async def args_method(args_input):
             return await self.async_step_args(args_input)
 
@@ -746,15 +675,11 @@ class WasteCollectionConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call
         return await self.async_step_args()
 
     # Step 3: User fills in source arguments
-    async def async_step_args(self, args_input=None) -> ConfigFlowResult:
+    async def async_step_args(self, args_input=None) -> FlowResult:
         self._source = cast(str, self._source)
-        schema, module = await self.__get_arg_schema(
-            self._source, self._extra_info_default_params, args_input
-        )
+        schema, module = await self.__get_arg_schema(self._source, self._extra_info_default_params, args_input)
         errors: dict[str, str] = {}
-        description_placeholders: dict[str, str] = self._get_description_placeholders(
-            self._source
-        )
+        description_placeholders: dict[str, str] = self._get_description_placeholders(self._source)
         # If all args are filled in
         if args_input is not None:
             # if contains method:
@@ -765,9 +690,7 @@ class WasteCollectionConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call
             ) = await self.__validate_args_user_input(self._source, args_input, module)
 
             if len(errors) > 0:
-                schema, module = await self.__get_arg_schema(
-                    self._source, self._extra_info_default_params, args_input
-                )
+                schema, module = await self.__get_arg_schema(self._source, self._extra_info_default_params, args_input)
                 # Update placeholders with validation errors
                 description_placeholders.update(validation_placeholders)
             else:
@@ -778,20 +701,21 @@ class WasteCollectionConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call
                 self._options.update(options)
                 self.async_show_form(step_id="options")
                 return await self.async_step_flow_type()
-        return self.async_show_form(
-            step_id=f"args_{self._id}",
-            data_schema=schema,
-            errors=errors,
-            description_placeholders=description_placeholders,
+        return cast(
+            FlowResult,
+            self.async_show_form(
+                step_id=f"args_{self._id}",
+                data_schema=schema,
+                errors=errors,
+                description_placeholders=description_placeholders,
+            ),
         )
 
-    async def async_step_flow_type(
-        self, user_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
+    async def async_step_flow_type(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         schema = vol.Schema(
             {
-                vol.Optional("show_customize_config", default=False): bool,
-                vol.Optional("show_sensor_config", default=False): bool,
+                vol.Optional("show_customize_config", default=False): cv.boolean,
+                vol.Optional("show_sensor_config", default=False): cv.boolean,
             }
         )
 
@@ -804,11 +728,12 @@ class WasteCollectionConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call
                 return await self.async_step_sensor()
             else:
                 return await self.finish()
-        return self.async_show_form(step_id="flow_type", data_schema=schema)
+        return cast(
+            FlowResult,
+            self.async_show_form(step_id="flow_type", data_schema=schema),
+        )
 
-    async def async_step_customize_select(
-        self, user_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
+    async def async_step_customize_select(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         schema = vol.Schema(
             {
                 vol.Optional(CONF_TYPE): SelectSelector(
@@ -826,11 +751,12 @@ class WasteCollectionConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call
             self._customize_types = list(set(user_input.get(CONF_TYPE, [])))
             self._fetched_types = list({*self._fetched_types, *self._customize_types})
             return await self.async_step_customize()
-        return self.async_show_form(step_id="customize_select", data_schema=schema)
+        return cast(
+            FlowResult,
+            self.async_show_form(step_id="customize_select", data_schema=schema),
+        )
 
-    async def async_step_customize(
-        self, user_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
+    async def async_step_customize(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         types = []
         if hasattr(self, "_customize_types"):
             types = self._customize_types
@@ -847,12 +773,8 @@ class WasteCollectionConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call
         errors = {}
 
         if user_input is not None:
-            if user_input.get(CONF_DEDICATED_CALENDAR_TITLE, "") and not user_input.get(
-                CONF_USE_DEDICATED_CALENDAR, False
-            ):
-                errors[CONF_DEDICATED_CALENDAR_TITLE] = (
-                    "dedicated_calendar_title_without_use_dedicated_calendar"
-                )
+            if user_input.get(CONF_DEDICATED_CALENDAR_TITLE, "") and not user_input.get(CONF_USE_DEDICATED_CALENDAR, False):
+                errors[CONF_DEDICATED_CALENDAR_TITLE] = "dedicated_calendar_title_without_use_dedicated_calendar"
             else:
                 if CONF_ALIAS in user_input:
                     self._fetched_types.remove(types[self._customize_index])
@@ -864,20 +786,21 @@ class WasteCollectionConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call
         schema = vol.Schema(get_customize_schema())
         if errors:
             schema = self.add_suggested_values_to_schema(schema, user_input)
-        return self.async_show_form(
-            step_id="customize",
-            data_schema=schema,
-            description_placeholders={
-                "type": types[self._customize_index],
-                "index": self._customize_index + 1,
-                "total": len(types),
-            },
-            errors=errors,
+        return cast(
+            FlowResult,
+            self.async_show_form(
+                step_id="customize",
+                data_schema=schema,
+                description_placeholders={
+                    "type": types[self._customize_index],
+                    "index": str(self._customize_index + 1),
+                    "total": str(len(types)),
+                },
+                errors=errors,
+            ),
         )
 
-    async def async_step_sensor(
-        self, sensor_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
+    async def async_step_sensor(self, sensor_input: dict[str, Any] | None = None) -> FlowResult:
         if not hasattr(self, "sensors"):
             self.sensors: list[dict[str, Any]] = []
         errors: dict[str, str] = {}
@@ -890,18 +813,24 @@ class WasteCollectionConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call
                     self._options.update({CONF_SENSORS: self.sensors})
                     return await self.finish()
 
-        return self.async_show_form(
-            step_id="sensor",
-            data_schema=get_sensor_schema(self._fetched_types),
-            errors=errors,
-            description_placeholders={"sensor_number": str(len(self.sensors) + 1)},
+        return cast(
+            FlowResult,
+            self.async_show_form(
+                step_id="sensor",
+                data_schema=get_sensor_schema(self._fetched_types),
+                errors=errors,
+                description_placeholders={"sensor_number": str(len(self.sensors) + 1)},
+            ),
         )
 
-    async def finish(self) -> ConfigFlowResult:
-        return self.async_create_entry(
-            title=self._title,
-            data=self._args_data,
-            options=self._options,
+    async def finish(self) -> FlowResult:
+        return cast(
+            FlowResult,
+            self.async_create_entry(
+                title=self._title,
+                data=self._args_data,
+                options=self._options,
+            ),
         )
 
     @staticmethod
@@ -912,16 +841,15 @@ class WasteCollectionConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call
     async def async_step_reconfigure(self, args_input: dict[str, Any] | None = None):
         await self._async_setup_sources()
 
-        config_entry = self.hass.config_entries.async_get_entry(
-            self.context["entry_id"]
-        )
+        entry_id = self.context.get("entry_id")
+        if entry_id is None:
+            return self.async_abort(reason="reconfigure_failed")
+        config_entry = self.hass.config_entries.async_get_entry(entry_id)
         if config_entry is None:
             return self.async_abort(reason="reconfigure_failed")
 
         source = config_entry.data["name"]
-        schema, module = await self.__get_arg_schema(
-            source, config_entry.data["args"], args_input, include_title=False
-        )
+        schema, module = await self.__get_arg_schema(source, config_entry.data["args"], args_input, include_title=False)
         title = module.TITLE
         errors: dict[str, str] = {}
         description_placeholders: dict[str, str] = self._get_description_placeholders(source)
@@ -962,16 +890,15 @@ class WasteCollectionOptionsFlow(OptionsFlow):
 
     async def translate(self, text: str) -> str:
         user_language = self.hass.config.language
-        return await async_get_translations(self.hass, user_language, DOMAIN)(text)
+        translations = await async_get_translations(self.hass, user_language, DOMAIN)
+        return translations.get(text, text)
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None):
         # get SourceShells
         collection_types = []
-        calendar_title = UNDEFINED
+        calendar_title: Any = UNDEFINED
         # get the right coordinator
-        coordinator: WCSCoordinator = self.hass.data.get(DOMAIN, {}).get(
-            self._entry.entry_id
-        )
+        coordinator: WCSCoordinator = self.hass.data.get(DOMAIN, {}).get(self._entry.entry_id)
 
         if coordinator and isinstance(coordinator, WCSCoordinator):
             collection_types = list(coordinator._aggregator.types)
@@ -984,49 +911,42 @@ class WasteCollectionOptionsFlow(OptionsFlow):
             {
                 vol.Optional(
                     CONF_SOURCE_CALENDAR_TITLE,
-                    default=self._entry.options.get(
-                        CONF_SOURCE_CALENDAR_TITLE, calendar_title
-                    ),
+                    default=self._entry.options.get(CONF_SOURCE_CALENDAR_TITLE, calendar_title),
                 ): cv.string,
                 vol.Optional(
                     CONF_SEPARATOR,
-                    default=self._entry.options.get(
-                        CONF_SEPARATOR, CONF_SEPARATOR_DEFAULT
-                    ),
+                    default=self._entry.options.get(CONF_SEPARATOR, CONF_SEPARATOR_DEFAULT),
                 ): cv.string,
                 vol.Optional(
                     CONF_FETCH_TIME,
-                    default=self._entry.options.get(
-                        CONF_FETCH_TIME, CONF_FETCH_TIME_DEFAULT
-                    ),
+                    default=self._entry.options.get(CONF_FETCH_TIME, CONF_FETCH_TIME_DEFAULT),
                 ): TimeSelector(),
                 vol.Optional(
                     CONF_RANDOM_FETCH_TIME_OFFSET,
-                    default={
-                        "hours": self._entry.options.get(
-                            CONF_RANDOM_FETCH_TIME_OFFSET,
-                            CONF_RANDOM_FETCH_TIME_OFFSET_DEFAULT,
-                        )
-                        // 60,
-                        "minutes": self._entry.options.get(
-                            CONF_RANDOM_FETCH_TIME_OFFSET,
-                            CONF_RANDOM_FETCH_TIME_OFFSET_DEFAULT,
-                        )
-                        % 60,
-                        "seconds": 0,
-                    },
+                    default=cast(
+                        dict[str, int],
+                        {
+                            "hours": self._entry.options.get(
+                                CONF_RANDOM_FETCH_TIME_OFFSET,
+                                CONF_RANDOM_FETCH_TIME_OFFSET_DEFAULT,
+                            )
+                            // 60,
+                            "minutes": self._entry.options.get(
+                                CONF_RANDOM_FETCH_TIME_OFFSET,
+                                CONF_RANDOM_FETCH_TIME_OFFSET_DEFAULT,
+                            )
+                            % 60,
+                            "seconds": 0,
+                        },
+                    ),
                 ): DurationSelector(DurationSelectorConfig(enable_day=False)),
                 vol.Optional(
                     CONF_DAY_SWITCH_TIME,
-                    default=self._entry.options.get(
-                        CONF_DAY_SWITCH_TIME, CONF_DAY_SWITCH_TIME_DEFAULT
-                    ),
+                    default=self._entry.options.get(CONF_DAY_SWITCH_TIME, CONF_DAY_SWITCH_TIME_DEFAULT),
                 ): TimeSelector(),
                 vol.Optional(
                     CONF_DAY_OFFSET,
-                    default=self._entry.options.get(
-                        CONF_DAY_OFFSET, CONF_DAY_OFFSET_DEFAULT
-                    ),
+                    default=self._entry.options.get(CONF_DAY_OFFSET, CONF_DAY_OFFSET_DEFAULT),
                 ): int,
                 vol.Optional(
                     "sensor_select",
@@ -1038,9 +958,7 @@ class WasteCollectionOptionsFlow(OptionsFlow):
                                 SelectOptionDict(label=x[CONF_NAME], value=x[CONF_NAME])
                                 for x in self._entry.options.get(CONF_SENSORS, [])
                             ],
-                            SelectOptionDict(
-                                label="add_new_sensor", value="sensor_select_add_new"
-                            ),
+                            SelectOptionDict(label="add_new_sensor", value="sensor_select_add_new"),
                         ],
                         custom_value=False,
                         multiple=True,
@@ -1053,22 +971,12 @@ class WasteCollectionOptionsFlow(OptionsFlow):
                         options=[
                             *[
                                 SelectOptionDict(
-                                    label=key
-                                    + (
-                                        f": {value[CONF_ALIAS]}"
-                                        if CONF_ALIAS in value
-                                        else ""
-                                    ),
+                                    label=key + (f": {value[CONF_ALIAS]}" if CONF_ALIAS in value else ""),
                                     value=key,
                                 )
-                                for key, value in self._entry.options.get(
-                                    CONF_CUSTOMIZE, {}
-                                ).items()
+                                for key, value in self._entry.options.get(CONF_CUSTOMIZE, {}).items()
                             ],
-                            *[
-                                SelectOptionDict(label=x, value=x)
-                                for x in uncustomized_types
-                            ],
+                            *[SelectOptionDict(label=x, value=x) for x in uncustomized_types],
                         ],
                         custom_value=True,
                         multiple=True,
@@ -1099,16 +1007,12 @@ class WasteCollectionOptionsFlow(OptionsFlow):
                 self._customize_select = user_input.get("customize_select", [])
                 self._customize_select_idx = 0
                 self._options[CONF_CUSTOMIZE] = {
-                    k: v
-                    for k, v in self._entry.options.get(CONF_CUSTOMIZE, {}).items()
-                    if k not in self._customize_select
+                    k: v for k, v in self._entry.options.get(CONF_CUSTOMIZE, {}).items() if k not in self._customize_select
                 }
                 self._sensor_select = user_input.get("sensor_select", [])
                 self._sensor_select_idx = 0
                 self._options[CONF_SENSORS] = [
-                    s
-                    for s in self._entry.options.get(CONF_SENSORS, [])
-                    if s[CONF_NAME] not in self._sensor_select
+                    s for s in self._entry.options.get(CONF_SENSORS, []) if s[CONF_NAME] not in self._sensor_select
                 ]
                 return await self.async_step_customize()
 
@@ -1118,38 +1022,24 @@ class WasteCollectionOptionsFlow(OptionsFlow):
         fetched_types = list(self._entry.options.get(CONF_CUSTOMIZE, {}).keys())
         for c in self._entry.options.get(CONF_SENSORS, []):
             if CONF_TYPE in c:
-                fetched_types.extend(
-                    c[CONF_TYPE] if isinstance(c[CONF_TYPE], list) else [c[CONF_TYPE]]
-                )
+                fetched_types.extend(c[CONF_TYPE] if isinstance(c[CONF_TYPE], list) else [c[CONF_TYPE]])
         return list(set(fetched_types))
 
     async def async_step_customize(self, user_input: dict[str, Any] | None = None):
-        if self._customize_select is None or self._customize_select_idx >= len(
-            self._customize_select
-        ):
+        if self._customize_select is None or self._customize_select_idx >= len(self._customize_select):
             return await self.async_step_sensor()
 
-        defaults = self._entry.options.get(CONF_CUSTOMIZE, {}).get(
-            self._customize_select[self._customize_select_idx], {}
-        )
-        is_new = self._customize_select[
-            self._customize_select_idx
-        ] not in self._entry.options.get(CONF_CUSTOMIZE, {})
+        defaults = self._entry.options.get(CONF_CUSTOMIZE, {}).get(self._customize_select[self._customize_select_idx], {})
+        is_new = self._customize_select[self._customize_select_idx] not in self._entry.options.get(CONF_CUSTOMIZE, {})
         dict_schema: dict[vol.Optional, Any] = get_customize_schema(defaults)
         if not is_new:
-            dict_schema[vol.Optional("delete")] = cv.boolean
+            dict_schema[vol.Optional("delete", default=False)] = cv.boolean
 
-        schema = self.add_suggested_values_to_schema(
-            vol.Schema(dict_schema), user_input
-        )
+        schema = self.add_suggested_values_to_schema(vol.Schema(dict_schema), user_input)
         if user_input is not None:
-            if not user_input.get(
-                "delete", False
-            ):  # only re-add the (modified) customization if not deleted
+            if not user_input.get("delete", False):  # only re-add the (modified) customization if not deleted
                 user_input.pop("delete", None)
-                self._options[CONF_CUSTOMIZE][
-                    self._customize_select[self._customize_select_idx]
-                ] = user_input
+                self._options[CONF_CUSTOMIZE][self._customize_select[self._customize_select_idx]] = user_input
                 self._customize_select_idx += 1
             return await self.async_step_customize()
 
@@ -1164,9 +1054,7 @@ class WasteCollectionOptionsFlow(OptionsFlow):
         )
 
     async def async_step_sensor(self, user_input: dict[str, Any] | None = None):
-        if self._sensor_select is None or self._sensor_select_idx >= len(
-            self._sensor_select
-        ):
+        if self._sensor_select is None or self._sensor_select_idx >= len(self._sensor_select):
             _LOGGER.debug("self._options: %s", self._options)
             return self.async_create_entry(data=self._options)
 
@@ -1192,16 +1080,12 @@ class WasteCollectionOptionsFlow(OptionsFlow):
         # is_new = self._sensor_select[self._sensor_select_idx] == "sensor_select_add_new"
 
         if user_input is not None:
-            if user_input.get(
-                "delete", False
-            ):  # only re-add the (modified) sensor if not deleted
+            if user_input.get("delete", False):  # only re-add the (modified) sensor if not deleted
                 self._sensor_select_idx += 1
                 return await self.async_step_sensor()
 
             user_input.pop("delete", None)
-            args, errors = validate_sensor_user_input(
-                user_input, self._options[CONF_SENSORS]
-            )
+            args, errors = validate_sensor_user_input(user_input, self._options[CONF_SENSORS])
 
             if len(errors) == 0:
                 self._options[CONF_SENSORS].append(args)

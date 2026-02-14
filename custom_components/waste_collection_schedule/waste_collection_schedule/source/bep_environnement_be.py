@@ -1,6 +1,5 @@
 import json
 from datetime import date
-from typing import List
 
 import requests
 from bs4 import BeautifulSoup
@@ -8,7 +7,7 @@ from waste_collection_schedule import Collection
 from waste_collection_schedule.exceptions import SourceArgumentNotFoundWithSuggestions
 
 TITLE = "Bep-Environnement"
-DESCRIPTION = "Source for Bep Environnement garbage collection"  # Describe your source
+DESCRIPTION = "Source for Bep Environnement garbage collection"  # Describe your source  # codespell: ignore
 # Insert url to service homepage. URL will show up in README.md and info.md
 URL = "https://www.bep-environnement.be"
 TEST_CASES = {  # Insert arguments for test cases to be used by test_sources.py script
@@ -48,17 +47,13 @@ def GetLocalities() -> dict[str, str]:
     options = soup.select("#locform-loc option")
 
     # Create a dictionary of city names and their values
-    localities = {
-        option.text.lower(): option["value"]
-        for option in options
-        if option.text.strip()
-    }
+    localities = {option.text.lower(): option["value"] for option in options if option.text.strip()}
 
     # Print the result
     return localities
 
 
-def BepWasteParser(response: dict) -> List[Collection]:
+def BepWasteParser(response: dict) -> list[Collection]:
     """Specific implementation to parse response from Bep-Environement.
 
     Args:
@@ -83,15 +78,11 @@ def BepWasteParser(response: dict) -> List[Collection]:
 
         if data_day and data_month and data_year and waste_types:
             # Construct the date
-            collection_date = date(
-                year=int(data_year), month=int(data_month), day=int(data_day)
-            )
+            collection_date = date(year=int(data_year), month=int(data_month), day=int(data_day))
 
             for abbr, map in WASTE_MAP.items():
                 if abbr in waste_types:
-                    c = Collection(
-                        date=collection_date, t=map["type"], icon=map["icon"]
-                    )
+                    c = Collection(date=collection_date, t=map["type"], icon=map["icon"])
                     collections.append(c)
 
     return collections
@@ -109,9 +100,7 @@ class Source:
         localities = GetLocalities()
 
         if self._locality not in localities:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "locality", self._locality, localities.keys()
-            )
+            raise SourceArgumentNotFoundWithSuggestions("locality", self._locality, localities.keys())
 
         # Make the request to get the data
         params = {

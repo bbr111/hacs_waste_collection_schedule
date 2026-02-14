@@ -22,7 +22,7 @@ TEST_CASES = {
         "suburb": "Guildford",
         "street_name": "Woodville Road",
         "street_number": 283,
-    }
+    },
 }
 
 HEADERS = {"user-agent": "Mozilla/5.0"}
@@ -35,7 +35,6 @@ class Source:
         self.street_number = street_number
 
     def fetch(self):
-
         suburb_id = 0
         street_id = 0
         property_id = 0
@@ -43,9 +42,7 @@ class Source:
         nextmonth = today + timedelta(days=365)
 
         # Retrieve suburbs
-        r = requests.get(
-            "https://cumberland.waste-info.com.au/api/v1/localities.json", headers=HEADERS
-        )
+        r = requests.get("https://cumberland.waste-info.com.au/api/v1/localities.json", headers=HEADERS)
         data = json.loads(r.text)
 
         # Find the ID for our suburb
@@ -104,24 +101,12 @@ class Source:
                 collection_date = date.fromisoformat(item["start"])
                 if (collection_date - today).days >= 0:
                     # Only consider recycle and organic events
-                    if item["event_type"] in ["recycle","organic"]:
+                    if item["event_type"] in ["recycle", "organic"]:
                         # Every collection day includes rubbish
-                        entries.append(
-                            Collection(
-                                date=collection_date, t="Rubbish", icon="mdi:trash-can"
-                            )
-                        )
+                        entries.append(Collection(date=collection_date, t="Rubbish", icon="mdi:trash-can"))
                         if item["event_type"] == "recycle":
-                            entries.append(
-                                Collection(
-                                    date=collection_date, t="Recycling", icon="mdi:recycle"
-                                )
-                            )
+                            entries.append(Collection(date=collection_date, t="Recycling", icon="mdi:recycle"))
                         if item["event_type"] == "organic":
-                            entries.append(
-                                Collection(
-                                    date=collection_date, t="Garden", icon="mdi:leaf"
-                                )
-                            )
+                            entries.append(Collection(date=collection_date, t="Garden", icon="mdi:leaf"))
 
         return entries

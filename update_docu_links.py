@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 
-import argparse
 import importlib
 import inspect
 import json
 import re
 import site
-from functools import lru_cache
+from collections.abc import Callable
+from functools import cache
 from pathlib import Path
 from types import ModuleType
-from typing import Any, Callable, Tuple, TypedDict, TypeVar
+from typing import Any, TypedDict, TypeVar, cast
 
 try:
     from typing import NotRequired
 except ImportError:
-    from typing_extensions import NotRequired
+    from typing import NotRequired
 
 import yaml
 
@@ -46,11 +46,7 @@ ARG_TRANSLATIONS_TO_KEEP = ["calendar_title"]
 ARG_DESCRIPTIONS_TO_KEEP = ["calendar_title"]
 ARG_GENERAL_KEYS_TO_KEEP = ["title", "description"]
 
-PACKAGE_DIR = (
-    Path(__file__).resolve().parents[0]
-    / "custom_components"
-    / "waste_collection_schedule"
-)
+PACKAGE_DIR = Path(__file__).resolve().parents[0] / "custom_components" / "waste_collection_schedule"
 SOURCE_DIR = PACKAGE_DIR / "waste_collection_schedule" / "source"
 DOC_URL_BASE = "https://github.com/mampfes/hacs_waste_collection_schedule/blob/master"
 
@@ -79,11 +75,19 @@ class SourceInfo:
         url: str,
         country: str,
         params: list[str],
-        extra_info_default_params: dict[str, Any] = {},
-        custom_param_translation: dict[str, dict[str, str]] = {},
-        custom_param_description: dict[str, dict[str, str]] = {},
-        custom_howto: dict[str, str] = {},
+        extra_info_default_params: dict[str, Any] | None = None,
+        custom_param_translation: dict[str, dict[str, str]] | None = None,
+        custom_param_description: dict[str, dict[str, str]] | None = None,
+        custom_howto: dict[str, str] | None = None,
     ):
+        if custom_howto is None:
+            custom_howto = {}
+        if custom_param_description is None:
+            custom_param_description = {}
+        if custom_param_translation is None:
+            custom_param_translation = {}
+        if extra_info_default_params is None:
+            extra_info_default_params = {}
         self._filename = filename
         self._module = module
         self._title = title
@@ -96,15 +100,11 @@ class SourceInfo:
         self._custom_param_translation.update(custom_param_translation)
 
         # sort alphabetically
-        self._custom_param_translation = sort_lang_param_dict(
-            self._custom_param_translation
-        )
+        self._custom_param_translation = sort_lang_param_dict(self._custom_param_translation)
 
         self._custom_param_description = default_descriptions(params)
         self._custom_param_description.update(custom_param_description)
-        self._custom_param_description = sort_lang_param_dict(
-            self._custom_param_description
-        )
+        self._custom_param_description = sort_lang_param_dict(self._custom_param_description)
 
         self._custom_howto = sort_param_dict(custom_howto)
 
@@ -116,9 +116,7 @@ class SourceInfo:
 
             for parameter in v.keys():
                 if parameter not in self._params:
-                    print(
-                        f"{self._filename} provided translation for non existing parameter {parameter}"
-                    )
+                    print(f"{self._filename} provided translation for non existing parameter {parameter}")
 
         for k, v in custom_param_description.items():
             if k not in LANGUAGES:
@@ -128,9 +126,7 @@ class SourceInfo:
 
             for parameter in v.keys():
                 if parameter not in self._params:
-                    print(
-                        f"{self._filename} provided description for non existing parameter {parameter}"
-                    )
+                    print(f"{self._filename} provided description for non existing parameter {parameter}")
 
     def __repr__(self):
         return f"filename:{self._filename}, title:{self._title}, url:{self._url}, country:{self._country}, params:{self._params}, extra_info_default_params:{self._extra_info_default_params}, custom_param_translation:{self._custom_param_translation}"
@@ -184,9 +180,13 @@ class IcsSourceInfo(SourceInfo):
         url: str,
         country: str,
         limit_params: list[str],
-        extra_info_default_params: dict[str, Any] = {},
-        custom_howto: dict[str, str] = {},
+        extra_info_default_params: dict[str, Any] | None = None,
+        custom_howto: dict[str, str] | None = None,
     ):
+        if custom_howto is None:
+            custom_howto = {}
+        if extra_info_default_params is None:
+            extra_info_default_params = {}
         _, ics_sources = get_source_by_file("ics")
         ics_source = ics_sources[0]
         params = set(ics_source.params) - set(limit_params)
@@ -235,7 +235,7 @@ class IcsSourceData(TypedDict):
     title: str
     url: str
     description: NotRequired[str]
-    howto: dict[str, str]
+    howto: dict[str, str] | str
     country: NotRequired[str]
     default_params: NotRequired[dict[str, Any]]
     test_cases: dict[str, dict[str, Any]]
@@ -247,7 +247,7 @@ def split_camel_and_snake_case(s: str) -> list[str]:
     return s.replace("_", " ").split()  # Split snake_case
 
 
-def extract_urls_from_text(text: str) -> Tuple[str, list[str]]:
+def extract_urls_from_text(text: str) -> tuple[str, list[str]]:
     """Extract URLs from text and return cleaned text with placeholder.
 
     Removes both plain URLs (http://.../https://...) and Markdown links ([text](url)).
@@ -269,8 +269,7 @@ def extract_urls_from_text(text: str) -> Tuple[str, list[str]]:
         # Keep the link text but remove the URL part
         return match.group(1) + " (" + placeholder + ")"
 
-    cleaned_text = re.sub(r'\[([^\]]+)\]\(([^\)]+)\)',
-                          extract_markdown_link, cleaned_text)
+    cleaned_text = re.sub(r"\[([^\]]+)\]\(([^\)]+)\)", extract_markdown_link, cleaned_text)
 
     # Extract plain URLs (http://... or https://...)
     def extract_plain_url(match):
@@ -281,7 +280,7 @@ def extract_urls_from_text(text: str) -> Tuple[str, list[str]]:
         url_counter += 1
         return placeholder
 
-    cleaned_text = re.sub(r'https?://[^\s]+', extract_plain_url, cleaned_text)
+    cleaned_text = re.sub(r"https?://[^\s]+", extract_plain_url, cleaned_text)
 
     return cleaned_text.strip(), urls
 
@@ -295,7 +294,7 @@ def update_edpevent_se(modules: dict[str, ModuleType]):
 
     str = ""
     for provider, data in sorted(services.items()):
-        str += f'- `{provider}`: {data["title"]}\n'
+        str += f"- `{provider}`: {data['title']}\n"
 
     _patch_file("doc/source/edpevent_se.md", "service", str)
 
@@ -364,7 +363,7 @@ def browse_sources() -> list[SourceInfo]:
     return sources
 
 
-@lru_cache(maxsize=None)
+@cache
 def get_source_by_file(file: str) -> tuple[ModuleType, list[SourceInfo]]:
     # iterate through all *.py files in waste_collection_schedule/source
     module = importlib.import_module(f"waste_collection_schedule.source.{file}")
@@ -398,9 +397,7 @@ def get_source_by_file(file: str) -> tuple[ModuleType, list[SourceInfo]]:
             )
         )
 
-    extra_info: list[ExtraInfoDict] | Callable[[], list[ExtraInfoDict]] = getattr(
-        module, "EXTRA_INFO", []
-    )
+    extra_info: list[ExtraInfoDict] | Callable[[], list[ExtraInfoDict]] = getattr(module, "EXTRA_INFO", [])
     if callable(extra_info):
         extra_info = extra_info()
     for e in extra_info:
@@ -425,31 +422,27 @@ def browse_ics_yaml() -> list[SourceInfo]:
     yaml_dir = doc_dir / "ics" / "yaml"
     md_dir = doc_dir / "ics"
 
-    files = yaml_dir.glob("*.yaml")
     sources: list[SourceInfo] = []
-    for f in files:
-        with open(f, encoding="utf-8") as stream:
-            # write markdown file
-            filename = (md_dir / f.name).with_suffix(".md")
-            data: IcsSourceData = yaml.safe_load(stream)
 
-            howto = data.get("howto", {})
-            if isinstance(data["howto"], str):
-                print(
-                    f"howto in {f} is a string, it should be a dictionary with language keys"
-                )
-                data["howto"] = {"en": howto}
+    for file in yaml_dir.glob("*.yaml"):
+        with open(file, encoding="utf-8") as stream:
+            filename = (md_dir / file.name).with_suffix(".md")
 
-            write_ics_md_file(filename, data)
-            howto = data.get("howto", {})
+            raw_data = yaml.safe_load(stream)
+            data = cast(IcsSourceData, raw_data)
+
+            # Normalize howto (ensure dict[str, str])
+            howto = data["howto"]
             if isinstance(howto, str):
-                print(
-                    f"howto in {f} is a string, it should be a dictionary with language keys"
-                )
+                print(f"howto in {file} is a string, it should be a dictionary with language keys")
                 howto = {"en": howto}
 
-            country = data.get("country", f.stem.split("_")[-1])
-            # extract country code
+            write_ics_md_file(filename, data)
+
+            country = data.get("country", file.stem.split("_")[-1])
+            default_params = data.get("default_params", {})
+
+            # Main entry
             sources.append(
                 IcsSourceInfo(
                     filename=f"/doc/ics/{filename.name}",
@@ -457,35 +450,37 @@ def browse_ics_yaml() -> list[SourceInfo]:
                     url=data["url"],
                     country=country,
                     limit_params=[],
-                    extra_info_default_params=data.get("default_params", {}),
+                    extra_info_default_params=default_params,
                     custom_howto=howto,
                 )
             )
-            if "extra_info" in data:
-                for e in data["extra_info"]:
-                    sources.append(
-                        IcsSourceInfo(
-                            filename=f"/doc/ics/{filename.name}",
-                            title=e.get("title", data["title"]),
-                            url=e.get("url", data["url"]),
-                            country=e.get("country", country),
-                            limit_params=[],
-                            extra_info_default_params=data.get("default_params", {}),
-                            custom_howto=howto,
-                        )
+
+            # Extra entries
+            for extra in data.get("extra_info", []):
+                sources.append(
+                    IcsSourceInfo(
+                        filename=f"/doc/ics/{filename.name}",
+                        title=extra.get("title", data["title"]),
+                        url=extra.get("url", data["url"]),
+                        country=extra.get("country", country),
+                        limit_params=[],
+                        extra_info_default_params=default_params,
+                        custom_howto=howto,
                     )
+                )
 
     update_ics_md(sources)
-
     return sources
 
 
 def write_ics_md_file(filename: Path, data: IcsSourceData) -> None:
     """Write a markdown file for a ICS .yaml file"""
-    if not "en" in data["howto"]:
-        print(
-            f"howto in {filename} does not contain an english translation, please add one"
-        )
+    howto = data["howto"]
+    if isinstance(howto, str):
+        howto = {"en": howto}
+
+    if "en" not in howto:
+        print(f"howto in {filename} does not contain an english translation, please add one")
         return
 
     md = f"# {data['title']}\n"
@@ -497,7 +492,7 @@ def write_ics_md_file(filename: Path, data: IcsSourceData) -> None:
     md += "\n"
     md += "## How to get the configuration arguments\n"
     md += "\n"
-    md += f"{data['howto']['en']}"
+    md += f"{howto['en']}"
     md += "\n"
     md += "## Examples\n"
     md += "\n"
@@ -588,10 +583,7 @@ def update_sources_json(countries: dict[str, list[SourceInfo]]) -> None:
             # Build metadata for each module (store once per module)
             if module not in source_metadata_by_module:
                 doc_url = DOC_URL_BASE + e.filename
-                source_metadata_by_module[module] = {
-                    "docs_url": doc_url,
-                    "howto": e.custom_howto
-                }
+                source_metadata_by_module[module] = {"docs_url": doc_url, "howto": e.custom_howto}
 
     with open(
         "custom_components/waste_collection_schedule/sources.json",
@@ -607,11 +599,11 @@ def update_sources_json(countries: dict[str, list[SourceInfo]]) -> None:
 
 
 def get_custom_translations(
-    countries: dict[str, list[SourceInfo]]
-) -> Tuple[
+    countries: dict[str, list[SourceInfo]],
+) -> tuple[
     dict[str, dict[str, dict[str, str | None]]],
     dict[str, dict[str, dict[str, str | None]]],
-    dict[str, dict[str, str | None]],
+    dict[str, dict[str, str]],
     dict[str, str],
 ]:
     """gets all parameters and its custom translations for all languages
@@ -624,7 +616,7 @@ def get_custom_translations(
     """
     param_translations: dict[str, dict[str, dict[str, str | None]]] = {}
     param_descriptions: dict[str, dict[str, dict[str, str | None]]] = {}
-    source_howto: dict[str, dict[str, str | None]] = {}
+    source_howto: dict[str, dict[str, str]] = {}
     source_doc_url: dict[str, str] = {}
 
     for country in sorted(countries):
@@ -635,12 +627,14 @@ def get_custom_translations(
             module = e.module
             if e.module is None:  # ICS source
                 module = "ics_" + e.filename.split("/")[-1].removesuffix(".md")
+            else:
+                module = e.module
 
             source_doc_url[module] = DOC_URL_BASE + e.filename
 
-            if not module in param_translations:
+            if module not in param_translations:
                 param_translations[module] = {}
-            if not module in param_descriptions:
+            if module not in param_descriptions:
                 param_descriptions[module] = {}
 
             for param in sorted(e.params):
@@ -662,9 +656,9 @@ def get_custom_translations(
     return param_translations, param_descriptions, source_howto, source_doc_url
 
 
-def update_json(
-    countries: dict[str, list[SourceInfo]], generics: list[SourceInfo] = []
-):
+def update_json(countries: dict[str, list[SourceInfo]], generics: list[SourceInfo] | None = None):
+    if generics is None:
+        generics = []
     countries = countries.copy()
     countries["Generic"] = generics
     update_sources_json(countries)
@@ -676,9 +670,7 @@ def update_json(
     ) = get_custom_translations(countries)
 
     for lang in LANGUAGES:
-        tranlation_file = (
-            f"custom_components/waste_collection_schedule/translations/{lang}.json"
-        )
+        tranlation_file = f"custom_components/waste_collection_schedule/translations/{lang}.json"
         if not Path(tranlation_file).exists():
             print(f"Translation file {tranlation_file} not found")
             continue
@@ -707,16 +699,10 @@ def update_json(
             if key.startswith("args_") or key.startswith("reconfigure_"):
                 translations["config"]["step"].pop(key)
 
-        for key, value in (
-            translations["config"]["step"]["args"].get("data_description", {}).items()
-        ):
+        for key, value in translations["config"]["step"]["args"].get("data_description", {}).items():
             if key in ARG_DESCRIPTIONS_TO_KEEP:
                 description_for_all_args[key] = value
-        for key, value in (
-            translations["config"]["step"]["reconfigure"]
-            .get("data_description", {})
-            .items()
-        ):
+        for key, value in translations["config"]["step"]["reconfigure"].get("data_description", {}).items():
             if key in ARG_DESCRIPTIONS_TO_KEEP:
                 description_for_all_reconfigure[key] = value
 
@@ -729,63 +715,42 @@ def update_json(
 
         for module, module_params in param_translations.items():
             translations["config"]["step"][f"args_{module}"] = keys_for_all_args.copy()
-            translations["config"]["step"][
-                f"reconfigure_{module}"
-            ] = keys_for_all_reconfigure.copy()
+            translations["config"]["step"][f"reconfigure_{module}"] = keys_for_all_reconfigure.copy()
 
-            translations["config"]["step"][f"args_{module}"][
-                "data"
-            ] = translation_for_all.copy()
-            translations["config"]["step"][f"reconfigure_{module}"][
-                "data"
-            ] = translation_for_all.copy()
+            translations["config"]["step"][f"args_{module}"]["data"] = translation_for_all.copy()
+            translations["config"]["step"][f"reconfigure_{module}"]["data"] = translation_for_all.copy()
 
-            translations["config"]["step"][f"args_{module}"][
-                "data_description"
-            ] = description_for_all_args.copy()
-            translations["config"]["step"][f"reconfigure_{module}"][
-                "data_description"
-            ] = description_for_all_reconfigure.copy()
+            translations["config"]["step"][f"args_{module}"]["data_description"] = description_for_all_args.copy()
+            translations["config"]["step"][f"reconfigure_{module}"]["data_description"] = (
+                description_for_all_reconfigure.copy()
+            )
 
             for param, languages in module_params.items():
                 if languages.get(lang, None) is None:
-                    languages[lang] = " ".join(
-                        [s.capitalize() for s in split_camel_and_snake_case(param)]
-                    )
-                translations["config"]["step"][f"args_{module}"]["data"][
-                    param
-                ] = languages[lang]
-                translations["config"]["step"][f"reconfigure_{module}"]["data"][
-                    param
-                ] = languages[lang]
+                    languages[lang] = " ".join([s.capitalize() for s in split_camel_and_snake_case(param)])
+                translations["config"]["step"][f"args_{module}"]["data"][param] = languages[lang]
+                translations["config"]["step"][f"reconfigure_{module}"]["data"][param] = languages[lang]
 
             for param, languages in param_descriptions.get(module, {}).items():
                 if languages.get(lang, None) is None:
                     continue
                 description = languages[lang]
                 # Remove URLs from data descriptions
-                cleaned_description, _ = extract_urls_from_text(description)
-                translations["config"]["step"][f"args_{module}"]["data_description"][
-                    param
-                ] = cleaned_description
-                translations["config"]["step"][f"reconfigure_{module}"][
-                    "data_description"
-                ][param] = cleaned_description
+                if description is not None:
+                    cleaned_description, _ = extract_urls_from_text(description)
+                    translations["config"]["step"][f"args_{module}"]["data_description"][param] = cleaned_description
+                    translations["config"]["step"][f"reconfigure_{module}"]["data_description"][param] = cleaned_description
 
             module_howto = source_howto.get(module, {})
 
-            howto_str = (
-                module_howto.get(lang, None)
-                or module_howto.get("en", None)
-                or ""
-            )
+            howto_str = module_howto.get(lang, None) or module_howto.get("en", None) or ""
             howto_str = format_howto(howto_str)
-            translations["config"]["step"][f"args_{module}"][
+            translations["config"]["step"][f"args_{module}"]["description"] = translations["config"]["step"]["args"][
                 "description"
-            ] = translations["config"]["step"]["args"]["description"]
-            translations["config"]["step"][f"reconfigure_{module}"][
-                "description"
-            ] = translations["config"]["step"]["reconfigure"]["description"]
+            ]
+            translations["config"]["step"][f"reconfigure_{module}"]["description"] = translations["config"]["step"][
+                "reconfigure"
+            ]["description"]
 
         with open(
             tranlation_file,
@@ -887,7 +852,7 @@ def update_awido_de(modules: dict[str, ModuleType]):
 
     str = ""
     for service in sorted(services, key=lambda s: s["service_id"]):
-        str += f'- `{service["service_id"]}`: {service["title"]}\n'
+        str += f"- `{service['service_id']}`: {service['title']}\n"
 
     _patch_file("doc/source/awido_de.md", "service", str)
 
@@ -900,10 +865,8 @@ def update_ctrace_de(modules: dict[str, ModuleType]):
     services = getattr(module, "SERVICE_MAP", {})
 
     str = "|Municipality|service|\n|-|-|\n"
-    for service in sorted(
-        services.keys(), key=lambda service: services[service]["title"]
-    ):
-        str += f'| {services[service]["title"]} | `{service}` |\n'
+    for service in sorted(services.keys(), key=lambda service: services[service]["title"]):
+        str += f"| {services[service]['title']} | `{service}` |\n"
 
     _patch_file("doc/source/c_trace_de.md", "service", str)
 
@@ -917,7 +880,7 @@ def update_citiesapps_com(modules: dict[str, ModuleType]):
 
     str = "|City|Website|\n|-|-|\n"
     for service in sorted(services, key=lambda service: service["title"]):
-        str += f'| {service["title"]} | [{beautify_url(service["url"])}]({service["url"]}) |\n'
+        str += f"| {service['title']} | [{beautify_url(service['url'])}]({service['url']}) |\n"
 
     _patch_file("doc/source/citiesapps_com.md", "service", str)
 

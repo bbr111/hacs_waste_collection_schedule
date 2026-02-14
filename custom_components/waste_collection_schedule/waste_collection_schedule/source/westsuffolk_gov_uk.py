@@ -7,9 +7,7 @@ TITLE = "West Suffolk Council"
 DESCRIPTION = "Source for West Suffolk Council."
 URL = "https://westsuffolk.gov.uk/"
 TEST_CASES = {
-    "Flat, The Flying Shuttle, Three Counties Way, Withersfield, CB9 7FB": {
-        "uprn": 10090739388
-    },
+    "Flat, The Flying Shuttle, Three Counties Way, Withersfield, CB9 7FB": {"uprn": 10090739388},
     "Haere Mai, The Street, Troston, IP31 1EW": {"uprn": "100091387226"},
 }
 
@@ -36,9 +34,7 @@ class Source:
         r = session.get(API_URL, params=args)
         r.raise_for_status()
         soup = BeautifulSoup(r.text, "html.parser")
-        waste_panel = soup.find("div", {"aria-label": "Waste and recycling"}).find(
-            "div", {"class": "atPanelData"}
-        )
+        waste_panel = soup.find("div", {"aria-label": "Waste and recycling"}).find("div", {"class": "atPanelData"})
 
         bin_type = None
         entries = []
@@ -46,17 +42,12 @@ class Source:
         for collection in waste_panel.contents:
             if isinstance(collection, Tag):
                 if collection.name == "strong":
-                    bin_type = " ".join(
-                        a.strip()
-                        for a in collection.text.strip().strip(":").split("\n")
-                    ).replace("   ", " ")
+                    bin_type = " ".join(a.strip() for a in collection.text.strip().strip(":").split("\n")).replace("   ", " ")
                 continue
 
             collection = collection.strip()
             date_str = collection.strip()
             # date: Saturday 30th December
             coll_date = parser.parse(date_str).date()
-            entries.append(
-                Collection(date=coll_date, t=bin_type, icon=ICON_MAP.get(bin_type))
-            )
+            entries.append(Collection(date=coll_date, t=bin_type, icon=ICON_MAP.get(bin_type)))
         return entries

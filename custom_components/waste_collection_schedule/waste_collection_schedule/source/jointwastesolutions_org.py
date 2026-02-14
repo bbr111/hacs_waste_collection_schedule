@@ -124,9 +124,7 @@ class Source:
 
         # Extract dates and waste types
         soup = BeautifulSoup(r3.text, "html.parser")
-        schedule = soup.findAll(
-            "p", {"class": "colorblack fontfamilyTahoma fontsize12rem"}
-        )
+        schedule = soup.findAll("p", {"class": "colorblack fontfamilyTahoma fontsize12rem"})
         waste_types = schedule[1::2]
         waste_dates = schedule[::2]
 

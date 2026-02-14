@@ -1,6 +1,6 @@
+import logging
 from datetime import datetime, timedelta
 from time import time_ns
-import logging
 
 import requests
 from waste_collection_schedule import Collection
@@ -26,6 +26,7 @@ ICON_MAP = {
 HEADERS = {
     "user-agent": "Mozilla/5.0",
 }
+
 
 class Source:
     def __init__(self, uprn: str | int):
@@ -75,16 +76,20 @@ class Source:
             # Would use %-d for day of month with no leading 0, but that is not OS independent, hence horrible strip
             attempts = 40
             attempt_date = today
-            attempt_formatted_for_comparison = f"{attempt_date.strftime('%A')} {attempt_date.strftime('%d').lstrip('0')} {attempt_date.strftime('%B')}"
+            attempt_formatted_for_comparison = (
+                f"{attempt_date.strftime('%A')} {attempt_date.strftime('%d').lstrip('0')} {attempt_date.strftime('%B')}"
+            )
             found = attempt_formatted_for_comparison == next_date
             while not found and attempts > 0:
                 attempt_date += timedelta(days=1)
-                attempt_formatted_for_comparison = f"{attempt_date.strftime('%A')} {attempt_date.strftime('%d').lstrip('0')} {attempt_date.strftime('%B')}"
+                attempt_formatted_for_comparison = (
+                    f"{attempt_date.strftime('%A')} {attempt_date.strftime('%d').lstrip('0')} {attempt_date.strftime('%B')}"
+                )
                 found = attempt_formatted_for_comparison == next_date
                 attempts -= 1
 
             if not found:
-                LOGGER.error(f'Failing to find the date - API returned {next_date}, last date attempted was {attempt_date}')
+                LOGGER.error(f"Failing to find the date - API returned {next_date}, last date attempted was {attempt_date}")
                 continue
 
             entries.append(

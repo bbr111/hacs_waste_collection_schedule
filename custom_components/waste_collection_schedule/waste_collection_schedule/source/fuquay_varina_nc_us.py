@@ -1,6 +1,5 @@
 import re
 from datetime import date, datetime
-from typing import Optional
 
 import requests
 from waste_collection_schedule import Collection  # type: ignore[attr-defined]
@@ -54,24 +53,18 @@ class Source:
         if garbage_date_text:
             garbage_date = self._parse_date_from_text(garbage_date_text)
             if garbage_date:
-                entries.append(
-                    Collection(date=garbage_date, t="Garbage", icon=ICON_MAP["GARBAGE"])
-                )
+                entries.append(Collection(date=garbage_date, t="Garbage", icon=ICON_MAP["GARBAGE"]))
 
         # Parse recycling collection
         recycling_date_text = attributes.get("recycling_next_pickup_date", "")
         if recycling_date_text:
             recycling_date = self._parse_date_from_text(recycling_date_text)
             if recycling_date:
-                entries.append(
-                    Collection(
-                        date=recycling_date, t="Recycling", icon=ICON_MAP["RECYCLING"]
-                    )
-                )
+                entries.append(Collection(date=recycling_date, t="Recycling", icon=ICON_MAP["RECYCLING"]))
 
         return entries
 
-    def _parse_date_from_text(self, date_text: str) -> Optional[date]:
+    def _parse_date_from_text(self, date_text: str) -> date | None:
         """Parse date from text like 'The next garbage pickup date for this address is Monday, January 06'."""
         if not date_text:
             return None

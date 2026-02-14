@@ -1,8 +1,7 @@
-import requests
 import json
-
 from datetime import datetime
 
+import requests
 from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 
 TITLE = "Wealden District Council"
@@ -56,9 +55,7 @@ class Source:
             try:
                 entries.append(
                     Collection(
-                        datetime.strptime(
-                            json_data[collection], "%Y-%m-%dT%H:%M:%S"
-                        ).date(),
+                        datetime.strptime(json_data[collection], "%Y-%m-%dT%H:%M:%S").date(),
                         t=COLLECTIONS[collection].title(),
                         icon=ICON_MAP[collection],
                     )

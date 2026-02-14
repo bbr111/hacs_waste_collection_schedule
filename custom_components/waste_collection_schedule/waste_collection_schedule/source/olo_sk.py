@@ -47,9 +47,7 @@ query PickupDaysByRegistrationNumber($registrationNumber: String!) {
 """
 
 # MeiliSearch API for street name search (needs API key)
-MEILISEARCH_URL = (
-    "https://olo-strapi-meilisearch.bratislava.sk/indexes/pickup-day/search"
-)
+MEILISEARCH_URL = "https://olo-strapi-meilisearch.bratislava.sk/indexes/pickup-day/search"
 
 # Where to look for the API key
 API_KEY_REGEX = r'"NEXT_PUBLIC_MEILISEARCH_HOST:",\s*".*?",\s*"(.*?)"'
@@ -177,9 +175,7 @@ class Source:
             "attributesToSearchOn": ["pickup-day.address"],
         }
 
-        response = requests.post(
-            MEILISEARCH_URL, json=params, headers=headers, timeout=30
-        )
+        response = requests.post(MEILISEARCH_URL, json=params, headers=headers, timeout=30)
         response.raise_for_status()
         data = response.json()
 
@@ -193,9 +189,7 @@ class Source:
         else:
             return self._fetch_by_street()
 
-    def _is_date_in_season(
-        self, date: datetime.date, season: tuple[tuple[int, int], tuple[int, int]]
-    ) -> bool:
+    def _is_date_in_season(self, date: datetime.date, season: tuple[tuple[int, int], tuple[int, int]]) -> bool:
         """Check if a date falls within a season range."""
         (start_day, start_month), (end_day, end_month) = season
 
@@ -211,9 +205,7 @@ class Source:
         else:
             return start_date <= date <= end_date
 
-    def _find_start_date_for_week_parity(
-        self, start: datetime.date, iso_weekday: int, want_even: bool
-    ) -> datetime.date:
+    def _find_start_date_for_week_parity(self, start: datetime.date, iso_weekday: int, want_even: bool) -> datetime.date:
         """Find the first date >= start that matches the weekday and week parity."""
         current = start
         # Any 14-day period contains each weekday twice: once odd, once even
@@ -253,9 +245,7 @@ class Source:
             dates.extend(dt.date() for dt in rule if dt.date() >= today)
         return dates
 
-    def _generate_collection_dates(
-        self, frequency: str, frequency_season: str | None
-    ) -> list[datetime.date]:
+    def _generate_collection_dates(self, frequency: str, frequency_season: str | None) -> list[datetime.date]:
         """
         Generate collection dates directly from OLO frequency string using rrule.
 
@@ -279,9 +269,7 @@ class Source:
                 part = part.strip()
                 match = re.match(r"(\d{2})/(\d{2})-(\d{2})/(\d{2})", part)
                 if match:
-                    start_day, start_month, end_day, end_month = map(
-                        int, match.groups()
-                    )
+                    start_day, start_month, end_day, end_month = map(int, match.groups())
                     seasons.append(((start_day, start_month), (end_day, end_month)))
                 else:
                     _LOGGER.warning("Unrecognized season format: %s", part)
@@ -314,18 +302,12 @@ class Source:
                         pattern_dates.extend(dt.date() for dt in rule)
 
             elif len(elements) == 2:
-                pattern_dates.extend(
-                    self._generate_biweekly_dates(elements[0], False, today, end_date)
-                )
-                pattern_dates.extend(
-                    self._generate_biweekly_dates(elements[1], True, today, end_date)
-                )
+                pattern_dates.extend(self._generate_biweekly_dates(elements[0], False, today, end_date))
+                pattern_dates.extend(self._generate_biweekly_dates(elements[1], True, today, end_date))
 
             # Apply season filter if this pattern has a corresponding season
             if seasons and idx < len(seasons):
-                pattern_dates = [
-                    d for d in pattern_dates if self._is_date_in_season(d, seasons[idx])
-                ]
+                pattern_dates = [d for d in pattern_dates if self._is_date_in_season(d, seasons[idx])]
 
             dates.extend(pattern_dates)
 

@@ -1,7 +1,7 @@
 import datetime
 
-from bs4 import BeautifulSoup
 import requests
+from bs4 import BeautifulSoup
 from waste_collection_schedule import Collection
 
 TITLE = "Harlow Council"
@@ -49,9 +49,7 @@ class Source:
 
             entries.append(
                 Collection(
-                    date=datetime.datetime.strptime(
-                        fields[3].text, "%a - %d %b %Y\n"
-                    ).date(),
+                    date=datetime.datetime.strptime(fields[3].text, "%a - %d %b %Y\n").date(),
                     t=fields[2].text,
                     icon=ICON_MAP.get(fields[2].text),
                 )

@@ -46,12 +46,7 @@ class Source:
             raise Exception("No data found, invalid UPRN?")
         soup = BeautifulSoup(html, "html.parser")
 
-        rows = (
-            soup.find("div", id="upcoming-collection")
-            .find("table")
-            .find("tbody")
-            .find_all("tr")
-        )
+        rows = soup.find("div", id="upcoming-collection").find("table").find("tbody").find_all("tr")
 
         entries = []
         for row in rows:

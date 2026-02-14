@@ -5,9 +5,7 @@ import requests
 from waste_collection_schedule import Collection
 
 TITLE = "Waipa District Council"
-DESCRIPTION = (
-    "Source for Waipa District Council. Finds both general and glass recycling dates."
-)
+DESCRIPTION = "Source for Waipa District Council. Finds both general and glass recycling dates."
 URL = "https://www.waipadc.govt.nz/"
 TEST_CASES = {
     "10 Queen Street": {"address": "10 Queen Street"},  # Monday
@@ -77,14 +75,10 @@ class Source:
             "X-Requested-With": "XMLHttpRequest",
         }
 
-        response = requests.request(
-            "POST", url, headers=headers, data=payload, params=params
-        )
+        response = requests.request("POST", url, headers=headers, data=payload, params=params)
 
         if "X-IntraMaps-Session" not in response.headers:
-            raise Exception(
-                "Failed to initiate session: X-IntraMaps-Session header not found"
-            )
+            raise Exception("Failed to initiate session: X-IntraMaps-Session header not found")
 
         sessionid = response.headers["X-IntraMaps-Session"]
 
@@ -101,9 +95,7 @@ class Source:
 
         params = {"IntraMapsSession": sessionid}
 
-        response = requests.request(
-            "POST", url, headers=headers, data=payload, params=params
-        )
+        response = requests.request("POST", url, headers=headers, data=payload, params=params)
 
         # Search for the address
         url = "https://waipadc.spatial.t1cloud.com/spatial/IntraMaps/ApplicationEngine/Search/"
@@ -118,9 +110,7 @@ class Source:
             "IntraMapsSession": sessionid,
         }
 
-        response = requests.request(
-            "POST", url, headers=headers, data=payload, params=params
-        )
+        response = requests.request("POST", url, headers=headers, data=payload, params=params)
 
         # This request may return multiple addresses. Use the first one.
         search_results = response.json()
@@ -146,32 +136,24 @@ class Source:
 
         params = {"IntraMapsSession": sessionid}
 
-        response = requests.request(
-            "POST", url, headers=headers, data=payload, params=params
-        )
+        response = requests.request("POST", url, headers=headers, data=payload, params=params)
         property_data = response.json()
 
         # Validate the response structure
         try:
             fields = property_data["infoPanels"]["info1"]["feature"]["fields"]
         except (KeyError, TypeError) as e:
-            raise Exception(f"Unexpected API response structure: {e}")
+            raise Exception(f"Unexpected API response structure: {e}") from e
 
         if len(fields) < 4:
-            raise Exception(
-                f"Expected at least 4 fields in API response, got {len(fields)}"
-            )
+            raise Exception(f"Expected at least 4 fields in API response, got {len(fields)}")
 
         # General recycling (yellow bin) - field [2]
         general_recycling_dates_text = fields[2]["value"]["value"]
-        entries.extend(
-            self._parse_collection_dates(general_recycling_dates_text, "Recycling")
-        )
+        entries.extend(self._parse_collection_dates(general_recycling_dates_text, "Recycling"))
 
         # Glass recycling (blue bin) - field [3]
         glass_recycling_dates_text = fields[3]["value"]["value"]
-        entries.extend(
-            self._parse_collection_dates(glass_recycling_dates_text, "Glass")
-        )
+        entries.extend(self._parse_collection_dates(glass_recycling_dates_text, "Glass"))
 
         return entries

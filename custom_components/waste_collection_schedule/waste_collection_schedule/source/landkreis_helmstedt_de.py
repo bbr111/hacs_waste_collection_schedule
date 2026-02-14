@@ -142,9 +142,7 @@ class Source:
         r.raise_for_status()
 
         soup = BeautifulSoup(r.text, "html.parser")
-        icsCalendarsForLandkreisHelmstedt = soup.select(
-            '.abfrage2 .manager_titel [title="herunterladen/öffnen"]'
-        )
+        icsCalendarsForLandkreisHelmstedt = soup.select('.abfrage2 .manager_titel [title="herunterladen/öffnen"]')
         foundMunicipalCalendarICSDownloadURL = ""
 
         for icsCalendarDownloadLink in icsCalendarsForLandkreisHelmstedt:
@@ -212,15 +210,11 @@ class Source:
                     )
                 )
 
-        self.abort_when_missing_collection_types(
-            missingAltpapier, missingBioabfall, missingGelberSack, missingRestabfall
-        )
+        self.abort_when_missing_collection_types(missingAltpapier, missingBioabfall, missingGelberSack, missingRestabfall)
 
         return elements
 
-    def abort_when_missing_collection_types(
-        self, missingAltpapier, missingBioabfall, missingGelberSack, missingRestabfall
-    ):
+    def abort_when_missing_collection_types(self, missingAltpapier, missingBioabfall, missingGelberSack, missingRestabfall):
         if missingGelberSack:
             raise SourceArgumentException(
                 argument="gelber_sack",

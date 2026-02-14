@@ -16,21 +16,15 @@ SECRET_REGEX = re.compile(r"!secret\s(\w+)")
 
 def main():
     parser = argparse.ArgumentParser(description="Test sources.")
-    parser.add_argument(
-        "-s", "--source", action="append", help="Test given source file"
-    )
-    parser.add_argument(
-        "-l", "--list", action="store_true", help="List retrieved entries"
-    )
+    parser.add_argument("-s", "--source", action="append", help="Test given source file")
+    parser.add_argument("-l", "--list", action="store_true", help="List retrieved entries")
     parser.add_argument(
         "-d",
         "--double",
         action="store_true",
         help="Run the fetch method twice and check that the second result is the same as the first one, should be run if fetching modifies the source object",
     )
-    parser.add_argument(
-        "-i", "--icon", action="store_true", help="Show waste type icon"
-    )
+    parser.add_argument("-i", "--icon", action="store_true", help="Show waste type icon")
     parser.add_argument("--sorted", action="store_true", help="Sort output by date")
     parser.add_argument("--weekday", action="store_true", help="Show weekday")
     parser.add_argument(
@@ -39,12 +33,8 @@ def main():
         action="store_true",
         help="Print exception information and stack trace",
     )
-    parser.add_argument(
-        "-I", "--ics", action="store_true", help="Test all .yaml file for ICS source"
-    )
-    parser.add_argument(
-        "-y", "--yaml", action="append", help="Test given .yaml file for ICS source"
-    )
+    parser.add_argument("-I", "--ics", action="store_true", help="Test all .yaml file for ICS source")
+    parser.add_argument("-y", "--yaml", action="append", help="Test given .yaml file for ICS source")
     args = parser.parse_args()
 
     # read secrets.yaml
@@ -136,9 +126,7 @@ def test_fetch(module, name, tc, args):
         if args.double:
             result2 = source.fetch()
             if result != result2:
-                print(
-                    f"{bcolors.FAIL}  ERROR: source.fetch() does not return the same result on second call"
-                )
+                print(f"{bcolors.FAIL}  ERROR: source.fetch() does not return the same result on second call")
                 for collection in result:
                     try:
                         idx = result2.index(collection)

@@ -48,7 +48,6 @@ class Source:
         self.street_number = street_number
 
     def fetch(self):
-
         suburb_id = 0
         street_id = 0
         property_id = 0
@@ -116,13 +115,7 @@ class Source:
         for item in data:
             if "start" not in item and "start_date" not in item:
                 continue
-            key = (
-                "start"
-                if "start" in item
-                else "start_date"
-                if "start_date" in item
-                else ""
-            )
+            key = "start" if "start" in item else "start_date" if "start_date" in item else ""
             collection_date = date.fromisoformat(item[key])
             if (collection_date - today).days >= 0:
                 entries.append(

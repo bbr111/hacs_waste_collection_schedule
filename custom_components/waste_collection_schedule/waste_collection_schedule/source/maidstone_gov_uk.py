@@ -68,9 +68,7 @@ class Source:
         )
 
         try:
-            rowdata = json.loads(schedule_request.content)["integration"][
-                "transformed"
-            ]["rows_data"][self._uprn]
+            rowdata = json.loads(schedule_request.content)["integration"]["transformed"]["rows_data"][self._uprn]
         except KeyError:
             return []
 
@@ -89,19 +87,12 @@ class Source:
 
             # Parse Dates
             # Logic updated to exclude "Default" and "Original" dates to prevent duplicates during holiday rescheduling
-            if (
-                key.endswith("_NextCollectionDateMM")
-                and "Default" not in key
-                and "Original" not in key
-                and value != ""
-            ):
+            if key.endswith("_NextCollectionDateMM") and "Default" not in key and "Original" not in key and value != "":
                 if collection_key not in collections:
                     collections[collection_key] = {"dates": []}
 
                 try:
-                    collections[collection_key]["dates"].append(
-                        datetime.strptime(value, "%d/%m/%Y").date()
-                    )
+                    collections[collection_key]["dates"].append(datetime.strptime(value, "%d/%m/%Y").date())
                 except ValueError:
                     pass
 
@@ -115,13 +106,7 @@ class Source:
             bin_name = collection.get("description") or key
 
             # Map icons
-            clean_name = (
-                bin_name.lower()
-                .replace("domestic ", "")
-                .replace("communal ", "")
-                .replace("waste", "")
-                .strip()
-            )
+            clean_name = bin_name.lower().replace("domestic ", "").replace("communal ", "").replace("waste", "").strip()
             icon = ICON_MAP.get(clean_name, "mdi:trash-can")
 
             for collectionDate in set(collection["dates"]):

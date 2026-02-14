@@ -29,9 +29,7 @@ class Source:
         if not calendar_month or not isinstance(calendar_month, Tag):
             return []
         month = calendar_month.text.strip()
-        calendar_days = calendar.find_all(
-            "div", {"class": "card-body card-body-padding"}
-        )
+        calendar_days = calendar.find_all("div", {"class": "card-body card-body-padding"})
 
         entries = []
         for day in calendar_days:
@@ -54,17 +52,13 @@ class Source:
                     )
         return entries
 
-    def extract_from_printable_calendar(
-        self, soup: BeautifulSoup
-    ) -> list[Collection] | None:
+    def extract_from_printable_calendar(self, soup: BeautifulSoup) -> list[Collection] | None:
         entries = []
         printable_calendar = soup.find("div", {"class": "printableCalendar"})
         if not printable_calendar or not isinstance(printable_calendar, Tag):
             return None
 
-        calendars = printable_calendar.find_all(
-            "div", {"class": "calendar-wrap onlyPrint"}
-        )
+        calendars = printable_calendar.find_all("div", {"class": "calendar-wrap onlyPrint"})
         if not calendars:
             return None
 

@@ -92,9 +92,7 @@ class Source:
         self._city: str = city
 
     def fetch(self) -> list[Collection]:
-        params = urlencode(
-            {"hsG": self._address, "hsO": self._city}, encoding="iso-8859-1"
-        )
+        params = urlencode({"hsG": self._address, "hsO": self._city}, encoding="iso-8859-1")
         r = requests.get(
             "https://webbservice.indecta.se/kunder/sjobo/kalender/basfiler/onlinekalender.php",
             params=params,

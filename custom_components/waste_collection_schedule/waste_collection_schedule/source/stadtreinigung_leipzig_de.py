@@ -30,18 +30,14 @@ class Source:
         }
 
         # get list of streets and house numbers
-        r = requests.get(
-            "https://stadtreinigung-leipzig.de/rest/Navision/Streets", params=params
-        )
+        r = requests.get("https://stadtreinigung-leipzig.de/rest/Navision/Streets", params=params)
 
         data = json.loads(r.text)
         if len(data["results"]) == 0:
             raise SourceArgumentNotFound("street", self._street)
         street_entry = data["results"].get(self._street)
         if street_entry is None:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "street", self._street, data["results"].keys()
-            )
+            raise SourceArgumentNotFoundWithSuggestions("street", self._street, data["results"].keys())
 
         id = street_entry.get(str(self._house_number))
         if id is None:

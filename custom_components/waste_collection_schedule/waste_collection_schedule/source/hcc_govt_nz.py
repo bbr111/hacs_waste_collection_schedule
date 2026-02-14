@@ -29,16 +29,12 @@ class Source:
         # Extract entries from RedBin/YellowBin fields
         entries = [
             Collection(
-                date=datetime.datetime.strptime(
-                    json[0]["RedBin"], "%Y-%m-%dT%H:%M:%S"
-                ).date(),
+                date=datetime.datetime.strptime(json[0]["RedBin"], "%Y-%m-%dT%H:%M:%S").date(),
                 t="Rubbish",
                 icon=ICON_MAP.get("Rubbish"),
             ),
             Collection(
-                date=datetime.datetime.strptime(
-                    json[0]["YellowBin"], "%Y-%m-%dT%H:%M:%S"
-                ).date(),
+                date=datetime.datetime.strptime(json[0]["YellowBin"], "%Y-%m-%dT%H:%M:%S").date(),
                 t="Recycling",
                 icon=ICON_MAP.get("Recycling"),
             ),

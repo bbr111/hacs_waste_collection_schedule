@@ -26,9 +26,7 @@ WASTE_MAP = {  # map new collection names to old collection names for compatibil
 
 
 class Source:
-    def __init__(
-        self, uprn: str
-    ):  # argX correspond to the args dict in the source configuration
+    def __init__(self, uprn: str):  # argX correspond to the args dict in the source configuration
         self._uprn = uprn
 
     def fetch(self):
@@ -46,9 +44,7 @@ class Source:
             if next_collection:
                 entries.append(
                     Collection(
-                        date=datetime.datetime.strptime(
-                            item["hso_nextcollection"].split("T")[0], "%Y-%m-%d"
-                        ).date(),
+                        date=datetime.datetime.strptime(item["hso_nextcollection"].split("T")[0], "%Y-%m-%d").date(),
                         t=WASTE_MAP[item["hso_servicename"]],
                         icon=ICON_MAP.get(WASTE_MAP[item["hso_servicename"]]),
                     )

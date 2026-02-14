@@ -67,9 +67,7 @@ class Source:
                 icon = ICON_MAP.get("PAP-PAPIR")
 
             if not (cells[3].get_text() is None or cells[3].get_text() == ""):
-                current_pickup = datetime.strptime(
-                    cells[3].get_text(), "%d-%m-%Y"
-                ).date()
+                current_pickup = datetime.strptime(cells[3].get_text(), "%d-%m-%Y").date()
                 if current_pickup == datetime.now().date():
                     entries.append(
                         Collection(
@@ -93,6 +91,6 @@ class Source:
                     t=fraktion,
                     icon=icon,
                 )
-                )
+            )
 
         return entries

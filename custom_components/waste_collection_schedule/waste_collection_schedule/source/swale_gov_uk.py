@@ -11,9 +11,7 @@ URL = "https://swale.gov.uk"
 HEADERS = {
     "User-Agent": "Mozilla/5.0",
 }
-API_URL = (
-    "https://swale.gov.uk/bins-littering-and-the-environment/bins/my-collection-day"
-)
+API_URL = "https://swale.gov.uk/bins-littering-and-the-environment/bins/my-collection-day"
 ICON_MAP = {
     "Refuse": "mdi:trash-can",
     "Recycling": "mdi:recycle",
@@ -71,7 +69,7 @@ class Source:
             headers=HEADERS,
             data=payload,
         )
-        r.raise_for_status
+        r.raise_for_status()
         sleep(5)
 
         # mimic address selection
@@ -86,7 +84,7 @@ class Source:
             headers=HEADERS,
             data=payload,
         )
-        r.raise_for_status
+        r.raise_for_status()
         soup: BeautifulSoup = BeautifulSoup(r.content, "html.parser")
         temp_list: list = []
 
@@ -106,9 +104,7 @@ class Source:
             # Try to extract actual date from string like "Tuesday, 14 April 2025"
             try:
                 # Remove the weekday part, e.g., "Monday, "
-                dt = raw_date.split("y, ")[
-                    -1
-                ].strip()  # This might still not work for all formats
+                dt = raw_date.split("y, ")[-1].strip()  # This might still not work for all formats
             except IndexError:
                 dt = "Unknown"
 

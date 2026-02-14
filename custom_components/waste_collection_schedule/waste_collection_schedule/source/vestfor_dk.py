@@ -40,9 +40,7 @@ class Source:
         term = self._streetName + " " + self._number + ", " + self._zipCode
 
         _LOGGER.info("Fetching addressId from Vestforbrændning: " + term)
-        addressResponse = request.get(
-            ADRESS_LOOKUP_URL, params={"term": term, "numberOfResults": 1}
-        )
+        addressResponse = request.get(ADRESS_LOOKUP_URL, params={"term": term, "numberOfResults": 1})
 
         addresses = json.loads(addressResponse.text)
 
@@ -52,22 +50,16 @@ class Source:
 
         _LOGGER.info("Fetching data from Vestforbrændning")
         start_date = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S%z")
-        end_date = (datetime.datetime.now() + datetime.timedelta(days=90)).strftime(
-            "%Y-%m-%dT%H:%M:%S%z"
-        )
+        end_date = (datetime.datetime.now() + datetime.timedelta(days=90)).strftime("%Y-%m-%dT%H:%M:%S%z")
 
         cookies = {"addressId": addressId}
-        response = request.get(
-            API_URL, params={"start": start_date, "end": end_date}, cookies=cookies
-        )
+        response = request.get(API_URL, params={"start": start_date, "end": end_date}, cookies=cookies)
         data = json.loads(response.text)
 
         for item in data:
             entries.append(
                 Collection(
-                    date=datetime.datetime.strptime(
-                        item["start"], "%Y-%m-%d"
-                    ).date(),  # Collection date
+                    date=datetime.datetime.strptime(item["start"], "%Y-%m-%d").date(),  # Collection date
                     t=item["title"],  # Collection type
                     icon=ICON_MAP.get(item["title"]),  # Collection icon
                 )

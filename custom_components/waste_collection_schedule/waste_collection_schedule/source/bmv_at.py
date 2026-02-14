@@ -66,27 +66,21 @@ class Source:
         args["Ort"] = self._ort
         args["Strasse"] = "HAUSNUMMER"
         args["Hausnummer"] = 0
-        r = session.post(
-            "https://webudb.udb.at/WasteManagementUDB/WasteManagementServlet", data=args
-        )
+        r = session.post("https://webudb.udb.at/WasteManagementUDB/WasteManagementServlet", data=args)
 
         args["Focus"] = "Strasse"
         args["SubmitAction"] = "changedEvent"
         args["Ort"] = self._ort
         args["Strasse"] = self._strasse
         args["Hausnummer"] = 0
-        r = session.post(
-            "https://webudb.udb.at/WasteManagementUDB/WasteManagementServlet", data=args
-        )
+        r = session.post("https://webudb.udb.at/WasteManagementUDB/WasteManagementServlet", data=args)
 
         args["Focus"] = "Hausnummer"
         args["SubmitAction"] = "forward"
         args["Ort"] = self._ort
         args["Strasse"] = self._strasse
         args["Hausnummer"] = self._hausnummer
-        r = session.post(
-            "https://webudb.udb.at/WasteManagementUDB/WasteManagementServlet", data=args
-        )
+        r = session.post("https://webudb.udb.at/WasteManagementUDB/WasteManagementServlet", data=args)
 
         args["ApplicationName"] = "com.athos.kd.udb.AbfuhrTerminModel"
         args["Focus"] = None
@@ -97,9 +91,7 @@ class Source:
         del args["Ort"]
         del args["Strasse"]
         del args["Hausnummer"]
-        r = session.post(
-            "https://webudb.udb.at/WasteManagementUDB/WasteManagementServlet", data=args
-        )
+        r = session.post("https://webudb.udb.at/WasteManagementUDB/WasteManagementServlet", data=args)
 
         dates = self._ics.convert(r.text)
 

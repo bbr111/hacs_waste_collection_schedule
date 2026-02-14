@@ -9,10 +9,7 @@ URL = "https://c-trace.de/"
 
 
 def EXTRA_INFO():
-    return [
-        {"title": s["title"], "url": s["url"], "default_params": {"service": key}}
-        for key, s in SERVICE_MAP.items()
-    ]
+    return [{"title": s["title"], "url": s["url"], "default_params": {"service": key}} for key, s in SERVICE_MAP.items()]
 
 
 TEST_CASES = {
@@ -188,9 +185,7 @@ class Source:
             if ort == "Bremen":
                 service = "bremenabfallkalender"
             else:
-                raise SourceArgumentRequired(
-                    "service", "service is required if ort is not Bremen"
-                )
+                raise SourceArgumentRequired("service", "service is required if ort is not Bremen")
 
         subdomain = DEFAULT_SUBDOMAIN
         ical_url_file = DEFAULT_ICAL_URL_FILE
@@ -229,9 +224,7 @@ class Source:
 
         session_id = ""
         if "location" in r.headers:
-            session_id = r.headers["location"].split("/")[
-                2
-            ]  # session_id like "(S(r3bme50igdgsp2lstgxxhvs2))"
+            session_id = r.headers["location"].split("/")[2]  # session_id like "(S(r3bme50igdgsp2lstgxxhvs2))"
 
         args = {
             "Ort": self._ort,

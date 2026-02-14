@@ -41,7 +41,7 @@ LABEL_MAP = {
 
 # Source : https://data.angers.fr/explore/dataset/secteurs-de-collecte-tri-et-plus/information/
 CITY = Literal[
-    "LES PONTS DE CE",
+    "LES PONTS DE CE",  # codespell: ignore
     "SAINT BARTHELEMY D ANJOU",
     "SAINT CLEMENT DE LA PLACE",
     "SAINTE GEMMES SUR LOIRE",
@@ -74,7 +74,7 @@ CITY = Literal[
     "LE PLESSIS GRAMMOIRE",
 ]
 CITY_NAME = [
-    "LES PONTS DE CE",
+    "LES PONTS DE CE",  # codespell: ignore
     "SAINT BARTHELEMY D ANJOU",
     "SAINT CLEMENT DE LA PLACE",
     "SAINTE GEMMES SUR LOIRE",
@@ -133,7 +133,7 @@ TYPE_VOIE = Literal[
     "HAMEAU",
     "AUTOROUTE",
     "CARREFOUR",
-    "CLOS",
+    "CLOS",  # codespell: ignore
     "RUELLE",
     "RESIDENCE",
     "MONTEE",
@@ -183,7 +183,7 @@ TYPE_VOIE_NAME = [
     "HAMEAU",
     "AUTOROUTE",
     "CARREFOUR",
-    "CLOS",
+    "CLOS",  # codespell: ignore
     "RUELLE",
     "RESIDENCE",
     "MONTEE",
@@ -247,9 +247,7 @@ class Source:
         self.typevoie = typevoie
         self.num_voie = num_voie
 
-    def _get_id_secteur_address(
-        self, address: str, city: str, typevoie: str, num_voie: int | None = None
-    ) -> list[dict]:
+    def _get_id_secteur_address(self, address: str, city: str, typevoie: str, num_voie: int | None = None) -> list[dict]:
         url = self.api_secteur.format(
             city=urllib.parse.quote(city.upper()),
             address=urllib.parse.quote(address),
@@ -259,9 +257,7 @@ class Source:
         response = requests.get(url)
 
         if response.status_code != 200:
-            raise SourceArgumentException(
-                "address", "Error response from data.angers.fr id secteur api."
-            )
+            raise SourceArgumentException("address", "Error response from data.angers.fr id secteur api.")
 
         id_secteurs = response.json()["results"]
 
@@ -275,9 +271,7 @@ class Source:
         )
 
         if not unique_data:
-            raise SourceArgumentException(
-                "address", "Pas de données depuis l'api, vérifier l'adresse"
-            )
+            raise SourceArgumentException("address", "Pas de données depuis l'api, vérifier l'adresse")
 
         return unique_data
 
@@ -315,44 +309,30 @@ class Source:
 
     def fetch(self) -> list[Collection]:
         try:
-            id_secteurs = self._get_id_secteur_address(
-                self.address, self.city, self.typevoie, self.num_voie
-            )
+            id_secteurs = self._get_id_secteur_address(self.address, self.city, self.typevoie, self.num_voie)
         except requests.RequestException as e:
-            raise SourceArgumentException(
-                "address", f"Error fetching address data: {e}"
-            )
+            raise SourceArgumentException("address", f"Error fetching address data: {e}") from e
 
         entries: list[EntryType] = []
         for id_secteur in id_secteurs:
             try:
                 if id_secteur["cat_secteur"] == "OM":
-                    url = self.api_url_waste_calendar.format(
-                        idsecteur=urllib.parse.quote(id_secteur["id_secteur"])
-                    )
+                    url = self.api_url_waste_calendar.format(idsecteur=urllib.parse.quote(id_secteur["id_secteur"]))
                     data_om = requests.get(url)
                     data_om.raise_for_status()
-                    dates_om = [
-                        entry["date_collecte"] for entry in data_om.json()["results"]
-                    ]
+                    dates_om = [entry["date_collecte"] for entry in data_om.json()["results"]]
                     entries.append({"type": "OM", "results": dates_om})
 
                 elif id_secteur["cat_secteur"] == "TRI":
-                    url = self.api_url_waste_calendar.format(
-                        idsecteur=urllib.parse.quote(id_secteur["id_secteur"])
-                    )
+                    url = self.api_url_waste_calendar.format(idsecteur=urllib.parse.quote(id_secteur["id_secteur"]))
                     data_tri = requests.get(url)
                     data_tri.raise_for_status()
-                    dates_tri = [
-                        entry["date_collecte"] for entry in data_tri.json()["results"]
-                    ]
+                    dates_tri = [entry["date_collecte"] for entry in data_tri.json()["results"]]
                     entries.append({"type": "TRI", "results": dates_tri})
                 else:
                     raise SourceArgumentException("city", "Error response from API")
             except requests.RequestException as e:
-                raise SourceArgumentException(
-                    "city", f"Error fetching collection data: {e}"
-                )
+                raise SourceArgumentException("city", f"Error fetching collection data: {e}") from e
         final_entries = []
         # print(entries)
         for entry in entries:

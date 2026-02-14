@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import site
 from pathlib import Path
-from typing import Tuple
 
 import inquirer
 
@@ -49,9 +48,7 @@ def select_landkreis(app: AppAbfallplusDe.AppAbfallplusDe):
     questions = [
         inquirer.List(
             "landkreis",
-            choices=sorted(
-                [(s["name"], s["name"]) for s in landkreise] + [("BACK", "BACK")]
-            ),
+            choices=sorted([(s["name"], s["name"]) for s in landkreise] + [("BACK", "BACK")]),
             message="Select your Landkreis",
         )
     ]
@@ -69,8 +66,7 @@ def select_city(app: AppAbfallplusDe.AppAbfallplusDe, bund_select: bool):
     questions = [
         inquirer.List(
             "city",
-            choices=sorted([(s["name"], s["name"]) for s in cities])
-            + ([("BACK", "BACK")] if bund_select else []),
+            choices=sorted([(s["name"], s["name"]) for s in cities]) + ([("BACK", "BACK")] if bund_select else []),
             message="Select your Kommune",
         )
     ]
@@ -84,15 +80,12 @@ def select_city(app: AppAbfallplusDe.AppAbfallplusDe, bund_select: bool):
     return city
 
 
-def select_bezirk(
-    app: AppAbfallplusDe.AppAbfallplusDe, bund_select: bool
-) -> Tuple[str, bool]:
+def select_bezirk(app: AppAbfallplusDe.AppAbfallplusDe, bund_select: bool) -> tuple[str, bool]:
     bezirke = app.get_bezirke()
     questions = [
         inquirer.List(
             "bezirk",
-            choices=sorted([(s["name"], s["name"]) for s in bezirke])
-            + [("BACK", "BACK")],
+            choices=sorted([(s["name"], s["name"]) for s in bezirke]) + [("BACK", "BACK")],
             message="Select your Bezirk",
         )
     ]
@@ -120,8 +113,7 @@ def select_street(app: AppAbfallplusDe.AppAbfallplusDe, bund_select: bool):
         questions = [
             inquirer.List(
                 "street",
-                choices=sorted([(s["name"], s["name"]) for s in streets])
-                + [("BACK", "BACK")],
+                choices=sorted([(s["name"], s["name"]) for s in streets]) + [("BACK", "BACK")],
                 message="Select your Street",
             )
         ]
@@ -143,8 +135,7 @@ def select_house_number(app: AppAbfallplusDe.AppAbfallplusDe, bund_select: bool)
     questions = [
         inquirer.List(
             "house_number",
-            choices=[(s["name"], s["name"]) for s in house_numbers]
-            + [("BACK", "BACK")],
+            choices=[(s["name"], s["name"]) for s in house_numbers] + [("BACK", "BACK")],
             message="Select your House Number",
         )
     ]

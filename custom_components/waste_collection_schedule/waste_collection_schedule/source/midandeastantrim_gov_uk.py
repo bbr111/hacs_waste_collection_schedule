@@ -49,7 +49,6 @@ class Source:
     def __init__(self, uprn: str | int):
         self._payload = PAYLOAD.format(uprn=str(uprn).strip())
 
-
     def fetch(self) -> list[Collection]:
         r = requests.post(
             API_URL,
@@ -60,7 +59,9 @@ class Source:
 
         entries: list[Collection] = []
         text = (
-            r.text.replace("&lt;", "<").replace("&gt;", ">" ).replace("&amp;", "&")
+            r.text.replace("&lt;", "<")
+            .replace("&gt;", ">")
+            .replace("&amp;", "&")
             .split("<getRoundCalendarForUPRNResult>")[-1]
             .split("</getRoundCalendarForUPRNResult>")[0]
         )
@@ -101,31 +102,25 @@ class Source:
                         title = svg.find("title")
                         if title and title.text.strip():
                             bin_type_raw = title.text.strip()
-                            
+
                             # Validate the date before processing
                             try:
                                 date_obj = datetime.strptime(f"{day} {month_year}", "%d %B %Y").date()
                             except ValueError:
                                 # Skip invalid dates (e.g., day 0, February 30, etc.)
                                 continue
-                            
+
                             # Use the proper translation from the key, or fallback mappings, or keep raw title
                             display_name = (
-                                self._bin_type_translation.get(bin_type_raw.lower()) or 
-                                WASTE_TYPE_MAPPINGS.get(bin_type_raw) or 
-                                bin_type_raw
+                                self._bin_type_translation.get(bin_type_raw.lower())
+                                or WASTE_TYPE_MAPPINGS.get(bin_type_raw)
+                                or bin_type_raw
                             )
-                            
+
                             # Get icon based on the clean display name
                             icon = ICON_MAP.get(display_name)
-                            
-                            entries.append(
-                                Collection(
-                                    date=date_obj,
-                                    t=display_name,
-                                    icon=icon
-                                )
-                            )
+
+                            entries.append(Collection(date=date_obj, t=display_name, icon=icon))
         return entries
 
     def _get_collections_by_id(self, id: str, date: date) -> list[Collection]:
@@ -133,7 +128,5 @@ class Source:
         collections = []
         for k, v in self._bin_type_translation.items():
             if id_int & int(k, 2) != 0:
-                collections.append(
-                    Collection(date=date, t=v, icon=ICON_MAP.get(v.split()[0].lower()))
-                )
+                collections.append(Collection(date=date, t=v, icon=ICON_MAP.get(v.split()[0].lower())))
         return collections

@@ -68,22 +68,14 @@ class Source:
             month = date.month
 
             # find all non empty tr's
-            trs = [
-                tr
-                for tr in table.find_all("tr")
-                if isinstance(tr, Tag) and tr.find_all()
-            ]
+            trs = [tr for tr in table.find_all("tr") if isinstance(tr, Tag) and tr.find_all()]
 
             for row in trs[1:]:  # Skipping first row since it is a header
                 all_cells = row.find_all("td")
                 collection_name = all_cells[0].text.strip()
                 # iterate over all rows with dates without collection name
                 for cell in all_cells[1:]:
-                    if (
-                        not isinstance(cell, Tag)
-                        or not cell["data-value"] == formatted_date
-                        or not cell.text.strip()
-                    ):
+                    if not isinstance(cell, Tag) or not cell["data-value"] == formatted_date or not cell.text.strip():
                         continue
 
                     for day in cell.text.split(","):

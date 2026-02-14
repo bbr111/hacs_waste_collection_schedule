@@ -36,9 +36,7 @@ SOURCE_CONFIG = vol.Schema(
     {
         vol.Required(const.CONF_SOURCE_NAME): cv.string,
         vol.Required(const.CONF_SOURCE_ARGS): dict,
-        vol.Optional(const.CONF_CUSTOMIZE, default=[]): vol.All(
-            cv.ensure_list, [CUSTOMIZE_CONFIG]
-        ),
+        vol.Optional(const.CONF_CUSTOMIZE, default=[]): vol.All(cv.ensure_list, [CUSTOMIZE_CONFIG]),
         vol.Optional(const.CONF_SOURCE_CALENDAR_TITLE): cv.string,
         vol.Optional(const.CONF_DAY_OFFSET, default=const.CONF_DAY_OFFSET_DEFAULT): int,
     }
@@ -48,15 +46,9 @@ CONFIG_SCHEMA = vol.Schema(
     {
         const.DOMAIN: vol.Schema(
             {
-                vol.Required(const.CONF_SOURCES): vol.All(
-                    cv.ensure_list, [SOURCE_CONFIG]
-                ),
-                vol.Optional(
-                    const.CONF_SEPARATOR, default=const.CONF_SEPARATOR_DEFAULT
-                ): cv.string,
-                vol.Optional(
-                    const.CONF_FETCH_TIME, default=const.CONF_FETCH_TIME_DEFAULT
-                ): cv.time,
+                vol.Required(const.CONF_SOURCES): vol.All(cv.ensure_list, [SOURCE_CONFIG]),
+                vol.Optional(const.CONF_SEPARATOR, default=const.CONF_SEPARATOR_DEFAULT): cv.string,
+                vol.Optional(const.CONF_FETCH_TIME, default=const.CONF_FETCH_TIME_DEFAULT): cv.time,
                 vol.Optional(
                     const.CONF_RANDOM_FETCH_TIME_OFFSET,
                     default=const.CONF_RANDOM_FETCH_TIME_OFFSET_DEFAULT,
@@ -83,9 +75,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         hass,
         separator=config[const.DOMAIN][const.CONF_SEPARATOR],
         fetch_time=config[const.DOMAIN][const.CONF_FETCH_TIME],
-        random_fetch_time_offset=config[const.DOMAIN][
-            const.CONF_RANDOM_FETCH_TIME_OFFSET
-        ],
+        random_fetch_time_offset=config[const.DOMAIN][const.CONF_RANDOM_FETCH_TIME_OFFSET],
         day_switch_time=config[const.DOMAIN][const.CONF_DAY_SWITCH_TIME],
     )
 
@@ -101,9 +91,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
                 icon=c.get(const.CONF_ICON),
                 picture=c.get(const.CONF_PICTURE),
                 use_dedicated_calendar=c.get(const.CONF_USE_DEDICATED_CALENDAR, False),
-                dedicated_calendar_title=c.get(
-                    const.CONF_DEDICATED_CALENDAR_TITLE, False
-                ),
+                dedicated_calendar_title=c.get(const.CONF_DEDICATED_CALENDAR_TITLE, False),
             )
 
         await hass.async_add_executor_job(
@@ -125,8 +113,6 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     hass.add_job(api._fetch)
 
     # Register new Service fetch_data
-    hass.services.async_register(
-        const.DOMAIN, "fetch_data", get_fetch_all_service(hass), schema=vol.Schema({})
-    )
+    hass.services.async_register(const.DOMAIN, "fetch_data", get_fetch_all_service(hass), schema=vol.Schema({}))
 
     return True

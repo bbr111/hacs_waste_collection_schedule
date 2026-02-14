@@ -34,7 +34,6 @@ class Source:
         self._uprn = str(uprn)
 
     def fetch(self):
-
         s = requests.Session()
         # Get session cookies
         r = s.get(API_URL, headers=HEADERS)

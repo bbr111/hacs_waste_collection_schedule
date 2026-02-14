@@ -41,9 +41,7 @@ class Collections(TypedDict):
 
 
 class Source:
-    def __init__(
-        self, address: str | None = None, property_no: str | int | None = None
-    ):
+    def __init__(self, address: str | None = None, property_no: str | int | None = None):
         self.address: str | None = None
         self.property_no: str | None = None
 
@@ -61,9 +59,7 @@ class Source:
             address = re.sub(" ch ", " chase ", address, flags=re.IGNORECASE)
             address = re.sub(" lp ", " loop ", address, flags=re.IGNORECASE)
             address = re.sub(" dr ", " drive ", address, flags=re.IGNORECASE)
-            address = re.sub(
-                r"western australia (\d{4})", "WA \\1", address, flags=re.IGNORECASE
-            )
+            address = re.sub(r"western australia (\d{4})", "WA \\1", address, flags=re.IGNORECASE)
             address = re.sub(r" wa (\d{4})", "  WA  \\1", address, flags=re.IGNORECASE)
             self.address = address
             self.search_method = "address"

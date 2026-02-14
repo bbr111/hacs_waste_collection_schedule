@@ -14,7 +14,9 @@ TEST_CASES = {
     "hoerdt": {"city": "Hördt", "street": ""},
 }
 
-API_URL = "https://www.abfallwirtschaft-germersheim.de/online-service/abfall-termine/abfalltermine-ics-export-bis-240-liter.html"
+API_URL = (
+    "https://www.abfallwirtschaft-germersheim.de/online-service/abfall-termine/abfalltermine-ics-export-bis-240-liter.html"
+)
 
 
 class Source:
@@ -37,12 +39,8 @@ class Source:
         r.raise_for_status()
 
         soup = BeautifulSoup(r.text, "html.parser")
-        ics_download = soup.find(
-            "input", {"type": "hidden", "name": "ICS_DOWNLOAD"}
-        ).get("value")
-        request_token = soup.find(
-            "input", {"type": "hidden", "name": "REQUEST_TOKEN"}
-        ).get("value")
+        ics_download = soup.find("input", {"type": "hidden", "name": "ICS_DOWNLOAD"}).get("value")
+        request_token = soup.find("input", {"type": "hidden", "name": "REQUEST_TOKEN"}).get("value")
 
         checkbox_class = re.compile("id_form_icsabfallart_[0-9][0-9]?")
         waste_types = soup.find("div", {"class": "ctlg_form_field checkbox"}).find_all(

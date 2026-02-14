@@ -69,17 +69,13 @@ class Source:
                 for region in region_str.split(","):
                     regions.add(region.strip())
 
-                if (
-                    region_str.lower() == "Gesamtes Gemeindegebiet".lower()
-                    or self._region.lower().replace(" ", "")
-                    in region_str.lower().replace(" ", "").split(",")
-                ):
+                if region_str.lower() == "Gesamtes Gemeindegebiet".lower() or self._region.lower().replace(
+                    " ", ""
+                ) in region_str.lower().replace(" ", "").split(","):
                     entries.append(Collection(date=date, t=bin_type, icon=icon))
 
         regions.remove("Gesamtes Gemeindegebiet")
-        if self._region.lower().replace(" ", "") not in map(
-            lambda x: x.lower().replace(" ", ""), regions
-        ):
+        if self._region.lower().replace(" ", "") not in map(lambda x: x.lower().replace(" ", ""), regions):
             raise SourceArgumentNotFoundWithSuggestions(
                 argument="region",
                 value=self._region,

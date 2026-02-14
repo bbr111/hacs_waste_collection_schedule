@@ -30,9 +30,7 @@ class Source:
             for item in schedule:
                 entries.append(
                     Collection(
-                        date=datetime.strptime(
-                            item["collectionDate"], "%d/%m/%Y"
-                        ).date(),
+                        date=datetime.strptime(item["collectionDate"], "%d/%m/%Y").date(),
                         t=item["type"],
                     )
                 )

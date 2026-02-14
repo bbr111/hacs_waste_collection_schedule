@@ -144,9 +144,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     for i in source_index:
         shell = api.get_shell(i)
         if shell is None:
-            raise ValueError(
-                f"source_index {i} out of range (0-{len(api.shells) - 1}) please check your sensor configuration"
-            )
+            raise ValueError(f"source_index {i} out of range (0-{len(api.shells) - 1}) please check your sensor configuration")
         shells.append(shell)
 
     aggregator = CollectionAggregator(shells)
@@ -225,9 +223,7 @@ class ScheduleSensor(SensorEntity):
         await super().async_added_to_hass()
 
         if self._coordinator:
-            self.async_on_remove(
-                self._coordinator.async_add_listener(self._update_sensor, None)
-            )
+            self.async_on_remove(self._coordinator.async_add_listener(self._update_sensor, None))
 
         self._update_sensor()
 
@@ -271,22 +267,16 @@ class ScheduleSensor(SensorEntity):
         # collection::=CollectionGroup{date=2020-04-01, types=['Type1', 'Type2']}
 
         if self._value_template is not None:
-            self._value = self._value_template.async_render_with_possible_json_value(
-                collection, None
-            )
+            self._value = self._value_template.async_render_with_possible_json_value(collection, None)
         else:
-            self._value = (
-                f"{self._separator.join(collection.types)} in {collection.daysTo} days"
-            )
+            self._value = f"{self._separator.join(collection.types)} in {collection.daysTo} days"
 
         self._attr_icon = collection.icon or "mdi:trash-can"
         self._attr_entity_picture = collection.picture
 
     def _render_date(self, collection: Collection):
         if self._date_template is not None:
-            return self._date_template.async_render_with_possible_json_value(
-                collection, None
-            )
+            return self._date_template.async_render_with_possible_json_value(collection, None)
         else:
             return collection.date.isoformat()
 
@@ -310,11 +300,7 @@ class ScheduleSensor(SensorEntity):
 
         attributes = {}
 
-        collection_types = (
-            sorted(self._aggregator.types)
-            if self._collection_types is None
-            else self._collection_types
-        )
+        collection_types = sorted(self._aggregator.types) if self._collection_types is None else self._collection_types
 
         if self._details_format == DetailsFormat.upcoming:
             # show upcoming events list in details
@@ -326,9 +312,7 @@ class ScheduleSensor(SensorEntity):
                 start_index=self._event_index,
             )
             for collection in upcoming:
-                attributes[self._render_date(collection)] = self._separator.join(
-                    collection.types
-                )
+                attributes[self._render_date(collection)] = self._separator.join(collection.types)
         elif self._details_format == DetailsFormat.appointment_types:
             # show list of collections in details
             for t in collection_types:
@@ -338,9 +322,7 @@ class ScheduleSensor(SensorEntity):
                     include_today=self._include_today,
                     start_index=self._event_index,
                 )
-                date = (
-                    "" if len(collections) == 0 else self._render_date(collections[0])
-                )
+                date = "" if len(collections) == 0 else self._render_date(collections[0])
                 attributes[t] = date
         elif self._details_format == DetailsFormat.generic:
             # insert generic attributes into details

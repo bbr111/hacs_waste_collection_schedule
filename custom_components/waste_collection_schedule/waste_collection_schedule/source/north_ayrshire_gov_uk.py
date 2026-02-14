@@ -47,9 +47,7 @@ class Source:
                     bin_list.append(
                         [
                             colour,
-                            "/".join(
-                                reversed(bin_json[0]["attributes"][item].split("/"))
-                            ),
+                            "/".join(reversed(bin_json[0]["attributes"][item].split("/"))),
                         ]
                     )
                 except AttributeError:  # catches error when no date is present

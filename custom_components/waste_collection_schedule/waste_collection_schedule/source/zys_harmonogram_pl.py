@@ -45,13 +45,9 @@ class Source:
 
     def fetch(self):
         try:
-            return self.get_data(
-                API_URL.format(self._commune_name, datetime.datetime.now().year)
-            )
+            return self.get_data(API_URL.format(self._commune_name, datetime.datetime.now().year))
         except Exception:
-            _LOGGER.debug(
-                f"fetch failed for source {TITLE}: trying different API_URL ..."
-            )
+            _LOGGER.debug(f"fetch failed for source {TITLE}: trying different API_URL ...")
             return self.get_data(API_URL.format("", ""))
 
     def get_data(self, api_url):
@@ -63,9 +59,7 @@ class Source:
             if item["value"].upper() == self._city:
                 city_id = item["id"]
         if city_id == 0:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "city", self._city, [c["value"] for c in cities]
-            )
+            raise SourceArgumentNotFoundWithSuggestions("city", self._city, [c["value"] for c in cities])
 
         r = requests.get(f"{api_url}/addresses/streets/{city_id}")
         r.raise_for_status()
@@ -75,9 +69,7 @@ class Source:
             if item["value"].upper() == self._street_name:
                 street_id = item["id"]
         if street_id == 0:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "street_name", self._street_name, [s["value"] for s in streets]
-            )
+            raise SourceArgumentNotFoundWithSuggestions("street_name", self._street_name, [s["value"] for s in streets])
 
         r = requests.get(f"{api_url}/addresses/numbers/{city_id}/{street_id}")
         r.raise_for_status()
@@ -87,9 +79,7 @@ class Source:
             if item["value"] == self._street_number:
                 number_id = item["id"]
         if number_id == 0:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "street_number", self._street_number, [n["value"] for n in numbers]
-            )
+            raise SourceArgumentNotFoundWithSuggestions("street_number", self._street_number, [n["value"] for n in numbers])
 
         r = requests.get(f"{api_url}/reports", params={"type": "html", "id": number_id})
         r.raise_for_status()
@@ -115,20 +105,14 @@ class Source:
                 continue
             cells = row.find_all("td")
             for cell_index, cell in enumerate(cells):
-                if (
-                    cell_index == 0
-                    or not isinstance(cell.text, str)
-                    or not cell.text.strip()
-                ):
+                if cell_index == 0 or not isinstance(cell.text, str) or not cell.text.strip():
                     continue
                 for day in cell.text.split(","):
                     entries.append(
                         Collection(
                             datetime.date(year, row_index - 1, int(day)),
                             NAME_MAP[cell_index],
-                            ICON_MAP.get(
-                                cell_index, "mdi:trash-can"
-                            ),  # Default to trash can if no icon is found
+                            ICON_MAP.get(cell_index, "mdi:trash-can"),  # Default to trash can if no icon is found
                         )
                     )
 

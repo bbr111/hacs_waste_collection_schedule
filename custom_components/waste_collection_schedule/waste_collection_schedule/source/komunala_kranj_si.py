@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import date, datetime
-from typing import Iterable
 
 import requests
 from waste_collection_schedule import Collection  # type: ignore[attr-defined]
@@ -16,9 +16,8 @@ try:
     from datetime import UTC
 except ImportError:
     # python <= 3.10
-    from datetime import timezone
 
-    UTC = timezone.utc
+    UTC = UTC
 
 TITLE = "Komunala Kranj"
 DESCRIPTION = "Source for Komunala Kranj."
@@ -40,9 +39,7 @@ PARAM_DESCRIPTIONS = {
 
 
 ADDRESS_URL = "https://gis.komunala-kranj.si/mapguide/KaliopaFDOService/Service.asmx/GetResultsSimplified"
-SCHEDULE_URL = (
-    "https://gis.komunala-kranj.si/ddmoduli/EkoloskiOtoki.asmx/GetKoledarOdvozov"
-)
+SCHEDULE_URL = "https://gis.komunala-kranj.si/ddmoduli/EkoloskiOtoki.asmx/GetKoledarOdvozov"
 API_HEADERS = {
     "Accept": "application/json",
     "Content-Type": "application/json; charset=utf-8",
@@ -113,19 +110,12 @@ class Source:
             "hsMid": match.identifier,
             "stDni": str(DEFAULT_DAYS_AHEAD),
         }
-        response = requests.get(
-            SCHEDULE_URL, params=schedule_params, headers=API_HEADERS, timeout=30
-        )
+        response = requests.get(SCHEDULE_URL, params=schedule_params, headers=API_HEADERS, timeout=30)
         response.raise_for_status()
 
         entries: list[Collection] = []
         for item in response.json().get("d", []):
-            raw_date = (
-                item.get("Datum")
-                or item.get("DatumSort")
-                or item.get("DatumSorten")
-                or item.get("DatumSortEn")
-            )
+            raw_date = item.get("Datum") or item.get("DatumSort") or item.get("DatumSorten") or item.get("DatumSortEn")
             if not raw_date:
                 continue
             collection_date = _parse_date(raw_date)
@@ -150,9 +140,7 @@ class Source:
             "locale": "SI",
             "query": self._address,
         }
-        response = requests.get(
-            ADDRESS_URL, params=params, headers=API_HEADERS, timeout=30
-        )
+        response = requests.get(ADDRESS_URL, params=params, headers=API_HEADERS, timeout=30)
         response.raise_for_status()
 
         matches = [
@@ -172,8 +160,6 @@ class Source:
             for match in matches:
                 if match.description.strip().casefold() == normalized_query:
                     return match
-            raise SourceArgAmbiguousWithSuggestions(
-                "address", self._address, _suggestions(matches)
-            )
+            raise SourceArgAmbiguousWithSuggestions("address", self._address, _suggestions(matches))
 
         return matches[0]

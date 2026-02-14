@@ -28,9 +28,7 @@ class Source:
             "query": self._address,
             "city": self._city.upper(),
         }
-        r = requests.get(
-            "https://www.srvatervinning.se/rest-api/core/sewagePickup/search", params
-        )
+        r = requests.get("https://www.srvatervinning.se/rest-api/core/sewagePickup/search", params)
         r.raise_for_status()
 
         data = r.json()

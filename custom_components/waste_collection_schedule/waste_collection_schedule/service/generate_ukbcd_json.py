@@ -18,11 +18,11 @@ WASTES = ["Refuse", "Recycling", "Garden", "Food", "Paper & Cardboard", "Batteri
 
 data: dict = {"bins": []}
 year = datetime.date.today().year
-for year in range(year, year + 6):
+for _year in range(year, year + 6):
     for month in range(1, 13):
-        for days in range(0, 4):
+        for _days in range(0, 4):
             day = randint(1, 28)
-            dt = f"{day:02d}" + "/" + f"{month:02d}" + "/" + f"{year:04d}"
+            dt = f"{day:02d}" + "/" + f"{month:02d}" + "/" + f"{_year:04d}"
             dict_data = {"type": choice(WASTES), "collectionDate": dt}
             data["bins"].append(dict_data)
 json_object = json.dumps(data, ensure_ascii=False, indent=4)

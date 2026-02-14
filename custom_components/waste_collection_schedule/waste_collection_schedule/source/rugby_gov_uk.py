@@ -39,9 +39,7 @@ class Source:
         for i in range(1, 9):
             container = containers.get(f"Container{i}CollectionDetails")
             if container and container.get("CollectionDate"):
-                date = datetime.strptime(
-                    container.get("CollectionDate"), "%Y-%m-%dT%H:%M:%S"
-                ).date()
+                date = datetime.strptime(container.get("CollectionDate"), "%Y-%m-%dT%H:%M:%S").date()
                 desc = container.get("ContainerDescription")
                 entries.append(
                     Collection(

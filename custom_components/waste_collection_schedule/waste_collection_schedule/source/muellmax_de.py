@@ -94,9 +94,7 @@ class InputTextParser(HTMLParser):
 
 
 class Source:
-    def __init__(
-        self, service, mm_frm_ort_sel=None, mm_frm_str_sel=None, mm_frm_hnr_sel=None
-    ):
+    def __init__(self, service, mm_frm_ort_sel=None, mm_frm_str_sel=None, mm_frm_hnr_sel=None):
         self._service = service
         self._mm_frm_ort_sel = mm_frm_ort_sel
         self._mm_frm_str_sel = mm_frm_str_sel
@@ -111,7 +109,7 @@ class Source:
         mm_ses.feed(r.text)
 
         # select "Abfuhrtermine", returns ort or an empty street search field
-        args = {"mm_ses": mm_ses.value, "mm_aus_ort.x": 0, "mm_aus_ort.x": 0}
+        args = {"mm_ses": mm_ses.value, "mm_aus_ort.x": 0}
         r = requests.post(url, data=args, headers=HEADERS)
         mm_ses.feed(r.text)
 
@@ -169,9 +167,7 @@ class Source:
         try:
             dates = self._ics.convert(r.text)
         except ValueError as e:
-            raise ValueError(
-                "Got invalid response from the server, please recheck your arguments"
-            ) from e
+            raise ValueError("Got invalid response from the server, please recheck your arguments") from e
 
         entries = []
         for d in dates:

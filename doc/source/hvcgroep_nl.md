@@ -80,7 +80,7 @@ waste_collection_schedule:
 ```
 
 ```yaml
-# appartment address with house_letter and suffix (30 A100)
+# apartment address with house_letter and suffix (30 A100)
 waste_collection_schedule:
   sources:
     - name: hvcgroep_nl

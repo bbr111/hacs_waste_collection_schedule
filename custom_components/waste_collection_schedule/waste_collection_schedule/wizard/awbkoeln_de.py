@@ -9,9 +9,7 @@ import requests
 def main():
     questions = [
         inquirer.Text("street_name", message="Enter search string for street"),
-        inquirer.Text(
-            "building_number", message="Enter search string for house number"
-        ),
+        inquirer.Text("building_number", message="Enter search string for house number"),
     ]
     answers = inquirer.prompt(questions)
 

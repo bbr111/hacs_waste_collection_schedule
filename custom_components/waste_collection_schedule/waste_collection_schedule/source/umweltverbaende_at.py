@@ -12,9 +12,7 @@ from waste_collection_schedule.exceptions import (
 from waste_collection_schedule.source.ics import Source as ICSSource
 
 TITLE = "Die NÖ Umweltverbände"
-DESCRIPTION = (
-    "Consolidated waste collection provider for several districts in Lower Austria"
-)
+DESCRIPTION = "Consolidated waste collection provider for several districts in Lower Austria"
 URL = "https://www.umweltverbaende.at/"
 
 
@@ -224,7 +222,7 @@ PARAM_TRANSLATIONS = {
         "hnr": "Hausnummer",
         "zusatz": "Zusatz",
         "calendar": "Kalender",
-        "calendar_title_separator": "Kalendertitel Seperator",
+        "calendar_title_separator": "Kalendertitel Separator",
         "calendar_splitter": "Kalendereintrag-Trenner",
     },
     "en": {
@@ -375,7 +373,7 @@ PARAM_TRANSLATIONS = {
         "district": "Gebiet",
         "municipal": "Gemeinde",
         "calendar": "Kalender",
-        "calendar_title_separator": "Kalendertitel Seperator",
+        "calendar_title_separator": "Kalendertitel Separator",
         "calendar_splitter": "Kalendereintrag-Trenner",
     }
 }
@@ -451,20 +449,14 @@ class Source:
             r = requests.get(f"{self._district_url}{scheibbs_path}")
             if r.status_code == 200:
                 self._district_collection_url = r.url
-                self._district_url = self._district_collection_url.split(scheibbs_path)[
-                    0
-                ]
+                self._district_url = self._district_collection_url.split(scheibbs_path)[0]
                 self.use_new = True
 
         if not self.use_new:
             for col_path in POSSIBLE_COLLECTION_PATHS:
-                if (
-                    r := requests.get(f"{self._district_url}{col_path}")
-                ).status_code == 200:
+                if (r := requests.get(f"{self._district_url}{col_path}")).status_code == 200:
                     self._district_collection_url = r.url
-                    self._district_url = self._district_collection_url.split(col_path)[
-                        0
-                    ]
+                    self._district_url = self._district_collection_url.split(col_path)[0]
                     self.use_new = True
                     break
 
@@ -505,7 +497,7 @@ class Source:
                     return self.fetch_old()
                 except Exception:
                     # If both methods fail, raise the original error from new method
-                    raise e
+                    raise e from e
         return self.fetch_old()
 
     def fetch_old(self) -> list[Collection]:
@@ -556,15 +548,9 @@ class Source:
                 ]
             if self._calendars:  # Filter for calendar if there are multiple calendars
                 if any(cal.upper() in txt[2].upper() for cal in self._calendars):
-                    for entry_text in (
-                        [txt[2]]
-                        if self.calendar_splitter is None
-                        else txt[2].split(self.calendar_splitter)
-                    ):
+                    for entry_text in [txt[2]] if self.calendar_splitter is None else txt[2].split(self.calendar_splitter):
                         new_txt = txt.copy()
-                        new_txt[2] = entry_text.split(self.calendar_title_separator)[
-                            -1
-                        ].strip()
+                        new_txt[2] = entry_text.split(self.calendar_title_separator)[-1].strip()
                         self.append_entry(entries, new_txt)
             else:  # Process all other municipals
                 self.append_entry(entries, txt)
@@ -621,24 +607,16 @@ class Source:
         def do_nothing(s: requests.Session, data: dict[str, str]):
             return data
 
-        return self.get_genereic(
-            s, data, "addition", self._addition, "zusatz", do_nothing
-        )
+        return self.get_genereic(s, data, "addition", self._addition, "zusatz", do_nothing)
 
     def get_hnr(self, s: requests.Session, data: dict[str, str]) -> dict[str, str]:
-        return self.get_genereic(
-            s, data, "hnr", self._hnr, "hausnummer", self.get_addition
-        )
+        return self.get_genereic(s, data, "hnr", self._hnr, "hausnummer", self.get_addition)
 
     def get_street(self, s: requests.Session, data: dict[str, str]) -> dict[str, str]:
-        return self.get_genereic(
-            s, data, "street", self._street, "strasse", self.get_hnr
-        )
+        return self.get_genereic(s, data, "street", self._street, "strasse", self.get_hnr)
 
     def get_plz(self, s: requests.Session, data: dict[str, str]) -> dict[str, str]:
-        return self.get_genereic(
-            s, data, "plz", self._plz, "postleitzahl", self.get_street
-        )
+        return self.get_genereic(s, data, "plz", self._plz, "postleitzahl", self.get_street)
 
     def get_ort(self, s: requests.Session, data: dict[str, str]) -> dict[str, str]:
         return self.get_genereic(s, data, "town", self._town, "ort", self.get_plz)
@@ -727,14 +705,8 @@ class Source:
         # OLD: Fallback to previous behavior
         NONCE_REGEX = r'"nonce":"([a-zA-Z0-9]+)"'
         nonce_match = re.search(NONCE_REGEX, r0.text)
-        if (
-            not nonce_match
-            or not (nonce := nonce_match.group(1))
-            or not isinstance(nonce, str)
-        ):
-            raise Exception(
-                f"Could not find nonce for page {self._district_collection_url}"
-            )
+        if not nonce_match or not (nonce := nonce_match.group(1)) or not isinstance(nonce, str):
+            raise Exception(f"Could not find nonce for page {self._district_collection_url}")
 
         mun_select = soup.select_one("select#gemeinde")
         if not mun_select:
@@ -754,11 +726,7 @@ class Source:
             raise SourceArgumentNotFoundWithSuggestions(
                 "municipal",
                 self._municipal,
-                [
-                    city_option.text.strip()
-                    for city_option in mun_options
-                    if city_option["value"]
-                ],
+                [city_option.text.strip() for city_option in mun_options if city_option["value"]],
             )
 
         # Build the data dict for get_zone_and_abfuhrtermine
@@ -820,9 +788,7 @@ class Source:
                 if key in data:
                     fraktionen_data[key] = data[key]
 
-            r_frak = s.post(
-                f"{self._district_url}wp-admin/admin-ajax.php", data=fraktionen_data
-            )
+            r_frak = s.post(f"{self._district_url}wp-admin/admin-ajax.php", data=fraktionen_data)
             r_frak.raise_for_status()
             frak_response = r_frak.json()
 
@@ -830,13 +796,9 @@ class Source:
             if frak_response.get("html"):
                 # Parse checkboxes from HTML
                 soup_frak = BeautifulSoup(frak_response["html"], "html.parser")
-                checkboxes = soup_frak.select(
-                    "input[type=checkbox][name='fraktionen[]']"
-                )
+                checkboxes = soup_frak.select("input[type=checkbox][name='fraktionen[]']")
                 # Only use checkboxes that have the "checked" attribute (regardless of disabled)
-                fraktionen = [
-                    cb["value"] for cb in checkboxes if cb.has_attr("checked")
-                ]
+                fraktionen = [cb["value"] for cb in checkboxes if cb.has_attr("checked")]
 
                 if fraktionen:
                     # Call API again with fraktionen - use list of tuples for multiple values with same key
@@ -859,9 +821,7 @@ class Source:
                     for frak in fraktionen:
                         post_data.append(("fraktionen[]", frak))
 
-                    r2 = s.post(
-                        f"{self._district_url}wp-admin/admin-ajax.php", data=post_data
-                    )
+                    r2 = s.post(f"{self._district_url}wp-admin/admin-ajax.php", data=post_data)
                     r2.raise_for_status()
                     response_json = r2.json()
 

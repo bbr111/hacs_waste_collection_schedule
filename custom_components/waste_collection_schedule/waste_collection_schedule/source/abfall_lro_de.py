@@ -112,15 +112,13 @@ class Source:
                 text += " " + link.next_sibling.strip()
 
             municipalities.append(text)
-            if self._municipality.lower().replace(" ", "").replace("(", "").replace(
-                ")", ""
-            ) == text.lower().replace(" ", "").replace("(", "").replace(")", ""):
+            if self._municipality.lower().replace(" ", "").replace("(", "").replace(")", "") == text.lower().replace(
+                " ", ""
+            ).replace("(", "").replace(")", ""):
                 mun_link = link.get("href")
                 break
         if mun_link is None:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "municipality", self._municipality, municipalities
-            )
+            raise SourceArgumentNotFoundWithSuggestions("municipality", self._municipality, municipalities)
 
         self._letters = mun_link.split("/")[-1].split(".")[0]
 

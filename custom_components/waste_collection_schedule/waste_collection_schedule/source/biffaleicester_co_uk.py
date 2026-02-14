@@ -49,9 +49,7 @@ class Source:
                     self._uprn = address["UPRNID"]
 
             if not self._uprn:
-                raise SourceArgumentNotFoundWithSuggestions(
-                    "number", self._number, [a["UPRNAddress"] for a in addresses]
-                )
+                raise SourceArgumentNotFoundWithSuggestions("number", self._number, [a["UPRNAddress"] for a in addresses])
 
         # Get collections
         p = {"action": API_ACTIONS["collection"], "uprn": self._uprn}
@@ -65,12 +63,8 @@ class Source:
             type = collection["ServiceMode"]
             props = BINS[type]
 
-            next_date = datetime.datetime.strptime(
-                collection["ServiceDueDate"], "%d/%m/%y"
-            ).date()
+            next_date = datetime.datetime.strptime(collection["ServiceDueDate"], "%d/%m/%y").date()
 
-            entries.append(
-                Collection(date=next_date, t=props["alias"], icon=props["icon"])
-            )
+            entries.append(Collection(date=next_date, t=props["alias"], icon=props["icon"]))
 
         return entries

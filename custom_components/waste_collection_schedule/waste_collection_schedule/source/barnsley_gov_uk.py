@@ -79,9 +79,7 @@ class Source:
         soup.prettify()
 
         if response.status_code != 200:
-            raise ConnectionRefusedError(
-                "Error getting results from website! Please open an issue on GitHub!"
-            )
+            raise ConnectionRefusedError("Error getting results from website! Please open an issue on GitHub!")
 
         # Parse the response, getting the top box first and then tabled collections after
         results = soup.find("div", {"class": "panel"}).find_all("fieldset")[0:2]

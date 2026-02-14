@@ -34,9 +34,7 @@ class Source:
         s = requests.Session()
 
         # get api_key and licensee
-        r1 = s.get(
-            "https://www.eastriding.gov.uk/templates/eryc_corptranet/js/eryc-bin-checker.js"
-        )
+        r1 = s.get("https://www.eastriding.gov.uk/templates/eryc_corptranet/js/eryc-bin-checker.js")
         api_key = re.findall(REGEX["API_KEY"], r1.text)[0]
         licensee = re.findall(REGEX["LICENSEE"], r1.text)[0]
 
@@ -54,12 +52,8 @@ class Source:
                     if item[key] is not None:
                         entries.append(
                             Collection(
-                                date=datetime.strptime(
-                                    item[key], "%Y-%m-%dT00:00:00"
-                                ).date(),
-                                t=key.replace(
-                                    "Date", " Bin"
-                                ),  # api doesn't return a waste type, so make one up
+                                date=datetime.strptime(item[key], "%Y-%m-%dT00:00:00").date(),
+                                t=key.replace("Date", " Bin"),  # api doesn't return a waste type, so make one up
                                 icon=ICON_MAP.get(key),
                             )
                         )

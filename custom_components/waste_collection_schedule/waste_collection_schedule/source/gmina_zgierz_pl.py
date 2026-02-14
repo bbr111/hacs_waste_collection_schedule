@@ -110,9 +110,7 @@ class Source:
                 break
 
         if not target_table:
-            raise Exception(
-                f"Could not find schedule table for region: {found_region_name}"
-            )
+            raise Exception(f"Could not find schedule table for region: {found_region_name}")
 
         # --- Step 2a: Extract the year from the title ---
         year = None
@@ -123,9 +121,7 @@ class Source:
                 year = int(match.group(1))
 
         if not year:
-            _LOGGER.warning(
-                "Could not find year in title, falling back to current year."
-            )
+            _LOGGER.warning("Could not find year in title, falling back to current year.")
             year = datetime.date.today().year
 
         # --- Step 3: Process the table and create Collection objects ---
@@ -167,9 +163,7 @@ class Source:
                                     )
                                 )
                             except ValueError:
-                                _LOGGER.warning(
-                                    f"Invalid date created for {day}/{month_num}/{year}"
-                                )
+                                _LOGGER.warning(f"Invalid date created for {day}/{month_num}/{year}")
 
             elif "gabaryty" in month_str_raw:
                 dates_text = None
@@ -195,8 +189,6 @@ class Source:
                                     )
                                 )
                             except ValueError:
-                                _LOGGER.warning(
-                                    f"Invalid gabaryty date for {day}/{month_name}"
-                                )
+                                _LOGGER.warning(f"Invalid gabaryty date for {day}/{month_name}")
 
         return entries

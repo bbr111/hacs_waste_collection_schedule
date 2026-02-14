@@ -4,7 +4,6 @@ import json
 import requests
 from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 from waste_collection_schedule.exceptions import (
-    SourceArgumentNotFound,
     SourceArgumentNotFoundWithSuggestions,
 )
 
@@ -58,9 +57,7 @@ class Source:
 
         city_id = CITY_MAP.get(self._city.lower())
         if city_id is None:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "city", self._city, CITY_MAP.keys()
-            )
+            raise SourceArgumentNotFoundWithSuggestions("city", self._city, CITY_MAP.keys())
         has_streets = city_id != CITY_MAP["sóskút"]
 
         if has_streets:
@@ -76,15 +73,13 @@ class Source:
             streets = json.loads(r.text)["results"]
             available_streets = [item["text"] for item in streets]
             try:
-                street_id = [
-                    item for item in streets if item.get("text") == self._street
-                ][0]["id"]
+                street_id = [item for item in streets if item.get("text") == self._street][0]["id"]
             except IndexError:
                 raise SourceArgumentNotFoundWithSuggestions(
                     "street",
                     self._street,
                     available_streets,
-                )
+                ) from None
 
         r = session.post(
             API_URL,

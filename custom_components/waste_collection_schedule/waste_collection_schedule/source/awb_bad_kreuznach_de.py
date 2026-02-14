@@ -43,9 +43,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 def compare_str(a: str, b: str):
-    return a.lower().replace(" ", "").replace("-", "") == b.lower().replace(
-        "-", ""
-    ).replace(" ", "")
+    return a.lower().replace(" ", "").replace("-", "") == b.lower().replace("-", "").replace(" ", "")
 
 
 class Source:
@@ -88,9 +86,7 @@ class Source:
                 break
 
         if not found:
-            SourceArgumentNotFoundWithSuggestions(
-                "ort", self._ort, [city["name"] for city in data["data"]["citys"]]
-            )
+            SourceArgumentNotFoundWithSuggestions("ort", self._ort, [city["name"] for city in data["data"]["citys"]])
 
         r = requests.post(URL, json=params)
         r.raise_for_status()
@@ -115,10 +111,7 @@ class Source:
                 raise SourceArgumentNotFoundWithSuggestions(
                     "stadtteil",
                     self._stadtteil,
-                    [
-                        part_of_city["name"]
-                        for part_of_city in data["data"]["partOfCitys"]
-                    ],
+                    [part_of_city["name"] for part_of_city in data["data"]["partOfCitys"]],
                 )
 
         r = requests.post(URL, json=params)
@@ -166,10 +159,7 @@ class Source:
                 raise SourceArgumentNotFoundWithSuggestions(
                     "nummer",
                     self._nummer,
-                    [
-                        house_number["name"]
-                        for house_number in data["data"]["houseNumbers"]
-                    ],
+                    [house_number["name"] for house_number in data["data"]["houseNumbers"]],
                 )
 
         from_time = datetime.now()
@@ -204,9 +194,7 @@ class Source:
                     freq=DAILY,
                     interval=cal_entry["frequency"],
                     dtstart=datetime.fromtimestamp(cal_entry["fromDate"] / 1000),
-                    until=datetime.fromtimestamp(cal_entry["toDate"] / 1000)
-                    if cal_entry["toDate"]
-                    else to_time,
+                    until=datetime.fromtimestamp(cal_entry["toDate"] / 1000) if cal_entry["toDate"] else to_time,
                 )
             )
 
@@ -216,13 +204,8 @@ class Source:
             holiday_date = datetime.fromtimestamp(holiday["holiday"] / 1000).date()
             for collection_name, collections in collection_dates.items():
                 for collection in collections:
-                    if (
-                        collection == holiday_date
-                        and not (collection_name, collection) in moved
-                    ):
-                        new_date = datetime.fromtimestamp(
-                            holiday["shiftTo"] / 1000
-                        ).date()
+                    if collection == holiday_date and (collection_name, collection) not in moved:
+                        new_date = datetime.fromtimestamp(holiday["shiftTo"] / 1000).date()
                         moved.append((collection_name, new_date))
                         collections[collections.index(collection)] = new_date
                         break

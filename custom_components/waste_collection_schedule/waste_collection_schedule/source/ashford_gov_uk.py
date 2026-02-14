@@ -45,10 +45,7 @@ class Source:
         self._postcode = str(postcode).strip()
 
     def fetch(self):
-
-        _LOGGER.warning(
-            "Forcing requests to use legacy TLSv1.2 & AES256-SHA256 to match ashford.gov.uk website"
-        )
+        _LOGGER.warning("Forcing requests to use legacy TLSv1.2 & AES256-SHA256 to match ashford.gov.uk website")
 
         # Use customised TLS/cipher settings
         s = requests.Session()
@@ -70,12 +67,8 @@ class Source:
                 continue
             args[input_tag["name"]] = input_tag.get("value")
         args["ctl00$ContentPlaceHolder1$CollectionDayLookup2$HiddenField_UPRN"] = ""
-        args["ctl00$ContentPlaceHolder1$CollectionDayLookup2$TextBox_PostCode"] = (
-            self._postcode
-        )
-        args["ctl00$ContentPlaceHolder1$CollectionDayLookup2$Button_PostCodeSearch"] = (
-            "Continue+>"
-        )
+        args["ctl00$ContentPlaceHolder1$CollectionDayLookup2$TextBox_PostCode"] = self._postcode
+        args["ctl00$ContentPlaceHolder1$CollectionDayLookup2$Button_PostCodeSearch"] = "Continue+>"
         args["__EVENTTARGET"] = ""
         args["__EVENTARGUMENT"] = ""
 
@@ -88,18 +81,12 @@ class Source:
             if not input_tag.get("name"):
                 continue
             args[input_tag["name"]] = input_tag.get("value")
-        args[
-            "ctl00$ContentPlaceHolder1$CollectionDayLookup2$DropDownList_Addresses"
-        ] = self._uprn
+        args["ctl00$ContentPlaceHolder1$CollectionDayLookup2$DropDownList_Addresses"] = self._uprn
 
-        args["ctl00$ContentPlaceHolder1$CollectionDayLookup2$Button_PostCodeSearch"] = (
-            "Continue+>"
-        )
+        args["ctl00$ContentPlaceHolder1$CollectionDayLookup2$Button_PostCodeSearch"] = "Continue+>"
         del args["ctl00$ContentPlaceHolder1$CollectionDayLookup2$Button_SelectAddress"]
         del args["ctl00$ContentPlaceHolder1$CollectionDayLookup2$Button_PostCodeSearch"]
-        args["ctl00$ContentPlaceHolder1$CollectionDayLookup2$Button_SelectAddress"] = (
-            "Continue+>"
-        )
+        args["ctl00$ContentPlaceHolder1$CollectionDayLookup2$Button_SelectAddress"] = "Continue+>"
 
         r = s.post(API_URL, data=args)
         if r.status_code != 200:
@@ -126,13 +113,8 @@ class Source:
                 continue
             bin_type: str = bin_type_soup.text.strip()
 
-            date_soup = bin_text.find(
-                "span", id=re.compile(r"CollectionDayLookup2_Label_\w*_Date")
-            )
-            if not date_soup or (
-                " " not in date_soup.text.strip()
-                and date_soup.text.strip().lower() != "today"
-            ):
+            date_soup = bin_text.find("span", id=re.compile(r"CollectionDayLookup2_Label_\w*_Date"))
+            if not date_soup or (" " not in date_soup.text.strip() and date_soup.text.strip().lower() != "today"):
                 continue
             date_str: str = date_soup.text.strip()
             try:

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import site
 from pathlib import Path
-from datetime import datetime
 
 import inquirer
 
@@ -90,6 +89,7 @@ def main(password, email, phone):
         password: {password}
         {"email: " + email if email else "phone: " + phone}"""
     )
+
 
 if __name__ == "__main__":
     credentials = ask_login()

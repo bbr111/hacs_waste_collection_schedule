@@ -7,9 +7,7 @@ from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 
 _LOGGER = logging.getLogger(__name__)
 TITLE = "CIDIU S.p.A."
-DESCRIPTION = (
-    "Source for CIDIU waste collection services for the north-west Turin province"
-)
+DESCRIPTION = "Source for CIDIU waste collection services for the north-west Turin province"
 URL = "https://cidiu.it/"
 
 TEST_CASES = {
@@ -72,9 +70,7 @@ class Source:
         rows = soup.find_all("tr")
 
         header_row = rows[0]
-        headers = [th.text.strip() for th in header_row.find_all(["th", "td"])][
-            1:
-        ]  # Skip the first empty header
+        headers = [th.text.strip() for th in header_row.find_all(["th", "td"])][1:]  # Skip the first empty header
 
         entries = []
         for row in rows[1:]:  # Skip the header row
@@ -96,7 +92,7 @@ class Source:
                 continue
 
             collections = []
-            for header, cell in zip(headers, cells[1:]):
+            for header, cell in zip(headers, cells[1:], strict=False):
                 if cell.text.strip():
                     collections.append(header)
 

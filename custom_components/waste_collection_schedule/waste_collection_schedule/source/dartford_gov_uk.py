@@ -45,9 +45,7 @@ class Source:
         )
 
         soup: BeautifulSoup = BeautifulSoup(r.content, "html.parser")
-        waste_types: list = soup.find_all(
-            "td", {"data-eb-colheader": "Collection Type"}
-        )
+        waste_types: list = soup.find_all("td", {"data-eb-colheader": "Collection Type"})
         waste_dates: list = soup.find_all("td", {"data-eb-colheader": "Date"})
 
         entries: list = []

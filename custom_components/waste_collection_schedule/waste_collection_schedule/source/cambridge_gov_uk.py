@@ -9,9 +9,7 @@ from waste_collection_schedule.exceptions import (
 )
 
 TITLE = "Cambridge City Council (Deprecated)"
-DESCRIPTION = (
-    "Source for cambridge.gov.uk services for Cambridge and part of Cambridgeshire"
-)
+DESCRIPTION = "Source for cambridge.gov.uk services for Cambridge and part of Cambridgeshire"
 URL = "https://cambridge.gov.uk"
 TEST_CASES = {
     "houseNumber": {"post_code": "CB13JD", "number": 37},
@@ -39,17 +37,13 @@ class Source:
 
     def fetch(self):
         # fetch location id
-        r = requests.get(
-            API_URLS["address_search"], params={"postCode": self._post_code}
-        )
+        r = requests.get(API_URLS["address_search"], params={"postCode": self._post_code})
         r.raise_for_status()
         addresses = r.json()
         if len(addresses) == 0:
             raise SourceArgumentNotFound("post_code", self._post_code)
 
-        address_ids = [
-            x["id"] for x in addresses if x["houseNumber"].capitalize() == self._number
-        ]
+        address_ids = [x["id"] for x in addresses if x["houseNumber"].capitalize() == self._number]
 
         if len(address_ids) == 0:
             raise SourceArgumentNotFoundWithSuggestions(
@@ -69,9 +63,7 @@ class Source:
             for round_type in collection["roundTypes"]:
                 entries.append(
                     Collection(
-                        date=datetime.strptime(
-                            collection["date"], "%Y-%m-%dT%H:%M:%SZ"
-                        ).date(),
+                        date=datetime.strptime(collection["date"], "%Y-%m-%dT%H:%M:%SZ").date(),
                         t=round_type.title(),
                         icon=ICON_MAP.get(round_type),
                     )

@@ -1,8 +1,8 @@
 import logging
 from datetime import datetime
-from xml.dom.minidom import parseString
 
 import requests
+from defusedxml.minidom import parseString
 from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 from waste_collection_schedule.service.ICS import ICS
 
@@ -66,9 +66,7 @@ class Source:
             raise Exception("Could not establish connection to the server") from e
         r.raise_for_status()
 
-        fixed_text = r.text.replace(
-            "REFRESH - INTERVAL; VALUE = ", "REFRESH-INTERVAL;VALUE="
-        )
+        fixed_text = r.text.replace("REFRESH - INTERVAL; VALUE = ", "REFRESH-INTERVAL;VALUE=")
 
         dates = self._ics.convert(fixed_text)
 

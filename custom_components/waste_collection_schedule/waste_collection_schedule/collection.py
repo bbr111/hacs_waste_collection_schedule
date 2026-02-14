@@ -1,13 +1,12 @@
 import datetime
-from typing import Optional
 
 
 class CollectionBase(dict):  # inherit from dict to enable JSON serialization
     def __init__(
         self,
         date: datetime.date,
-        icon: Optional[str] = None,
-        picture: Optional[str] = None,
+        icon: str | None = None,
+        picture: str | None = None,
     ):
         dict.__init__(self, date=date.isoformat(), icon=icon, picture=picture)
         self._date = date  # store date also as python date object
@@ -44,8 +43,8 @@ class Collection(CollectionBase):
         self,
         date: datetime.date,
         t: str,
-        icon: Optional[str] = None,
-        picture: Optional[str] = None,
+        icon: str | None = None,
+        picture: str | None = None,
     ):
         CollectionBase.__init__(self, date=date, icon=icon, picture=picture)
         self["type"] = t

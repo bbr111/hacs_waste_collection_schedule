@@ -71,29 +71,18 @@ class Source:
         address_postcode=None,
         uprn=None,
     ):
-
-        self._address_name_number = (
-            address_name_number
-            if address_name_number is not None
-            else address_name_numer
-        )
+        self._address_name_number = address_name_number if address_name_number is not None else address_name_numer
         self._address_street = address_street
         self._street_town = street_town
         self._address_postcode = address_postcode
         self._uprn = uprn
 
         if address_name_numer is not None:
-            _LOGGER.warning(
-                "address_name_numer is deprecated. Use address_name_number instead."
-            )
+            _LOGGER.warning("address_name_numer is deprecated. Use address_name_number instead.")
         if address_street is not None:
-            _LOGGER.warning(
-                "address_street is deprecated. Only address_name_number and address_postcode are required"
-            )
+            _LOGGER.warning("address_street is deprecated. Only address_name_number and address_postcode are required")
         if street_town is not None:
-            _LOGGER.warning(
-                "street_town is deprecated. Only address_name_number and address_postcode are required"
-            )
+            _LOGGER.warning("street_town is deprecated. Only address_name_number and address_postcode are required")
 
     def get_uprn_from_postcode(self, s, pcode):
         # returns the first uprn from a postcode search
@@ -117,14 +106,11 @@ class Source:
         return temp_dt
 
     def fetch(self):
-
         s = requests.Session()
 
         # get a uprn is one has not been provided
         if self._uprn is None:
-            self._uprn = self.get_uprn_from_postcode(
-                s, self._address_postcode.replace(" ", "")
-            )
+            self._uprn = self.get_uprn_from_postcode(s, self._address_postcode.replace(" ", ""))
 
         # set up session
         r = s.get(
@@ -142,26 +128,20 @@ class Source:
 
         # now query using the uprn
         timestamp = time.time_ns() // 1_000_000  # epoch time in milliseconds
-        payload = {
-            "formValues": {"Collection Days": {"inputUPRN": {"value": self._uprn}}}
-        }
+        payload = {"formValues": {"Collection Days": {"inputUPRN": {"value": self._uprn}}}}
         scheduleRequest = s.post(
             f"https://eastherts-self.achieveservice.com/apibroker/runLookup?id=683d9ff0e299d&repeat_against=&noRetry=true&getOnlyTokens=undefined&log_id=&app_name=AF-Renderer::Self&_={timestamp}&sid={sid}",
             headers=HEADERS,
             json=payload,
         )
         scheduleRequest.raise_for_status()
-        rowdata = json.loads(scheduleRequest.content)["integration"]["transformed"][
-            "rows_data"
-        ]["0"]
+        rowdata = json.loads(scheduleRequest.content)["integration"]["transformed"]["rows_data"]["0"]
 
         temp_dict: dict = {}
         for item in rowdata:
             if "NextDate" in item:
                 if rowdata[item] != "":
-                    temp_dict.update(
-                        {item.replace("NextDate", ""): self.resolve_year(rowdata[item])}
-                    )
+                    temp_dict.update({item.replace("NextDate", ""): self.resolve_year(rowdata[item])})
 
         entries = []
         for item in temp_dict:

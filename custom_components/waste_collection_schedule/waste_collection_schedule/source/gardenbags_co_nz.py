@@ -22,9 +22,7 @@ COUNTRY = "nz"
 
 
 class Source:
-    def __init__(
-        self, account_number: str, account_pin: str, franchise: str | None = None
-    ):
+    def __init__(self, account_number: str, account_pin: str, franchise: str | None = None):
         self._account_number: str = account_number
         self._account_pin: str = account_pin
         self._franchise: str | None = franchise
@@ -43,21 +41,15 @@ class Source:
         response = requests.post(url, headers=headers, data=data, verify=False)
 
         soup = BeautifulSoup(response.content, "html.parser")
-        upcoming_collection = soup.find(
-            "div", class_="upcoming-collection next-collection"
-        )
+        upcoming_collection = soup.find("div", class_="upcoming-collection next-collection")
 
         entries = []
 
         if upcoming_collection:
-            collection_date_str = upcoming_collection.find(
-                "span", class_="not-v-cust"
-            ).text.strip()
+            collection_date_str = upcoming_collection.find("span", class_="not-v-cust").text.strip()
             collection_date = parse(collection_date_str, fuzzy=True)
             if collection_date:
                 date = collection_date.date()
-                entries.append(
-                    Collection(date=date, t="Organic waste", icon="mdi:leaf")
-                )
+                entries.append(Collection(date=date, t="Organic waste", icon="mdi:leaf"))
 
         return entries

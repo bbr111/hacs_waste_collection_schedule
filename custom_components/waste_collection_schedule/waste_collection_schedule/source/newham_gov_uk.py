@@ -35,9 +35,7 @@ class Source:
         sections = soup.find_all("div", {"class": "card h-100"})
 
         # there may also be a recycling one too
-        sections_recycling = soup.find_all(
-            "div", {"class": "card h-100 card-recycling"}
-        )
+        sections_recycling = soup.find_all("div", {"class": "card h-100 card-recycling"})
         if len(sections_recycling) > 0:
             sections.append(sections_recycling[0])
 
@@ -51,11 +49,7 @@ class Source:
             array_expected_types = ["Domestic", "Recycling"]
             if bin_type not in array_expected_types:
                 continue
-            date_string = (
-                item.find_next("p", {"class": "card-text"})
-                .find_next("mark")
-                .next_sibling.strip()
-            )
+            date_string = item.find_next("p", {"class": "card-text"}).find_next("mark").next_sibling.strip()
             next_collection = datetime.strptime(date_string, "%d/%m/%Y").date()
 
             entries.append(

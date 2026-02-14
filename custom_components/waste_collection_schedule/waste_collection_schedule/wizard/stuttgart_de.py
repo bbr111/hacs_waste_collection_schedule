@@ -12,9 +12,7 @@ def main():
     answers = inquirer.prompt(questions)
 
     # retrieve suggestions for street
-    r = requests.get(
-        "https://service.stuttgart.de/lhs-services/aws/strassennamen", params=answers
-    )
+    r = requests.get("https://service.stuttgart.de/lhs-services/aws/strassennamen", params=answers)
 
     data = json.loads(r.text)
     street_choices = []
@@ -22,9 +20,7 @@ def main():
         street_choices.append((d["value"], d["data"]))
 
     # select street
-    questions = [
-        inquirer.List("street", choices=street_choices, message="Select street")
-    ]
+    questions = [inquirer.List("street", choices=street_choices, message="Select street")]
     results = inquirer.prompt(questions)
 
     # search for house number

@@ -61,11 +61,9 @@ class Source:
         )
         address_lookup.raise_for_status()
         addresses = address_lookup.json()["response"]["addresses"]["items"]
-        id = next(
-            address
-            for address in addresses
-            if address["Description"].upper().startswith(self.house_number.upper())
-        )["Id"]
+        id = next(address for address in addresses if address["Description"].upper().startswith(self.house_number.upper()))[
+            "Id"
+        ]
 
         collection_lookup = requests.post(
             self.url,

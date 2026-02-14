@@ -29,8 +29,7 @@ TEST_CASES = {
 }
 
 API_URL = (
-    "https://norkartrenovasjon.azurewebsites.net/proxyserver.ashx?server="
-    "https://komteksky.norkart.no/MinRenovasjon.Api/api/"
+    "https://norkartrenovasjon.azurewebsites.net/proxyserver.ashx?server=https://komteksky.norkart.no/MinRenovasjon.Api/api/"
 )
 APP_KEY = "AE13DEEC-804F-4615-A74E-B4FAC11F0A30"
 ICON_MAP = {

@@ -54,9 +54,7 @@ class Source:
         # get the default view (might not needed, but is a good check the login worked)
         response = session.get("https://kundenportal.berlin-recycling.de/Default.aspx")
         if response.history:
-            raise Exception(
-                "The default view request was redirected to " + response.url
-            )
+            raise Exception("The default view request was redirected to " + response.url)
 
         headers = {"Content-Type": "application/json"}
 
@@ -73,9 +71,7 @@ class Source:
             "ClientParameters": "",
             "headrecid": "",
         }
-        r = session.post(
-            f"{serviceUrl}/GetDatasetTableHead", json=request_data, headers=headers
-        )
+        r = session.post(f"{serviceUrl}/GetDatasetTableHead", json=request_data, headers=headers)
 
         data = json.loads(r.text)
         # load json again, because response is double coded

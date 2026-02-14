@@ -13,6 +13,7 @@ TEST_CASES = {
     "Kohlberg": {"city": "Kohlberg", "street": "alle Straßen"},
 }
 
+
 class Source:
     def __init__(self, city, street=None):
         self._city = city
@@ -25,9 +26,7 @@ class Source:
             "parent": "",
             "kind": "removaldate.city",
         }
-        r = self._session.post(
-            "https://www.awb-es.de/statics/abfallplus/search.json.php", data=data
-        )
+        r = self._session.post("https://www.awb-es.de/statics/abfallplus/search.json.php", data=data)
         r.raise_for_status()
         suggestsion = r.json()["suggestions"]
         for suggestion in suggestsion:
@@ -46,13 +45,11 @@ class Source:
             "parent": self._city,
             "kind": "removaldate.street",
         }
-        r = self._session.post(
-            "https://www.awb-es.de/statics/abfallplus/search.json.php", data=data
-        )
+        r = self._session.post("https://www.awb-es.de/statics/abfallplus/search.json.php", data=data)
         r.raise_for_status()
         suggestsion = r.json()["suggestions"]
         for suggestion in suggestsion:
-            if suggestion["value"].lower() == self._street.lower():
+            if self._street and suggestion["value"].lower() == self._street.lower():
                 return
         raise SourceArgumentNotFoundWithSuggestions(
             "street",
@@ -80,7 +77,7 @@ class Source:
         for download in downloads:
             href = download.get("href")
             if (
-                "t=ics" in href and href not in ics_urls
+                href and "t=ics" in href and href not in ics_urls
             ):  # The website lists the same url multiple times, we only want it once
                 ics_urls.append(href)
 

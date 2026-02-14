@@ -30,9 +30,7 @@ class Source:
 
     def fetch(self):
         s = requests.Session()
-        r = s.get(
-            f"https://exeter.gov.uk/repositories/hidden-pages/address-finder/?qsource=UPRN&qtype=bins&term={self._uprn}"
-        )
+        r = s.get(f"https://exeter.gov.uk/repositories/hidden-pages/address-finder/?qsource=UPRN&qtype=bins&term={self._uprn}")
 
         json_data = json.loads(r.text)[0]["Results"]
         soup = BeautifulSoup(json_data, "html.parser")
@@ -40,14 +38,12 @@ class Source:
         dates = soup.findAll("h3")
 
         entries = []
-        for b, d in zip(bins, dates):
+        for b, d in zip(bins, dates, strict=False):
             # check cases where no date is given for a collection
             if d and len(d.text.split(",")) > 1:
                 entries.append(
                     Collection(
-                        date=datetime.strptime(
-                            re.compile(REGEX_ORDINALS).sub("", d.text), "%A, %d %B %Y"
-                        ).date(),
+                        date=datetime.strptime(re.compile(REGEX_ORDINALS).sub("", d.text), "%A, %d %B %Y").date(),
                         t=b.text.replace(" collection", ""),
                         icon=ICON_MAP.get(b.text.replace(" collection", "").upper()),
                     )

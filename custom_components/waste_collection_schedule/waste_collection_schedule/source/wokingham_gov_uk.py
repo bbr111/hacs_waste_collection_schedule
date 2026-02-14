@@ -53,9 +53,7 @@ class Source:
         s = requests.Session()
 
         # Get Christmas & New Year schedule adjustments
-        r = s.get(
-            "https://www.wokingham.gov.uk/rubbish-and-recycling/christmas-bin-day-changes"
-        )
+        r = s.get("https://www.wokingham.gov.uk/rubbish-and-recycling/christmas-bin-day-changes")
         soup = BeautifulSoup(r.content, "html.parser")
 
         revised_schedules: dict = {}
@@ -65,14 +63,10 @@ class Source:
             if tds:
                 revised_schedules.update({tds[0].text: tds[1].text.split(" (")[0]})
         # get rid of dates where there is no adjustment
-        revised_schedules = {
-            k: v for k, v in revised_schedules.items() if v != "Normal"
-        }
+        revised_schedules = {k: v for k, v in revised_schedules.items() if v != "Normal"}
         # reformat dates to make comparison easier
         revised_schedules = {
-            datetime.strptime(k, "%A %d %B %Y")
-            .strftime("%d/%m/%Y"): datetime.strptime(v, "%A %d %B %Y")
-            .strftime("%d/%m/%Y")
+            datetime.strptime(k, "%A %d %B %Y").strftime("%d/%m/%Y"): datetime.strptime(v, "%A %d %B %Y").strftime("%d/%m/%Y")
             for k, v in revised_schedules.items()
         }
 
@@ -131,9 +125,7 @@ class Source:
             waste_type = card.find("h3").text.split("(")[0].strip()
             waste_date = card.find("span").text.strip().split()[-1]
             try:
-                waste_date = datetime.strptime(waste_date, "%d/%m/%Y").strftime(
-                    "%d/%m/%Y"
-                )
+                waste_date = datetime.strptime(waste_date, "%d/%m/%Y").strftime("%d/%m/%Y")
             except ValueError:
                 # occurs if next collections date shows as "No collection"
                 continue

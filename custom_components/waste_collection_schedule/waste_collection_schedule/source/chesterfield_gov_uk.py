@@ -51,7 +51,6 @@ class Source:
         self._uprn = str(uprn)
 
     def fetch(self):
-
         s = requests.Session()
         r = s.get(API_URLS["session"], headers=HEADERS, verify=False)
 
@@ -97,9 +96,7 @@ class Source:
             else:
                 waste_type = str(waste_type).replace("Collect ", "")
                 try:
-                    dt_zulu = item["serviceTasks"][0]["serviceTaskSchedules"][0][
-                        "nextInstance"
-                    ]["currentScheduledDate"]
+                    dt_zulu = item["serviceTasks"][0]["serviceTaskSchedules"][0]["nextInstance"]["currentScheduledDate"]
                 except (IndexError, KeyError):
                     #  keys are missing from some entries, or keys have no values
                     pass

@@ -1,6 +1,6 @@
 import calendar
 import re
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import requests
 from dateutil.rrule import DAILY, FR, MO, SA, SU, TH, TU, WE, WEEKLY, rrule, rruleset
@@ -16,12 +16,8 @@ TEST_CASES = {
     "Sainte-Julie City Hall": {
         "address": "1580 Chem. du Fer-à-Cheval, Sainte-Julie, QC J3E 0A2",
     },
-    "Calixa-Lavallée City Hall": {
-        "address": "771 Chem. de la Beauce, Calixa-Lavallée, QC J0L 1A0"
-    },
-    "Contrecoeur City Hall": {
-        "address": "5000 Rte Marie-Victorin, Contrecoeur, QC J0L 1C0"
-    },
+    "Calixa-Lavallée City Hall": {"address": "771 Chem. de la Beauce, Calixa-Lavallée, QC J0L 1A0"},
+    "Contrecoeur City Hall": {"address": "5000 Rte Marie-Victorin, Contrecoeur, QC J0L 1C0"},
     # "Saint-Amable City Hall": {
     #     "address": "575 Rue Principale, Saint-Amable, QC J0L 1N0"
     # },
@@ -104,9 +100,7 @@ class Source:
 
         data = response.json()[0]["data"]["features"]
         if not data:
-            raise SourceArgumentException(
-                "address", "No results found for the given address"
-            )
+            raise SourceArgumentException("address", "No results found for the given address")
 
         lat, lon = data[0]["geometry"]["coordinates"]
 
@@ -129,9 +123,7 @@ class Source:
         response = requests.get(api_url, params=params)
 
         if response.status_code != 200:
-            raise Exception(
-                f"Error fetching data from {api_url}: {response.status_code}"
-            )
+            raise Exception(f"Error fetching data from {api_url}: {response.status_code}")
 
         return self._sanitize_response(response.json())
 
@@ -234,9 +226,7 @@ class Source:
 
     def _parse_month(self, input_string):
         print(input_string)
-        input_string = input_string.replace(
-            ":", ""
-        )  # match some actual cases in production
+        input_string = input_string.replace(":", "")  # match some actual cases in production
         if "-" in input_string and "," in input_string:
             month_list = list
 
@@ -249,10 +239,7 @@ class Source:
                 )
             )
         else:
-            month_list = [
-                _CALENDAR_MONTHS_ABBR.index(month) + 1
-                for month in input_string.split(",")
-            ]
+            month_list = [_CALENDAR_MONTHS_ABBR.index(month) + 1 for month in input_string.split(",")]
 
         return {"bymonth": month_list}
 
@@ -273,8 +260,8 @@ class Source:
             end_year = start_year
 
         return {
-            "dtstart": datetime(start_year, 1, 1, tzinfo=timezone.utc),
-            "until": datetime(end_year, 12, 31, tzinfo=timezone.utc),
+            "dtstart": datetime(start_year, 1, 1, tzinfo=UTC),
+            "until": datetime(end_year, 12, 31, tzinfo=UTC),
         }
 
     def _parse_part(self, part):
@@ -319,9 +306,7 @@ class Source:
         return {"byweekno": week_nos}
 
     def _has_date_list(self, input_string):
-        return bool(
-            re.search(r"^(\d{4} \w+ \d{1,2}),(\d{4} \w+ \d{1,2})", input_string)
-        )
+        return bool(re.search(r"^(\d{4} \w+ \d{1,2}),(\d{4} \w+ \d{1,2})", input_string))
 
     def _extract_date_list(self, input_string):
         """Split a string containing a date list such as "2024 Jan 01,2024 May 12".
@@ -336,9 +321,7 @@ class Source:
         raise ValueError(f"Invalid date range: {input_string}")
 
     def _has_date_range(self, input_string):
-        return bool(
-            re.search(r"^(\d{4} \w+ \d{1,2})-(\d{4} \w+ \d{1,2})", input_string)
-        )
+        return bool(re.search(r"^(\d{4} \w+ \d{1,2})-(\d{4} \w+ \d{1,2})", input_string))
 
     def _extract_date_range(self, input_string):
         """Split a string containing a date range such as "2024 Jan 01-2024 May 12".
@@ -354,26 +337,18 @@ class Source:
 
     def _parse_date_range(self, input_string):
         """Parse a date range such as "2024 Jan 01-2024 May 12" and return the corresponding kwargs to rrule constructor."""
-        start_date = datetime.strptime(
-            input_string.split("-")[0], "%Y %b %d"
-        ).astimezone(timezone.utc)
-        end_date = datetime.strptime(input_string.split("-")[1], "%Y %b %d").astimezone(
-            timezone.utc
-        )
+        start_date = datetime.strptime(input_string.split("-")[0], "%Y %b %d").astimezone(UTC)
+        end_date = datetime.strptime(input_string.split("-")[1], "%Y %b %d").astimezone(UTC)
         return {"dtstart": start_date, "until": end_date}
 
     def _parse_regular(self, schedule):
         """Parse the 'opening_hours' from the input dictionary and return an rruleset object."""
         opening_hours = schedule["opening_hours"]
-        start_at = (
-            datetime.strptime(schedule["start_at"], "%Y-%m-%dT%H:%M:%S.%f%z")
-            if schedule["start_at"]
-            else None
-        )
+        start_at = datetime.strptime(schedule["start_at"], "%Y-%m-%dT%H:%M:%S.%f%z") if schedule["start_at"] else None
         if schedule["end_at"]:
             end_at = datetime.strptime(schedule["end_at"], "%Y-%m-%dT%H:%M:%S.%f%z")
         else:
-            end_at = datetime.now(timezone.utc) + timedelta(days=365)
+            end_at = datetime.now(UTC) + timedelta(days=365)
 
         rule_set = rruleset()
 
@@ -383,12 +358,8 @@ class Source:
         time_start, time_end = None, None
         if time_match:
             time_start, time_end = time_match.groups()
-            opening_hours = opening_hours.replace(
-                f"{time_start}-{time_end}", ""
-            ).strip()
-            start_hour, start_minute, end_hour, end_minute = self._parse_hours(
-                time_start, time_end
-            )
+            opening_hours = opening_hours.replace(f"{time_start}-{time_end}", "").strip()
+            start_hour, start_minute, end_hour, end_minute = self._parse_hours(time_start, time_end)
         else:
             # Missing opening_hours start time, default to midnight
             start_hour, start_minute = 0, 0
@@ -403,10 +374,7 @@ class Source:
 
         # Weekdays extraction
         weekday_pattern = r"(Mo|Tu|We|Th|Fr|Sa|Su)"
-        weekdays = [
-            _CALENDAR_DAY_VERY_ABBR[day]
-            for day in re.findall(weekday_pattern, opening_hours)
-        ]
+        weekdays = [_CALENDAR_DAY_VERY_ABBR[day] for day in re.findall(weekday_pattern, opening_hours)]
 
         # Construct RRULE
         if weeks:

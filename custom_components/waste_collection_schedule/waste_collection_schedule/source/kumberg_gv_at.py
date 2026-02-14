@@ -46,9 +46,7 @@ class Source:
             for date_, bin_type in self._ics.convert(r.text):
                 # remove time like "7.00 - 9.30 Uhr" from bin_type
                 if re.search(r"\d{1,2}\.\d{2} - \d{1,2}\.\d{2} Uhr", bin_type):
-                    bin_type = re.sub(
-                        r"\d{1,2}\.\d{2} - \d{1,2}\.\d{2} Uhr", "", bin_type
-                    ).strip()
+                    bin_type = re.sub(r"\d{1,2}\.\d{2} - \d{1,2}\.\d{2} Uhr", "", bin_type).strip()
 
                 icon = ICON_MAP.get(bin_type)
                 collections.append(Collection(date_, bin_type, icon))

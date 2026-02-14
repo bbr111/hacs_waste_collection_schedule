@@ -115,7 +115,5 @@ class Source:
 
         entries = []
         for d in dates:
-            entries.append(
-                Collection(d[0], d[1].strip(), ICON_MAP.get(d[1].split(" ")[0]))
-            )
+            entries.append(Collection(d[0], d[1].strip(), ICON_MAP.get(d[1].split(" ")[0])))
         return entries

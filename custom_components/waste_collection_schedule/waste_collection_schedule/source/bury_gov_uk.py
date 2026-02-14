@@ -57,19 +57,14 @@ class Source:
                 errors.append("postcode")
             else:
                 errors = ["postcode", "address", "id"]
-            raise SourceArgumentExceptionMultiple(
-                errors, "specify postcode and address or just id"
-            )
+            raise SourceArgumentExceptionMultiple(errors, "specify postcode and address or just id")
 
         self._id = str(id).zfill(6) if id is not None else None
         self._postcode = postcode
         self._address = address
 
     def compare_address(self, address) -> bool:
-        return (
-            self._address.replace(",", "").replace(" ", "").upper()
-            == address.replace(",", "").replace(" ", "").upper()
-        )
+        return self._address.replace(",", "").replace(" ", "").upper() == address.replace(",", "").replace(" ", "").upper()
 
     def get_id(self, s):
         url = "https://www.bury.gov.uk/app-services/getProperties"
@@ -111,9 +106,7 @@ class Source:
         entries = []
         for bin_name, bin_info in data["response"]["bins"].items():
             # Remove the ordinal suffix from the date string
-            date_str_without_suffix = re.sub(
-                ordinal_suffix_pattern, "", bin_info["nextCollection"]
-            )
+            date_str_without_suffix = re.sub(ordinal_suffix_pattern, "", bin_info["nextCollection"])
 
             entries.append(
                 Collection(

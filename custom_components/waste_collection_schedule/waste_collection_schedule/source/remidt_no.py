@@ -43,9 +43,7 @@ class Source:
         for disposal in disposals:
             entries.append(
                 Collection(
-                    date=datetime.datetime.fromisoformat(
-                        disposal["date"]
-                    ).date(),  # Collection date
+                    date=datetime.datetime.fromisoformat(disposal["date"]).date(),  # Collection date
                     t=disposal["fraction"],  # Collection type
                     icon=ICON_MAP.get(disposal["fraction"]),  # Collection icon
                 )

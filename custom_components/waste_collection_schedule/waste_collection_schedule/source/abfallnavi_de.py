@@ -2,9 +2,7 @@ from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 from waste_collection_schedule.service.AbfallnaviDe import SERVICE_DOMAINS, AbfallnaviDe
 
 TITLE = "AbfallNavi (RegioIT.de)"
-DESCRIPTION = (
-    "Source for AbfallNavi waste collection. AbfallNavi is a brand name of regioit.de."
-)
+DESCRIPTION = "Source for AbfallNavi waste collection. AbfallNavi is a brand name of regioit.de."
 URL = "https://www.regioit.de"
 
 
@@ -76,9 +74,7 @@ class Source:
         self._api = AbfallnaviDe(service)
         self._ort = ort
         self._strasse = strasse
-        self._hausnummer = (
-            str(hausnummer) if isinstance(hausnummer, int) else hausnummer
-        )
+        self._hausnummer = str(hausnummer) if isinstance(hausnummer, int) else hausnummer
 
     def fetch(self):
         dates = self._api.get_dates(self._ort, self._strasse, self._hausnummer)

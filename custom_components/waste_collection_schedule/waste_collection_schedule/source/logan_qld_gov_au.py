@@ -29,7 +29,9 @@ TEST_CASES = {
 HEADERS = {"user-agent": "Mozilla/5.0"}
 
 API_URL = "https://services-ap1.arcgis.com/nHQ8JHPrW0Z3aeN4/arcgis/rest/services/Council_Property_view/FeatureServer/0/query"
-FALLBACK_API_URL = "https://services5.arcgis.com/ZUCWDRj8F77Xo351/arcgis/rest/services/Logan_City_Bin_Collection/FeatureServer/0/query"
+FALLBACK_API_URL = (
+    "https://services5.arcgis.com/ZUCWDRj8F77Xo351/arcgis/rest/services/Logan_City_Bin_Collection/FeatureServer/0/query"
+)
 
 
 class Source:
@@ -48,9 +50,7 @@ class Source:
         if data["features"]:
             collection_day = data["features"][0]["attributes"]["Rubbish_Collection"]
             recycling_week = data["features"][0]["attributes"]["Recycling_Collection"]
-            green_waste_week = data["features"][0]["attributes"][
-                "Green_Waste_Collection"
-            ]
+            green_waste_week = data["features"][0]["attributes"]["Green_Waste_Collection"]
         else:
             # Fall back to old API
             r = requests.get(
@@ -93,32 +93,18 @@ class Source:
             collection_date = next_collection_date + timedelta(weeks=x)
             week = collection_date.isocalendar().week % 2
 
-            entries.append(
-                Collection(date=collection_date, t="Rubbish", icon="mdi:trash-can")
-            )
+            entries.append(Collection(date=collection_date, t="Rubbish", icon="mdi:trash-can"))
 
             # Check if Recycling Bin Collected
             if recycling_week != "":
                 # Check if Recycling Week
-                if (recycling_week == "Week 1" and week == 1) or (
-                    recycling_week == "Week 2" and week == 0
-                ):
-                    entries.append(
-                        Collection(
-                            date=collection_date, t="Recycling", icon="mdi:recycle"
-                        )
-                    )
+                if (recycling_week == "Week 1" and week == 1) or (recycling_week == "Week 2" and week == 0):
+                    entries.append(Collection(date=collection_date, t="Recycling", icon="mdi:recycle"))
 
             # Check if Green Waste Bin Collected
             if green_waste_week is not None:
                 # Check if Green Waste Week
-                if (green_waste_week == "Week 1" and week == 1) or (
-                    green_waste_week == "Week 2" and week == 0
-                ):
-                    entries.append(
-                        Collection(
-                            date=collection_date, t="Green Waste", icon="mdi:leaf"
-                        )
-                    )
+                if (green_waste_week == "Week 1" and week == 1) or (green_waste_week == "Week 2" and week == 0):
+                    entries.append(Collection(date=collection_date, t="Green Waste", icon="mdi:leaf"))
 
         return entries

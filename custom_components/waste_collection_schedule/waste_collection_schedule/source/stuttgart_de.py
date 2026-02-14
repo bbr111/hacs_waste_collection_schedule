@@ -115,15 +115,13 @@ class Source:
             ("calendar[street]", self._street),
             ("calendar[streetnr]", self._streetnr),
             ("calendar[datefrom]", now.strftime("%d.%m.%Y")),
-            ("calendar[dateto]", f"31.01.{now.year+1}"),
+            ("calendar[dateto]", f"31.01.{now.year + 1}"),
         ]
         for w in wastetypes.value:
             args.append(("calendar[wastetype][]", w))
         args.append(("calendar[submit]", ""))
 
-        r = requests.post(
-            "https://service.stuttgart.de/lhs-services/aws/abfuhrtermine", data=args
-        )
+        r = requests.post("https://service.stuttgart.de/lhs-services/aws/abfuhrtermine", data=args)
         entries_parser = TableParser()
         entries_parser.feed(r.text)
         return entries_parser.entries

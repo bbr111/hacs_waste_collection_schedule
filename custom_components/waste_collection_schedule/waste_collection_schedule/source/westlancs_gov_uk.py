@@ -69,15 +69,11 @@ class Source:
                 break
 
         if not selected_link:
-            raise Exception(
-                f"No address found with UPRN {self._uprn} for postcode {self._postcode}"
-            )
+            raise Exception(f"No address found with UPRN {self._uprn} for postcode {self._postcode}")
 
         # Parse the __doPostBack parameters
         onclick = selected_link.get("href", "")
-        match = re.search(
-            r"__doPostBack\s*\(\s*'([^']+)'\s*,\s*'([^']+)'\s*\)", onclick
-        )
+        match = re.search(r"__doPostBack\s*\(\s*'([^']+)'\s*,\s*'([^']+)'\s*\)", onclick)
         if not match:
             raise Exception(f"Could not parse address link: {onclick}")
 

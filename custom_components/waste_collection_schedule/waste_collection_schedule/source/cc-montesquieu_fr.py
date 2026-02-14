@@ -74,9 +74,7 @@ class Source:
         self.commune = commune
 
         if self.commune not in COMMUNES:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "Commune", self.commune, COMMUNES
-            )
+            raise SourceArgumentNotFoundWithSuggestions("Commune", self.commune, COMMUNES)
 
     def get_parsed_source(self) -> BeautifulSoup:
         s = requests.Session()
@@ -111,9 +109,7 @@ class Source:
                     )
                 )
 
-        global_planning2 = self.get_planning_table_dechets_verts_et_encombrants(
-            parsed_source
-        )
+        global_planning2 = self.get_planning_table_dechets_verts_et_encombrants(parsed_source)
         city_planning2 = global_planning2[self.commune]
 
         for bin_type in city_planning2.keys():
@@ -127,9 +123,7 @@ class Source:
                 )
         return entries
 
-    def get_planning_table(
-        self, parsed_source: BeautifulSoup
-    ) -> dict[str, dict[str, str]]:
+    def get_planning_table(self, parsed_source: BeautifulSoup) -> dict[str, dict[str, str]]:
         tables = parsed_source.select("table")
 
         planning: dict[str, dict[str, str]] = {}
@@ -158,9 +152,7 @@ class Source:
             for row in table_rows:
                 td = row.find_all("td")
                 if td:
-                    villes = [
-                        ville.text.strip() for ville in td[0].find_all(string=True)
-                    ]
+                    villes = [ville.text.strip() for ville in td[0].find_all(string=True)]
                     parsed_dates = [
                         # dateparser.parse(date.text.strip(), languages=["fr"]).date()
                         self.convert_date(date.text.strip())

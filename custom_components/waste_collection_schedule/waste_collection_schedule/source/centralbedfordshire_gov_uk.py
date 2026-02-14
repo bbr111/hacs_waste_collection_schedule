@@ -9,9 +9,7 @@ from waste_collection_schedule.exceptions import (
 )
 
 TITLE = "Central Bedfordshire Council"
-DESCRIPTION = (
-    "Source for www.centralbedfordshire.gov.uk services for Central Bedfordshire"
-)
+DESCRIPTION = "Source for www.centralbedfordshire.gov.uk services for Central Bedfordshire"
 URL = "https://www.centralbedfordshire.gov.uk"
 TEST_CASES = {
     "postcode has space": {"postcode": "SG15 6YF", "house_name": "10 Old School Walk"},
@@ -74,15 +72,11 @@ class Source:
 
             # Check if we got blocked or redirected
             if "403" in r.text or "forbidden" in r.text.lower():
-                raise requests.exceptions.HTTPError(
-                    "403 Forbidden - IP may be temporarily blocked"
-                )
+                raise requests.exceptions.HTTPError("403 Forbidden - IP may be temporarily blocked")
 
             address_select = soup.find("select", id="address")
             if not address_select:
-                raise ValueError(
-                    "Could not find address selection dropdown - page structure may have changed"
-                )
+                raise ValueError("Could not find address selection dropdown - page structure may have changed")
 
             address = address_select.find(
                 "option",
@@ -90,10 +84,7 @@ class Source:
             )
 
             if address is None:
-                addresses = {
-                    option.text.removeprefix(self._postcode)
-                    for option in address_select.select("option")
-                } - {""}
+                addresses = {option.text.removeprefix(self._postcode) for option in address_select.select("option")} - {""}
                 raise SourceArgumentNotFoundWithSuggestions(
                     "house_name",
                     self._house_name,
@@ -118,9 +109,7 @@ class Source:
             collections_div = soup.find("div", id="collections")
 
             if not collections_div:
-                raise ValueError(
-                    "Could not find collections data - page structure may have changed"
-                )
+                raise ValueError("Could not find collections data - page structure may have changed")
 
             s = collections_div.find_all("h3")
             entries = []
@@ -129,18 +118,9 @@ class Source:
                 try:
                     date = datetime.strptime(collection.text, "%A, %d %B %Y").date()
                     for sibling in collection.next_siblings:
-                        if (
-                            sibling.name == "h3"
-                            or sibling.name == "p"
-                            or sibling.name == "a"
-                            or sibling.name == "div"
-                        ):
+                        if sibling.name == "h3" or sibling.name == "p" or sibling.name == "a" or sibling.name == "div":
                             break
-                        if (
-                            sibling.name != "br"
-                            and hasattr(sibling, "text")
-                            and sibling.text.strip()
-                        ):
+                        if sibling.name != "br" and hasattr(sibling, "text") and sibling.text.strip():
                             entries.append(
                                 Collection(
                                     date=date,

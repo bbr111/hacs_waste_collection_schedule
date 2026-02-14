@@ -1,17 +1,15 @@
 from datetime import datetime
-from typing import List
 
 from waste_collection_schedule import Collection
 from waste_collection_schedule.exceptions import (
     SourceArgumentNotFoundWithSuggestions,
 )
+
 # Include work around for SSL UNSAFE_LEGACY_RENEGOTIATION_DISABLED error
 from waste_collection_schedule.service.SSLError import get_legacy_session
 
 TITLE = "Bath & North East Somerset Council"
-DESCRIPTION = (
-    "Source for bathnes.gov.uk services for Bath & North East Somerset Council"
-)
+DESCRIPTION = "Source for bathnes.gov.uk services for Bath & North East Somerset Council"
 URL = "https://bathnes.gov.uk"
 TEST_CASES = {
     "uprn": {"uprn": "10001138699"},
@@ -32,15 +30,13 @@ class Source:
         self._housenameornumber = str(housenameornumber)
         self._uprn = uprn
 
-    def fetch(self) -> List[Collection]:
+    def fetch(self) -> list[Collection]:
         session = get_legacy_session()
 
         if self._uprn is None:
             self._uprn = self.get_uprn(session)
 
-        info = session.get(
-            f"https://www.bathnes.gov.uk/webapi/api/BinsAPI/v2/getbartecroute/{self._uprn}/true"
-        ).json()
+        info = session.get(f"https://www.bathnes.gov.uk/webapi/api/BinsAPI/v2/getbartecroute/{self._uprn}/true").json()
 
         entries = []
         for type, props in TYPES.items():
@@ -50,9 +46,7 @@ class Source:
 
                 entries.append(
                     Collection(
-                        date=datetime.fromisoformat(
-                            info[f"{type}{dateType}Date"]
-                        ).date(),
+                        date=datetime.fromisoformat(info[f"{type}{dateType}Date"]).date(),
                         t=props["alias"],
                         icon=props["icon"],
                     )

@@ -94,9 +94,7 @@ class Source:
             html_collections = collections_request.content
 
         bin_collections = bs4.BeautifulSoup(html_collections, "html.parser")
-        containers = bin_collections.find_all(
-            "div", {"class": "bin-collection-listing-row row"}
-        )
+        containers = bin_collections.find_all("div", {"class": "bin-collection-listing-row row"})
 
         entries = []
 
@@ -117,8 +115,6 @@ class Source:
             if waste_type.startswith("Garden waste"):
                 waste_type = "Garden"
 
-            entries.append(
-                Collection(t=waste_type, date=waste_date, icon=ICON_MAP.get(waste_type))
-            )
+            entries.append(Collection(t=waste_type, date=waste_date, icon=ICON_MAP.get(waste_type)))
 
         return entries

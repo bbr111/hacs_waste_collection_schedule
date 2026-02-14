@@ -6,9 +6,7 @@ from bs4 import BeautifulSoup
 from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 
 TITLE = "Newcastle Under Lyme Borough Council"
-DESCRIPTION = (
-    "Source for waste collection services for Newcastle Under Lyme Borough Council"
-)
+DESCRIPTION = "Source for waste collection services for Newcastle Under Lyme Borough Council"
 URL = "https://www.newcastle-staffs.gov.uk"
 TEST_CASES = {
     "Test_001": {"uprn": 100031744129},
@@ -63,13 +61,7 @@ class Source:
                     if (dt - today) < timedelta(days=-31):
                         dt = dt.replace(year=dt.year + 1)
                 else:
-                    bins = (
-                        str(cell)
-                        .replace("\n", "")
-                        .replace("<td>", "")
-                        .replace("</td>", "")
-                        .split("<br/>")
-                    )
+                    bins = str(cell).replace("\n", "").replace("<td>", "").replace("</td>", "").split("<br/>")
                     for bin in bins[:-1]:
                         schedule.append([dt, bin.strip()])
 

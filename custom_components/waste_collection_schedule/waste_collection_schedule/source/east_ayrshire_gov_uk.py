@@ -40,9 +40,7 @@ class Source:
                 Collection(
                     date=parser.parse(bins["datetime"]).date(),
                     t=bins.select_one("span.ScheduleItem").get_text().strip(),
-                    icon=ICON_MAP.get(
-                        bins.select_one("span.ScheduleItem").get_text().strip()
-                    ),
+                    icon=ICON_MAP.get(bins.select_one("span.ScheduleItem").get_text().strip()),
                 )
             )
         return entries

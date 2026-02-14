@@ -1,6 +1,6 @@
 import json
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import requests
 from waste_collection_schedule import Collection  # type: ignore[attr-defined]
@@ -67,22 +67,14 @@ class Source:
             (
                 item
                 for item in data
-                if item["name"] == self._street
-                and item["plz"] == self._postcode
-                and item["place"] == self._city
+                if item["name"] == self._street and item["plz"] == self._postcode and item["place"] == self._city
             ),
             None,
         )
 
         if street_entry is None:
-            suggestions = [
-                item["name"]
-                for item in data
-                if item["plz"] == self._postcode and item["place"] == self._city
-            ]
-            raise SourceArgumentNotFoundWithSuggestions(
-                "street", self._street, suggestions=suggestions
-            )
+            suggestions = [item["name"] for item in data if item["plz"] == self._postcode and item["place"] == self._city]
+            raise SourceArgumentNotFoundWithSuggestions("street", self._street, suggestions=suggestions)
 
         params = {"StreetId": street_entry["id"]}
         r = requests.get(
@@ -96,28 +88,18 @@ class Source:
             raise SourceArgumentNotFound("house_number", self._house_number)
 
         house_number_entry = next(
-            (
-                item
-                for item in data
-                if f"{item['houseNr']}{item['houseNrAdd']}" == self._house_number
-            ),
+            (item for item in data if f"{item['houseNr']}{item['houseNrAdd']}" == self._house_number),
             None,
         )
 
         if house_number_entry is None:
             suggestions = [f"{item['houseNr']}{item['houseNrAdd']}" for item in data]
-            raise SourceArgumentNotFoundWithSuggestions(
-                "house_number", self._house_number, suggestions=suggestions
-            )
+            raise SourceArgumentNotFoundWithSuggestions("house_number", self._house_number, suggestions=suggestions)
 
         # get ics file
         params = {
-            "von": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]
-            + "Z",
-            "bis": (datetime.now(timezone.utc) + timedelta(days=365)).strftime(
-                "%Y-%m-%dT%H:%M:%S.%f"
-            )[:-3]
-            + "Z",
+            "von": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z",
+            "bis": (datetime.now(UTC) + timedelta(days=365)).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z",
             "benachrichtigungVorJederAbholung": False,
             "abholbenachrichtigungTageVorher": 1,
             "abholbenachrichtigungUhrzeit": {

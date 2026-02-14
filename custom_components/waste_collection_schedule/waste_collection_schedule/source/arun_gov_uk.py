@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import List
 
 import bs4
 import requests
@@ -27,11 +26,9 @@ class Source:
         self._address = address
 
     def _get_gds_error(self, soup: bs4.BeautifulSoup) -> str:
-        return soup.find("div", {"class": "govuk-error-summary__body"}).get_text(
-            strip=True
-        )
+        return soup.find("div", {"class": "govuk-error-summary__body"}).get_text(strip=True)
 
-    def fetch(self) -> List[Collection]:
+    def fetch(self) -> list[Collection]:
         if self._postcode is None or self._address is None:
             raise ValueError("Either postcode or address is None")
 
@@ -64,18 +61,12 @@ class Source:
             try:
                 error_summary = self._get_gds_error(addresses)
             except (AttributeError, Exception) as e:
-                raise Exception(
-                    "An unexpected error occurred while fetching addresses"
-                ) from e
+                raise Exception("An unexpected error occurred while fetching addresses") from e
             raise ValueError(error_summary)
 
         options = addresses_select.find_all("option")[1:]
         try:
-            found_address = next(
-                address
-                for address in options
-                if self._address.upper() in address.get_text().upper()
-            )
+            found_address = next(address for address in options if self._address.upper() in address.get_text().upper())
         except StopIteration as e:
             raise SourceArgumentNotFoundWithSuggestions(
                 argument="address",
@@ -106,9 +97,7 @@ class Source:
                 icon = ICON_MAP.get(bin_type)
                 html_bin_date = bin_by_type.find_all("td")[0].get_text()  # DD/MM/YYYY
                 bin_date = datetime.strptime(html_bin_date, "%d/%m/%Y").date()
-                entries.setdefault(bin_date.strftime("%Y-%m-%d"), []).append(
-                    Collection(t=bin_type, date=bin_date, icon=icon)
-                )
+                entries.setdefault(bin_date.strftime("%Y-%m-%d"), []).append(Collection(t=bin_type, date=bin_date, icon=icon))
 
             # Ensure Rubbish collection is also added if only Recycling is present
             # For some postcodes, Arun Council only shows Recycling collection dates

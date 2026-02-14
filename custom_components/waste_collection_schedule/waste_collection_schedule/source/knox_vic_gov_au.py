@@ -44,9 +44,7 @@ class Source:
 
         session = requests.Session()
 
-        response = session.get(
-            "https://www.knox.vic.gov.au/our-services/bins-rubbish-and-recycling/find-my-bin-days"
-        )
+        response = session.get("https://www.knox.vic.gov.au/our-services/bins-rubbish-and-recycling/find-my-bin-days")
         response.raise_for_status()
 
         response = session.get(
@@ -55,10 +53,7 @@ class Source:
         )
         response.raise_for_status()
         addressSearchApiResults = response.json()
-        if (
-            not isinstance(addressSearchApiResults, list)
-            or len(addressSearchApiResults) < 1
-        ):
+        if not isinstance(addressSearchApiResults, list) or len(addressSearchApiResults) < 1:
             raise Exception(
                 f"Address search for '{self._street_address}' returned no results. Check your address on https://www.knox.vic.gov.au/our-services/bins-rubbish-and-recycling/find-my-bin-days"
             )
@@ -84,9 +79,7 @@ class Source:
         for key, value in rubbishCollectionApiResult.items():
             if key.endswith(dateString):
                 name = key.replace(dateString, "")
-                waste_type = (
-                    WASTE_TYPES[name].display_name if name in WASTE_TYPES else name
-                )
+                waste_type = WASTE_TYPES[name].display_name if name in WASTE_TYPES else name
                 date = extract_date(value)
                 icon = WASTE_TYPES[name].icon if name in WASTE_TYPES else None
                 entries.append(Collection(date=date, t=waste_type, icon=icon))

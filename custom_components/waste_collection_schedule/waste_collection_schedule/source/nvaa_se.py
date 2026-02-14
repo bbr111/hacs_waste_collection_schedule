@@ -15,9 +15,7 @@ FIND_ADDRESS_URL = f"{API_URL}findAddress"
 
 
 TEST_CASES = {
-    "Gustav Adolfs väg 24, Norrtälje": {
-        "street_address": "Gustav Adolfs väg 24, Norrtälje"
-    },
+    "Gustav Adolfs väg 24, Norrtälje": {"street_address": "Gustav Adolfs väg 24, Norrtälje"},
     "Rödhakestigen 1, Väddö": {"street_address": "Rödhakestigen 1, Väddö"},
 }
 
@@ -42,9 +40,7 @@ def parse_date(next_pickup_date):
     if result:
         # Parse week range format
         [start_week, _, year] = result.groups()
-        date_obj = datetime.strptime(
-            f"{int(year)}-W{int(start_week) - 1}-1", "%Y-W%W-%w"
-        ).date()
+        date_obj = datetime.strptime(f"{int(year)}-W{int(start_week) - 1}-1", "%Y-W%W-%w").date()
     elif next_pickup_date.startswith("v"):
         # Parse week format
         week_number = int(next_pickup_date[1:].split()[0])
@@ -113,11 +109,7 @@ class Source:
             next_pickup_date = service["next_collection"]
             date_obj = parse_date(next_pickup_date)
             if date_obj:
-                entries.append(
-                    Collection(
-                        date=date_obj, t=waste_type, icon=ICON_MAP.get(waste_type)
-                    )
-                )
+                entries.append(Collection(date=date_obj, t=waste_type, icon=ICON_MAP.get(waste_type)))
         return entries
 
     def fetch(self):

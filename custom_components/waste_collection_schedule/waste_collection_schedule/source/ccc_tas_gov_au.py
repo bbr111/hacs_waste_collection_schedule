@@ -69,12 +69,7 @@ def _process_results(results) -> list[Collection]:
 
     for bin_type, dates in collections.items():
         entries.extend(
-            [
-                Collection(
-                    date=collection_date, t=bin_type, icon=ICON_MAP[bin_type.upper()]
-                )
-                for collection_date in dates
-            ]
+            [Collection(date=collection_date, t=bin_type, icon=ICON_MAP[bin_type.upper()]) for collection_date in dates]
         )
     return entries
 
@@ -84,13 +79,11 @@ def _query_api(address: str) -> dict:
     session.headers.update({"content-type": "application/json"})
 
     address_search_data = {"address": address}
-    address_url = "%s/address-search" % URL
+    address_url = f"{URL}/address-search"
     address_result = session.post(address_url, json=address_search_data)
 
     if address_result.status_code != 200:
-        raise Exception(
-            "Could not complete address lookup %i" % address_result.status_code
-        )
+        raise Exception(f"Could not complete address lookup {address_result.status_code}")
 
     address_data = address_result.json()
 
@@ -100,11 +93,11 @@ def _query_api(address: str) -> dict:
     ccc_formatted_address = address_data["results"][0]
 
     collection_search_data = {"address": ccc_formatted_address}
-    collection_url = "%s/collection-search" % URL
+    collection_url = f"{URL}/collection-search"
     collections = session.post(collection_url, json=collection_search_data)
 
-    if address_result.status_code != 200:
-        raise Exception("Could not find collections")
+    if collections.status_code != 200:
+        raise Exception(f"Could not find collections {collections.status_code}")
 
     collections_result = collections.json()
 

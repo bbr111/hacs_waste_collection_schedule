@@ -1,5 +1,5 @@
 import datetime
-from typing import Mapping, Optional
+from collections.abc import Mapping
 
 import requests
 from bs4 import BeautifulSoup, Tag
@@ -55,9 +55,9 @@ HEADERS = {
 class Source:
     def __init__(
         self,
-        post_code: Optional[str] = None,
-        house: Optional[str] = None,
-        address: Optional[str] = None,
+        post_code: str | None = None,
+        house: str | None = None,
+        address: str | None = None,
     ):
         self._post_code = post_code
         self._house = house
@@ -65,9 +65,7 @@ class Source:
 
     def _find_address(self) -> str:
         if not self._post_code:
-            raise SourceArgumentRequired(
-                "post_code", "postcode is required if address is not provided"
-            )
+            raise SourceArgumentRequired("post_code", "postcode is required if address is not provided")
         term_list = [self._post_code]
         if self._house:
             term_list.append(self._house)
@@ -95,9 +93,7 @@ class Source:
         s = requests.Session()
         s.headers.update(HEADERS)
 
-        r = s.get(
-            "https://www.royalgreenwich.gov.uk/recycling-and-rubbish/bins-and-collections/black-top-bin-collections"
-        )
+        r = s.get("https://www.royalgreenwich.gov.uk/recycling-and-rubbish/bins-and-collections/black-top-bin-collections")
         r.raise_for_status()
 
         soup = BeautifulSoup(r.text, "html.parser")
@@ -113,20 +109,13 @@ class Source:
 
         # e.g. Monday 1 January to Friday 5 January
         first_week_dates_range_str: str = (
-            black_top_bin_schedule_table.find("tbody")
-            .find("tr")
-            .find_all("td")[week_column_index]
-            .text
+            black_top_bin_schedule_table.find("tbody").find("tr").find_all("td")[week_column_index].text
         )
 
-        first_week_date = parser.parse(
-            first_week_dates_range_str.split(" to ")[0]
-        ).date()
+        first_week_date = parser.parse(first_week_dates_range_str.split(" to ")[0]).date()
 
         # we assume that this "first_week_date" is always Monday (as per schedule)
-        first_week_collection_date = first_week_date + datetime.timedelta(
-            this_week_collection_date.isoweekday() - 1
-        )
+        first_week_collection_date = first_week_date + datetime.timedelta(this_week_collection_date.isoweekday() - 1)
         return (
             this_week_collection_date + datetime.timedelta(weeks=1)
             if (this_week_collection_date - first_week_collection_date).days % 14
@@ -137,18 +126,13 @@ class Source:
         s = requests.Session()
         s.headers.update(HEADERS)
 
-        r = s.get(
-            "https://www.royalgreenwich.gov.uk/recycling-and-rubbish/bins-and-collections/bank-holiday-collection-dates"
-        )
+        r = s.get("https://www.royalgreenwich.gov.uk/recycling-and-rubbish/bins-and-collections/bank-holiday-collection-dates")
         r.raise_for_status()
 
         soup = BeautifulSoup(r.text, "html.parser")
 
         bank_holiday_bin_collection_table = soup.find("table")
-        if (
-            not isinstance(bank_holiday_bin_collection_table, Tag)
-            or len(bank_holiday_bin_collection_table.find_all("th")) < 2
-        ):
+        if not isinstance(bank_holiday_bin_collection_table, Tag) or len(bank_holiday_bin_collection_table.find_all("th")) < 2:
             # skip generating bank holiday overrides if the table is empty or of invalid format
             return {}
 
@@ -159,11 +143,7 @@ class Source:
                 continue
 
             from_date = parser.parse(row_dates[0].text).date()
-            to_date = (
-                from_date
-                if row_dates[1].text == "Collection as usual"
-                else parser.parse(row_dates[1].text).date()
-            )
+            to_date = from_date if row_dates[1].text == "Collection as usual" else parser.parse(row_dates[1].text).date()
 
             result[from_date] = to_date
 
@@ -202,13 +182,9 @@ class Source:
 
         today = datetime.date.today()
         collection_day_index = DAYS.index(collection_day.upper()) + 1
-        this_week_collection_date = today + datetime.timedelta(
-            (collection_day_index - today.isoweekday()) % 7
-        )
+        this_week_collection_date = today + datetime.timedelta((collection_day_index - today.isoweekday()) % 7)
 
-        next_food_collection_date = self._get_black_top_bin_next_collection_date(
-            black_top_bin_week, this_week_collection_date
-        )
+        next_food_collection_date = self._get_black_top_bin_next_collection_date(black_top_bin_week, this_week_collection_date)
 
         bank_holiday_overrides = self._get_bank_holiday_overrides()
 

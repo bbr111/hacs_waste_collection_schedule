@@ -30,6 +30,7 @@ TEST_CASES = {
 #   "typeOfWasteDescription": "Matavfall"
 # }
 
+
 class Source:
     def __init__(self, street_address):
         self._street_address = street_address

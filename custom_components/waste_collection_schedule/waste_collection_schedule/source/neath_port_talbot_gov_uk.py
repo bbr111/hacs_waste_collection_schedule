@@ -1,14 +1,13 @@
 from __future__ import annotations
 
+import datetime
 import re
 from dataclasses import dataclass
-import datetime
-from dateutil import parser
 
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
+from dateutil import parser
 from waste_collection_schedule import Collection
-
 
 TITLE = "Neath Port Talbot Council"
 DESCRIPTION = "Source for waste collection services for Neath Port Talbot Council"
@@ -69,9 +68,7 @@ class FailedToFindTokensError(Exception): ...
 class FailedToFindCollections(Exception): ...
 
 
-_DAY_MONTH_RE = re.compile(
-    r"(?i)^\s*(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)\w*,?\s*(\d{1,2})\s*([A-Za-z]+)\s*$"
-)
+_DAY_MONTH_RE = re.compile(r"(?i)^\s*(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)\w*,?\s*(\d{1,2})\s*([A-Za-z]+)\s*$")
 
 
 @dataclass(frozen=True)
@@ -97,6 +94,7 @@ class Source:
 
     Finally, the waste collection schedule is parsed from the resulting HTML page.
     """
+
     _BASE_URL = f"{URL}bins-and-recycling/equipment-and-collections/bin-day-finder/"
     _HEADERS = {
         "User-Agent": "Mozilla/5.0",
@@ -121,7 +119,7 @@ class Source:
         fetch_addresses_payload = {
             **_base_post_payload(initial_request.text),
             "PostCode": self._postcode,
-            "action": "Find address"
+            "action": "Find address",
         }
         fetch_addresses_request = session.post(self._BASE_URL, data=fetch_addresses_payload, timeout=20)
         fetch_addresses_request.raise_for_status()
@@ -130,7 +128,7 @@ class Source:
         fetch_collections_payload = {
             **_base_post_payload(fetch_addresses_request.text),
             "Address": self._uprn,
-            "action": "Show my bin days"
+            "action": "Show my bin days",
         }
         fetch_collections_request = session.post(self._BASE_URL, data=fetch_collections_payload, timeout=20)
         fetch_collections_request.raise_for_status()
@@ -139,7 +137,7 @@ class Source:
         return _parse_collections_from_page_source(fetch_collections_request.text)
 
 
-def _base_post_payload(raw_html: str) -> dict[str, str]:
+def _base_post_payload(raw_html: str) -> dict[str, str | None]:
     tokens = _extract_tokens(raw_html)
     return {
         "__RequestVerificationToken": tokens.request_verification_token,
@@ -151,12 +149,18 @@ def _extract_tokens(raw_html: str) -> Tokens:
     soup = BeautifulSoup(raw_html, "html.parser")
 
     try:
-        request_verification_token = soup.find("input", {"name": "__RequestVerificationToken"})["value"]
+        token_element = soup.find("input", {"name": "__RequestVerificationToken"})
+        if token_element is None:
+            raise TypeError("__RequestVerificationToken element not found")
+        request_verification_token = str(token_element["value"]) if token_element.get("value") else None
     except TypeError as e:
         raise FailedToFindTokensError("Failed to find __RequestVerificationToken in HTML.") from e
 
     try:
-        ufprt = soup.find("input", {"name": "ufprt"})["value"]
+        ufprt_element = soup.find("input", {"name": "ufprt"})
+        if ufprt_element is None:
+            raise TypeError("ufprt element not found")
+        ufprt = str(ufprt_element["value"]) if ufprt_element.get("value") else None
     except TypeError as e:
         raise FailedToFindTokensError("Failed to find ufprt in HTML.") from e
 
@@ -170,6 +174,9 @@ def _parse_collections_from_page_source(raw_html: str) -> list[Collection]:
     soup = BeautifulSoup(raw_html, "html.parser")
     root = soup.find(id="contentInner")
 
+    if root is None:
+        raise FailedToFindCollections("Could not find contentInner element on page.")
+
     # Find all date headers (they are <h2> containing e.g. "Thursday, 23 October").
     headers = [h for h in root.find_all("h2") if _DAY_MONTH_RE.match(_clean_text(h.get_text()))]
 
@@ -178,6 +185,9 @@ def _parse_collections_from_page_source(raw_html: str) -> list[Collection]:
         collection_date = _collection_date_from_header(h2.get_text())
 
         for sib in h2.next_siblings:
+            if not isinstance(sib, Tag):
+                continue
+
             name = sib.name
             if not name:
                 continue

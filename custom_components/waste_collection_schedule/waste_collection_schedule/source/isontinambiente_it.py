@@ -60,11 +60,7 @@ class Source:
         calendars = soup.select("table.calendar")
 
         collections = []
-        for (
-            calendar
-        ) in (
-            calendars
-        ):  # Probably only one but just in case there are more at the end of a month
+        for calendar in calendars:  # Probably only one but just in case there are more at the end of a month
             prev_sibling = calendar.find_previous_sibling()
             if not isinstance(prev_sibling, Tag):
                 raise Exception("Cannot find calendar header")
@@ -80,7 +76,7 @@ class Source:
             try:
                 year = int(year_str)
             except ValueError:
-                raise Exception(f"Cannot parse year: {year_str}")
+                raise Exception(f"Cannot parse year: {year_str}") from header
 
             legend = calendar.find_next_sibling()
             if not isinstance(legend, Tag):

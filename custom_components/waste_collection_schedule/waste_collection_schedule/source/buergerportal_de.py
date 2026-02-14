@@ -1,7 +1,7 @@
 import re
 from dataclasses import dataclass
-from datetime import date, datetime, timezone
-from typing import List, Literal, Optional, TypedDict, Union
+from datetime import UTC, date, datetime
+from typing import Literal, TypedDict
 
 import requests
 from waste_collection_schedule import Collection  # type: ignore[attr-defined]
@@ -117,13 +117,13 @@ PARAM_TRANSLATIONS = {
 class CollectionEntry:
     date: date
     waste_type: str
-    icon: Optional[str]
+    icon: str | None
 
     def export(self) -> Collection:
         return Collection(self.date, self.waste_type, self.icon)
 
 
-def quote_none(value: Optional[str]) -> str:
+def quote_none(value: str | None) -> str:
     if value is None:
         return "null"
 
@@ -140,8 +140,8 @@ class Source:
         operator: Operator,
         district: str,
         street: str,
-        subdistrict: Optional[str] = None,
-        number: Union[int, str, None] = None,
+        subdistrict: str | None = None,
+        number: int | str | None = None,
         show_volume: bool = False,
     ):
         self.api_url = get_api_map()[operator]
@@ -168,12 +168,8 @@ class Source:
             "jahr": year,
         }
         if not new_params:
-            params["$expand"] = (
-                "Abfuhrplan,Abfuhrplan/GefaesstarifArt/Abfallart,Abfuhrplan/GefaesstarifArt/Volumen"
-            )
-            params["$orderby"] = (
-                "Abfuhrplan/GefaesstarifArt/Abfallart/Name,Abfuhrplan/GefaesstarifArt/Volumen/VolumenWert"
-            )
+            params["$expand"] = "Abfuhrplan,Abfuhrplan/GefaesstarifArt/Abfallart,Abfuhrplan/GefaesstarifArt/Volumen"
+            params["$orderby"] = "Abfuhrplan/GefaesstarifArt/Abfallart/Name,Abfuhrplan/GefaesstarifArt/Volumen/VolumenWert"
 
         if self.number:
             params["hausNr"] = (f"'{self.number}'",)
@@ -193,14 +189,10 @@ class Source:
         street_id = self.fetch_street_id(session, district_id)
         # Eventually verify house number in the future
 
-        res = self._do_fetch_request(
-            session, district_id, street_id, year, self.new_params
-        )
+        res = self._do_fetch_request(session, district_id, street_id, year, self.new_params)
         if res.status_code == 500:
             self.new_params = not self.new_params
-            res = self._do_fetch_request(
-                session, district_id, street_id, year, self.new_params
-            )
+            res = self._do_fetch_request(session, district_id, street_id, year, self.new_params)
 
         res.raise_for_status()
         payload: CollectionsRes = res.json()
@@ -210,10 +202,8 @@ class Source:
         for collection in payload["d"]:
             if date_match := re.search(date_regex, collection["Termin"]):
                 timestamp = float(date_match.group())
-                date_ = datetime.fromtimestamp(timestamp / 1000, timezone.utc).date()
-                waste_type = collection["Abfuhrplan"]["GefaesstarifArt"]["Abfallart"][
-                    "Name"
-                ]
+                date_ = datetime.fromtimestamp(timestamp / 1000, UTC).date()
+                waste_type = collection["Abfuhrplan"]["GefaesstarifArt"]["Abfallart"]["Name"]
                 icon = None
 
                 for icon_type, tested_icon in ICON_MAP.items():
@@ -221,19 +211,13 @@ class Source:
                         icon = tested_icon
 
                 if self.show_volume:
-                    volume = int(
-                        collection["Abfuhrplan"]["GefaesstarifArt"]["Volumen"][
-                            "VolumenWert"
-                        ]
-                    )
+                    volume = int(collection["Abfuhrplan"]["GefaesstarifArt"]["Volumen"]["VolumenWert"])
                     waste_type = f"{waste_type} ({volume} l)"
 
                 entries.add(CollectionEntry(date_, waste_type, icon))
 
         if len(entries) == 0:
-            raise ValueError(
-                "No collections found! Please verify that your configuration is correct."
-            )
+            raise ValueError("No collections found! Please verify that your configuration is correct.")
 
         return [entry.export() for entry in entries]
 
@@ -249,34 +233,25 @@ class Source:
             return next(
                 entry["OrteId"]
                 for entry in payload["d"]
-                if entry["Ortsname"] == self.district
-                and entry["Ortsteilname"] == self.subdistrict
+                if entry["Ortsname"] == self.district and entry["Ortsteilname"] == self.subdistrict
             )
         except StopIteration:
             district_match = next(
-                (
-                    entry["OrteId"]
-                    for entry in payload["d"]
-                    if entry["Ortsname"] == self.district
-                ),
+                (entry["OrteId"] for entry in payload["d"] if entry["Ortsname"] == self.district),
                 None,
             )
             if district_match:
                 raise SourceArgumentNotFoundWithSuggestions(
                     "subdistrict",
                     self.subdistrict,
-                    [
-                        entry["Ortsteilname"]
-                        for entry in payload["d"]
-                        if entry["Ortsname"] == self.district
-                    ],
-                )
+                    [entry["Ortsteilname"] for entry in payload["d"] if entry["Ortsname"] == self.district],
+                ) from None
             else:
                 raise SourceArgumentNotFoundWithSuggestions(
                     "district",
                     self.district,
                     {entry["Ortsname"] for entry in payload["d"]},
-                )
+                ) from None
 
     def fetch_street_id(self, session: requests.Session, district_id: int):
         res = session.get(
@@ -291,15 +266,11 @@ class Source:
         payload: StreetsRes = res.json()
 
         try:
-            return next(
-                entry["StrassenId"]
-                for entry in payload["d"]
-                if entry["Name"] == self.street
-            )
+            return next(entry["StrassenId"] for entry in payload["d"] if entry["Name"] == self.street)
         except StopIteration:
             raise SourceArgumentNotFoundWithSuggestions(
                 "street", self.street, [entry["Name"] for entry in payload["d"]]
-            )
+            ) from None
 
 
 # Typed dictionaries for the API
@@ -309,11 +280,11 @@ class Source:
 class DistrictRes(TypedDict):
     OrteId: int
     Ortsname: str
-    Ortsteilname: Optional[str]
+    Ortsteilname: str | None
 
 
 class DistrictsRes(TypedDict):
-    d: List[DistrictRes]
+    d: list[DistrictRes]
 
 
 class StreetRes(TypedDict):
@@ -323,7 +294,7 @@ class StreetRes(TypedDict):
 
 
 class StreetsRes(TypedDict):
-    d: List[StreetRes]
+    d: list[StreetRes]
 
 
 class Capacity(TypedDict):
@@ -372,4 +343,4 @@ class CollectionRes(TypedDict):
 
 
 class CollectionsRes(TypedDict):
-    d: List[CollectionRes]
+    d: list[CollectionRes]

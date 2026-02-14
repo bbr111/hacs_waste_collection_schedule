@@ -26,14 +26,10 @@ class Source:
 
     def fetch(self):
         s = requests.Session()
-        r = s.get(
-            f"https://estates7.warwickdc.gov.uk/PropertyPortal/Property/Recycling/{self._uprn}"
-        )
+        r = s.get(f"https://estates7.warwickdc.gov.uk/PropertyPortal/Property/Recycling/{self._uprn}")
         soup = BeautifulSoup(r.text, "html.parser")
 
-        infoboxes = soup.findAll(
-            "div", {"class": "col-xs-12 text-center waste-dates margin-bottom-15"}
-        )
+        infoboxes = soup.findAll("div", {"class": "col-xs-12 text-center waste-dates margin-bottom-15"})
 
         entries = []
         for box in infoboxes:

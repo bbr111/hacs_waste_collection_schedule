@@ -19,9 +19,7 @@ DESCRIPTION = "Source for City of Wanneroo."
 URL = "https://www.wanneroo.wa.gov.au/"
 TEST_CASES = {
     "23 Bakana Loop LANDSDALE": {"address": "23 Bakana Loop LANDSDALE"},
-    "13/26 Princeton Circle ALEXANDER HEIGHTS": {
-        "address": "13/26 Princeton Circle ALEXANDER HEIGHTS"
-    },
+    "13/26 Princeton Circle ALEXANDER HEIGHTS": {"address": "13/26 Princeton Circle ALEXANDER HEIGHTS"},
 }
 
 
@@ -37,9 +35,7 @@ MAP_SESSION_URL = [
     "https://wanneroo.spatial.t1cloud.com/spatial/IntraMaps/ApplicationEngine/Configuration/PublicLite/Config/{liteConfigId}",
     "https://wanneroo.spatial.t1cloud.com/spatial/IntraMaps/ApplicationEngine/Projects/",
 ]
-MAP_INITIALIZE_URL = (
-    "https://wanneroo.spatial.t1cloud.com/spatial/IntraMaps/ApplicationEngine/Modules/"
-)
+MAP_INITIALIZE_URL = "https://wanneroo.spatial.t1cloud.com/spatial/IntraMaps/ApplicationEngine/Modules/"
 COLLECTION_URL = "https://wanneroo.spatial.t1cloud.com/spatial/IntraMaps/ApplicationEngine/Integration/set"
 
 
@@ -80,9 +76,7 @@ def _parse_rythm_description(rythm_description: str) -> list[date]:
     if rythm_description.strip().lower().startswith("fortnightly"):
         next_date_str = rythm_description.strip().lower().split("next collection", 1)[1]
         next_date = parse(next_date_str, dayfirst=True).date()
-        return [
-            d.date() for d in rrule(WEEKLY, interval=2, dtstart=next_date, count=10)
-        ]
+        return [d.date() for d in rrule(WEEKLY, interval=2, dtstart=next_date, count=10)]
 
     raise Exception(f"Could not parse rhythm description: {rythm_description}")
 
@@ -95,9 +89,7 @@ class Source:
         self._session = requests.Session()
 
     def _match_address(self, address: str) -> bool:
-        return self._address.lower().replace(" ", "").replace(
-            ",", ""
-        ) == address.lower().replace(" ", "").replace(",", "")
+        return self._address.lower().replace(" ", "").replace(",", "") == address.lower().replace(" ", "").replace(",", "")
 
     def _fetch_address_values(self) -> str:
         session = requests.Session()
@@ -189,9 +181,7 @@ class Source:
         params = {
             "configId": config_id,
         }
-        r = self._session.get(
-            MAP_SESSION_URL[0].format(liteConfigId=lite_config_id), params=params
-        )
+        r = self._session.get(MAP_SESSION_URL[0].format(liteConfigId=lite_config_id), params=params)
         r.raise_for_status()
         data = r.json()
         if (
@@ -268,12 +258,7 @@ class Source:
         r.raise_for_status()
 
         respone_data: dict = r.json()
-        panel_fields = (
-            respone_data.get("infoPanels", {})
-            .get("info1", {})
-            .get("feature", {})
-            .get("fields")
-        )
+        panel_fields = respone_data.get("infoPanels", {}).get("info1", {}).get("feature", {}).get("fields")
         if not panel_fields:
             raise Exception("Invalid response from server")
 
@@ -296,9 +281,7 @@ class Source:
             try:
                 dates = _parse_rythm_description(rythm_description)
             except Exception as e:
-                _LOGGER.warning(
-                    f"Failed to parse rhythm description: {rythm_description}, {e}"
-                )
+                _LOGGER.warning(f"Failed to parse rhythm description: {rythm_description}, {e}")
                 continue
 
             for date_ in dates:

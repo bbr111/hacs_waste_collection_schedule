@@ -125,9 +125,7 @@ class Source:
 
         # some waste types just state the collection day and frequency
         # so generate dates for those
-        general = self.generate_general_waste_date(
-            start_date, DAYS[pickups["Rubbish_Day"].upper().strip()]
-        )
+        general = self.generate_general_waste_date(start_date, DAYS[pickups["Rubbish_Day"].upper().strip()])
         recycle1, recycle2 = self.generate_recycle_dates(pickups["Next_Recycling_Date"])
 
         schedule: dict = {

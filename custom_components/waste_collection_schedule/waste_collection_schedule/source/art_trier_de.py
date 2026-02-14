@@ -32,9 +32,7 @@ TEST_CASES = {
 }
 
 API_URL = "https://www.art-trier.de/ics-feed"
-REMINDER_DAY = (
-    "0"  # The calendar event should be on the same day as the waste collection
-)
+REMINDER_DAY = "0"  # The calendar event should be on the same day as the waste collection
 REMINDER_TIME = "0600"  # The calendar event should start on any hour of the correct day, so this does not matter much
 ICON_MAP = {
     "Altpapier": "mdi:package-variant",
@@ -66,9 +64,7 @@ PARAM_TRANSLATIONS = {
 
 class Source:
     def __init__(self, district: str, zip_code: str):
-        self._district = quote(
-            district.lower().removeprefix("stadt ").translate(SPECIAL_CHARS).strip()
-        )
+        self._district = quote(district.lower().removeprefix("stadt ").translate(SPECIAL_CHARS).strip())
         self._zip_code = zip_code
         self._ics = ICS(regex=r"^A.R.T. Abfuhrtermin: (.*)", split_at=r" & ")
 
@@ -84,7 +80,4 @@ class Source:
 
         schedule = self._ics.convert(res.text)
 
-        return [
-            Collection(date=entry[0], t=entry[1], icon=ICON_MAP.get(entry[1]))
-            for entry in schedule
-        ]
+        return [Collection(date=entry[0], t=entry[1], icon=ICON_MAP.get(entry[1])) for entry in schedule]

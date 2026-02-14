@@ -24,9 +24,7 @@ ICON_MAP = {
 }
 
 
-SITE_URL = (
-    "https://mycouncil.milton-keynes.gov.uk/service/Waste_Collection_Round_Checker"
-)
+SITE_URL = "https://mycouncil.milton-keynes.gov.uk/service/Waste_Collection_Round_Checker"
 HEADERS = {
     "user-agent": "Mozilla/5.0",
 }
@@ -85,7 +83,7 @@ class Source:
 
         # Extract bin types and next collection dates
         entries = []
-        for index, item in rowdata.items():
+        for _index, item in rowdata.items():
             # print(item)
             bin_type = item["AssetTypeName"]
             icon = None

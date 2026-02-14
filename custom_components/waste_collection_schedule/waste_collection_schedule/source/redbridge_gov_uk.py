@@ -25,9 +25,7 @@ class Source:
         self._uprn = str(uprn)
 
     def fetch(self):
-        r = requests.get(
-            "https://my.redbridge.gov.uk/RecycleRefuse", params={"uprn": self._uprn}
-        )
+        r = requests.get("https://my.redbridge.gov.uk/RecycleRefuse", params={"uprn": self._uprn})
         r.raise_for_status()
 
         soup = BeautifulSoup(r.text, "html.parser")
@@ -39,12 +37,8 @@ class Source:
         for service in services:
             waste_type = service.find("h3").text
 
-            month_raw = service.find(
-                "div", {"class": re.compile(".*-collection-month")}
-            )
-            day_raw = service.find(
-                "div", {"class": re.compile(".*-collection-day-numeric")}
-            )
+            month_raw = service.find("div", {"class": re.compile(".*-collection-month")})
+            day_raw = service.find("div", {"class": re.compile(".*-collection-day-numeric")})
 
             if not month_raw or not day_raw:
                 # no collection date found for this service
@@ -52,15 +46,11 @@ class Source:
 
             # sanitize and extract day, month and optional year (e.g., 'January 2026')
             day_match = re.search(r"(\d{1,2})", day_raw.text.strip())
-            month_match = re.search(
-                r"([A-Za-z]+)(?:\s+(\d{4}))?", month_raw.text.strip()
-            )
+            month_match = re.search(r"([A-Za-z]+)(?:\s+(\d{4}))?", month_raw.text.strip())
 
             if not day_match or not month_match:
                 # not a valid date format
-                raise ValueError(
-                    f"Can't parse day/month from: day={day_raw.text!r}, month={month_raw.text!r}"
-                )
+                raise ValueError(f"Can't parse day/month from: day={day_raw.text!r}, month={month_raw.text!r}")
 
             day = day_match.group(1)
             month = month_match.group(1)

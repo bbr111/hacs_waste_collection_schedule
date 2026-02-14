@@ -51,11 +51,7 @@ class Source:
                     date=item[0],
                     t=bin_type,
                     icon=next(
-                        (
-                            icon
-                            for bin, icon in ICON_MAP.items()
-                            if bin.lower() in bin_type.lower().split("(")[0].strip()
-                        ),
+                        (icon for bin, icon in ICON_MAP.items() if bin.lower() in bin_type.lower().split("(")[0].strip()),
                         None,
                     ),
                 )

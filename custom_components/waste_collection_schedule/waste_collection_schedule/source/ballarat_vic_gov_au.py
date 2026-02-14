@@ -9,12 +9,8 @@ TITLE = "City of Ballarat"
 DESCRIPTION = "Source for City of Ballarat rubbish collection."
 URL = "https://www.ballarat.vic.gov.au"
 TEST_CASES = {
-    "Clothesline Cafe": {
-        "street_address": "202 Humffray Street South BAKERY HILL VIC 3350"
-    },
-    "Cuthberts Road Milk Bar": {
-        "street_address": "27 Cuthberts Road ALFREDTON VIC 3350"
-    },
+    "Clothesline Cafe": {"street_address": "202 Humffray Street South BAKERY HILL VIC 3350"},
+    "Cuthberts Road Milk Bar": {"street_address": "27 Cuthberts Road ALFREDTON VIC 3350"},
 }
 
 _LOGGER = logging.getLogger(__name__)
@@ -45,10 +41,7 @@ class Source:
         )
         response.raise_for_status()
         addressSearchApiResults = response.json()
-        if (
-            addressSearchApiResults["records"] is None
-            or len(addressSearchApiResults["records"]) < 1
-        ):
+        if addressSearchApiResults["records"] is None or len(addressSearchApiResults["records"]) < 1:
             raise SourceArgumentNotFound(
                 "street_address",
                 self._street_address,
@@ -60,9 +53,7 @@ class Source:
 
         entries = []
         collection_dates = [
-            (key.replace("next", ""), val)
-            for key, val in addressSearchTopHit["fields"].items()
-            if key.startswith("next")
+            (key.replace("next", ""), val) for key, val in addressSearchTopHit["fields"].items() if key.startswith("next")
         ]
         for collection_type, collection_date in collection_dates:
             date = datetime.strptime(collection_date, "%Y-%m-%d").date()

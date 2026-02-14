@@ -1,6 +1,5 @@
 import json
 from datetime import datetime
-from typing import Dict, List, Tuple
 from urllib.parse import quote, urlencode
 
 import requests
@@ -41,7 +40,7 @@ class Source:
 
         return self.parse_waste_pickup_dates(waste_response)
 
-    def get_address_detail(self) -> Tuple[str, str]:
+    def get_address_detail(self) -> tuple[str, str]:
         address_response = self._session.post(
             self.ADDRESS_URL,
             json={"prefixText": self._address, "count": 12, "contextKey": "test"},
@@ -58,13 +57,11 @@ class Source:
 
         return addr_1, addr_2
 
-    def get_waste_pickup_dates(self, form_data: Dict[str, str]) -> requests.Response:
+    def get_waste_pickup_dates(self, form_data: dict[str, str]) -> requests.Response:
         pickup_date_response = self._session.post(
             self.WASTE_URL,
             data=form_data,
-            headers={
-                "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
-            },
+            headers={"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"},
         )
 
         return pickup_date_response
@@ -73,16 +70,10 @@ class Source:
         state_response = self._session.get(self.WASTE_URL)
         soup = BeautifulSoup(state_response.content, "html.parser")
         view_state = soup.find("input", attrs={"id": "__VIEWSTATE"})["value"]
-        view_state_generator = soup.find("input", attrs={"id": "__VIEWSTATEGENERATOR"})[
-            "value"
-        ]
+        view_state_generator = soup.find("input", attrs={"id": "__VIEWSTATEGENERATOR"})["value"]
         dnn_variable = soup.find("input", attrs={"id": "__dnnVariable"})["value"]
-        request_verification_token = soup.find(
-            "input", attrs={"name": "__RequestVerificationToken"}
-        )["value"]
-        event_validation = soup.find("input", attrs={"id": "__EVENTVALIDATION"})[
-            "value"
-        ]
+        request_verification_token = soup.find("input", attrs={"name": "__RequestVerificationToken"})["value"]
+        event_validation = soup.find("input", attrs={"id": "__EVENTVALIDATION"})["value"]
 
         form_data = {
             "dnn$ctr2863$MasterView$CollectionDaysSAP$Address": addr_1,
@@ -98,9 +89,7 @@ class Source:
 
         return encoded_form_data
 
-    def parse_waste_pickup_dates(
-        self, pickup_date_response: requests.Response
-    ) -> List[Collection]:
+    def parse_waste_pickup_dates(self, pickup_date_response: requests.Response) -> list[Collection]:
         soup = BeautifulSoup(pickup_date_response.text, "html.parser")
         bin_type_containers = soup.find_all("div", class_="binTypeContainer")
 
@@ -108,11 +97,7 @@ class Source:
 
         for container in bin_type_containers:
             date = container.find("h5").text.strip()
-            bin_types = [
-                item.text
-                for item in container.find_all("p")
-                if item.find("span", class_="dot")
-            ]
+            bin_types = [item.text for item in container.find_all("p") if item.find("span", class_="dot")]
             if date == "Not subscribed":
                 continue  # Skip waste types that aren't being paid for/subscribed to.
             else:
@@ -121,14 +106,10 @@ class Source:
 
                 if current_date.month == 12 and pickup_datetime.month == 1:
                     # Date responses have no year, handle adding a year and also year end/new year collections
-                    pickup_date = pickup_datetime.replace(
-                        year=datetime.now().year + 1
-                    ).date()
+                    pickup_date = pickup_datetime.replace(year=datetime.now().year + 1).date()
 
                 else:
-                    pickup_date = pickup_datetime.replace(
-                        year=datetime.now().year
-                    ).date()
+                    pickup_date = pickup_datetime.replace(year=datetime.now().year).date()
 
             for bin_type in bin_types:
                 entries.append(

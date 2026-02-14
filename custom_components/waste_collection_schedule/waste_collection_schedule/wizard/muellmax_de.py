@@ -67,12 +67,7 @@ class InputSelectParser(HTMLParser):
         if tag == "select":
             self._within_select = False
         elif tag == "option":
-            if (
-                self._within_select
-                and self._within_option
-                and len(self._option_name) > 0
-                and self._option_value != ""
-            ):
+            if self._within_select and self._within_option and len(self._option_name) > 0 and self._option_value != "":
                 self._choices.append((self._option_name, self._option_value))
             self._within_option = False
             self._option_name = ""
@@ -123,7 +118,7 @@ def main():
     mm_ses.feed(r.text)
 
     # select "Abfuhrtermine", returns ort or an empty street search field
-    args = {"mm_ses": mm_ses.value, "mm_aus_ort.x": 0, "mm_aus_ort.x": 0}
+    args = {"mm_ses": mm_ses.value, "mm_aus_ort.x": 0}
     r = requests.post(url, data=args, headers=HEADERS)
     mm_ses.feed(r.text)
 
@@ -132,11 +127,7 @@ def main():
     mm_frm_ort_sel.feed(r.text)
     if len(mm_frm_ort_sel.choices) > 0:
         # select city
-        questions = [
-            inquirer.List(
-                "mm_frm_ort_sel", choices=mm_frm_ort_sel.choices, message="Select city"
-            )
-        ]
+        questions = [inquirer.List("mm_frm_ort_sel", choices=mm_frm_ort_sel.choices, message="Select city")]
         answers = inquirer.prompt(questions)
         results.update(answers)
 
@@ -165,11 +156,7 @@ def main():
     print(mm_frm_str_sel.choices)
 
     # select street
-    questions = [
-        inquirer.List(
-            "mm_frm_str_sel", choices=mm_frm_str_sel.choices, message="Select street"
-        )
-    ]
+    questions = [inquirer.List("mm_frm_str_sel", choices=mm_frm_str_sel.choices, message="Select street")]
     answers = inquirer.prompt(questions)
     results.update(answers)
 

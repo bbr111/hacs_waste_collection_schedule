@@ -1,8 +1,8 @@
 import datetime
 import json
-import xml.etree.ElementTree as ET
 
 import requests
+from defusedxml.ElementTree import fromstring
 from waste_collection_schedule import Collection
 
 TITLE = "Cardiff Council"
@@ -33,9 +33,7 @@ PAYLOAD_GET_JWT = (
 )
 
 URL_COLLECTIONS = "https://api.cardiff.gov.uk/WasteManagement/api/WasteCollection"
-URL_GET_JWT = (
-    "https://authwebservice.cardiff.gov.uk/AuthenticationWebService.asmx?op=GetJWT"
-)
+URL_GET_JWT = "https://authwebservice.cardiff.gov.uk/AuthenticationWebService.asmx?op=GetJWT"
 
 
 def get_headers() -> dict[str, str]:
@@ -58,11 +56,9 @@ def get_token() -> str:
     r = requests.post(URL_GET_JWT, headers=headers, data=PAYLOAD_GET_JWT)
     r.raise_for_status()
 
-    tree = ET.fromstring(r.text)
+    tree = fromstring(r.text)
 
-    jwt_result_element = tree.find(
-        ".//GetJWTResult", namespaces={"": "http://tempuri.org/"}
-    )
+    jwt_result_element = tree.find(".//GetJWTResult", namespaces={"": "http://tempuri.org/"})
 
     if jwt_result_element is None or jwt_result_element.text is None:
         raise Exception("could not find Token")
@@ -90,9 +86,7 @@ class Source:
         headers = get_headers()
         headers.update({"Authorization": f"Bearer {jwt}"})
 
-        r = client.post(
-            URL_COLLECTIONS, headers=headers, json=payload_waste_collections
-        )
+        r = client.post(URL_COLLECTIONS, headers=headers, json=payload_waste_collections)
         r.raise_for_status()
         collections = r.json()
 

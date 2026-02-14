@@ -7,12 +7,8 @@ TITLE = "City of Darebin"
 DESCRIPTION = "Source for City of Darebin waste collection."
 URL = "https://www.darebin.vic.gov.au/"
 TEST_CASES = {
-    "266 Gower Street PRESTON 3072": {
-        "property_location": "266 Gower Street PRESTON 3072"
-    },
-    "23 EDWARDES STREET RESERVOIR 3073": {
-        "property_location": "23 EDWARDES STREET RESERVOIR 3073"
-    },
+    "266 Gower Street PRESTON 3072": {"property_location": "266 Gower Street PRESTON 3072"},
+    "23 EDWARDES STREET RESERVOIR 3073": {"property_location": "23 EDWARDES STREET RESERVOIR 3073"},
 }
 API_URL = "https://services-ap1.arcgis.com/1WJBRkF3v1EEG5gz/arcgis/rest/services/Waste_Collection_Date3/FeatureServer/0/query"
 WEEKDAY_MAP = {
@@ -32,7 +28,7 @@ def _get_next_n_dates(date_obj: date, n: int, delta: timedelta):
         while date_obj < date.today():
             date_obj += delta
         next_dates.append(date_obj)
-        date_obj += delta 
+        date_obj += delta
     return next_dates
 
 
@@ -77,34 +73,21 @@ class Source:
         street_sweeping_epoch_seconds = attributes["Street_Sweeping"] / 1000
         collection_day = attributes["Collection_Day"]
 
-        next_collection_date = _get_previous_date_for_day_of_week(
-            WEEKDAY_MAP[collection_day]
-        )
+        next_collection_date = _get_previous_date_for_day_of_week(WEEKDAY_MAP[collection_day])
 
         green_collection = date.fromtimestamp(green_collection_epoch_seconds)
         recycle_collection = date.fromtimestamp(recycle_collection_epoch_seconds)
         street_sweeping = date.fromtimestamp(street_sweeping_epoch_seconds)
 
-        green_collection_dates = _get_next_n_dates(
-            green_collection, 26, timedelta(days=14)
-        )
-        recycle_collection_dates = _get_next_n_dates(
-            recycle_collection, 26, timedelta(days=14)
-        )
-        waste_collection_dates = _get_next_n_dates(
-            next_collection_date, 52, timedelta(days=7)
-        )
-        street_sweeping_dates = _get_next_n_dates(
-            street_sweeping, 1, timedelta(weeks=6))
-
+        green_collection_dates = _get_next_n_dates(green_collection, 26, timedelta(days=14))
+        recycle_collection_dates = _get_next_n_dates(recycle_collection, 26, timedelta(days=14))
+        waste_collection_dates = _get_next_n_dates(next_collection_date, 52, timedelta(days=7))
+        street_sweeping_dates = _get_next_n_dates(street_sweeping, 1, timedelta(weeks=6))
 
         entries = []
 
         entries.extend(
-            [
-                Collection(date=collection_date, t="Green Waste", icon="mdi:leaf")
-                for collection_date in green_collection_dates
-            ]
+            [Collection(date=collection_date, t="Green Waste", icon="mdi:leaf") for collection_date in green_collection_dates]
         )
         entries.extend(
             [
@@ -113,10 +96,7 @@ class Source:
             ]
         )
         entries.extend(
-            [
-                Collection(date=collection_day, t="Rubbish", icon="mdi:trash-can")
-                for collection_day in waste_collection_dates
-            ]
+            [Collection(date=collection_day, t="Rubbish", icon="mdi:trash-can") for collection_day in waste_collection_dates]
         )
         entries.extend(
             [

@@ -20,15 +20,11 @@ ICON_MAP = {
 
 
 class Source:
-    def __init__(
-        self, uprn
-    ):  # argX correspond to the args dict in the source configuration
+    def __init__(self, uprn):  # argX correspond to the args dict in the source configuration
         self._uprn = uprn
 
     def fetch(self):
-        r = requests.get(
-            f"https://www.richmondshire.gov.uk/Umbraco/Api/MyAreaApi/GetBinRoundData?uprn={self._uprn}"
-        )
+        r = requests.get(f"https://www.richmondshire.gov.uk/Umbraco/Api/MyAreaApi/GetBinRoundData?uprn={self._uprn}")
         ids = r.json()
 
         entries = []

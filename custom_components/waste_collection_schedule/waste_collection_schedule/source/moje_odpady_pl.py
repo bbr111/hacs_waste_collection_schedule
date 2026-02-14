@@ -55,13 +55,9 @@ class Source:
         english: bool = False,
     ):
         self._city: str = make_comparable(city)
-        self._voivodeship: str | None = (
-            make_comparable(voivodeship) if voivodeship else None
-        )
+        self._voivodeship: str | None = make_comparable(voivodeship) if voivodeship else None
         self._address: str | None = make_comparable(address) if address else None
-        self._house_number: str | None = (
-            make_comparable(house_number) if house_number else None
-        )
+        self._house_number: str | None = make_comparable(house_number) if house_number else None
         self._english: bool = english
 
         self._org_number: int | None = None
@@ -140,9 +136,7 @@ class Source:
             self._fetch_house_number()
 
     def fetch_area(self):
-        r = requests.post(
-            "https://waste24.net/client/api/mywaste/v2/location_cities.php"
-        )
+        r = requests.post("https://waste24.net/client/api/mywaste/v2/location_cities.php")
         r.raise_for_status()
 
         data = r.json()
@@ -197,9 +191,7 @@ class Source:
             "address": self._real_address or "",
             "addressNr": self._real_house_number or "",
         }
-        r = requests.post(
-            "https://waste24.net/client/api/mywaste/v2/schedule_list.php", json=payload
-        )
+        r = requests.post("https://waste24.net/client/api/mywaste/v2/schedule_list.php", json=payload)
         r.raise_for_status()
         data = r.json()
         entries = []
@@ -208,9 +200,7 @@ class Source:
             for containers in collection["containers"]:
                 bin_type = containers["containerName"]
                 if self._english:
-                    bin_type = (
-                        containers.get("containerNameEn", bin_type).strip() or bin_type
-                    )
+                    bin_type = containers.get("containerNameEn", bin_type).strip() or bin_type
                 entries.append(Collection(date_, bin_type, ICON_MAP.get(bin_type)))
         return entries
 

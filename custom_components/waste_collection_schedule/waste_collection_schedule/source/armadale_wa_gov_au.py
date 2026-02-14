@@ -23,7 +23,7 @@ WEEKDAYS = {
 }
 
 
-# this is the current ajax server used by the tool on their website 
+# this is the current ajax server used by the tool on their website
 API_URL = "https://app-corporate-prod-001.azurewebsites.net/system/ajax"
 
 
@@ -65,11 +65,7 @@ class Source:
 
         soup = BeautifulSoup(r.text, "html.parser")
         form_build_id = soup.find("input", {"type": "hidden", "name": "form_build_id"})
-        if (
-            not form_build_id
-            or isinstance(form_build_id, NavigableString)
-            or not form_build_id.attrs["value"]
-        ):
+        if not form_build_id or isinstance(form_build_id, NavigableString) or not form_build_id.attrs["value"]:
             raise Exception("Could not find form_build_id")
 
         form_build_id = form_build_id["value"]
@@ -112,20 +108,15 @@ class Source:
         current_day = current_day + datetime.timedelta(days=diff_to_next)
 
         entries = []
-        for i in range(52):
+        for _i in range(52):
             date = current_day
             start_of_week = date - datetime.timedelta(days=date.weekday())
 
             christmas = datetime.date(current_day.year, 12, 25)
-            new_years_day = datetime.date(
-                current_day.year + (1 if current_day.month == 12 else 0), 1, 1
-            )
+            new_years_day = datetime.date(current_day.year + (1 if current_day.month == 12 else 0), 1, 1)
             good_friday = easter(current_day.year) - datetime.timedelta(days=2)
 
-            if (
-                start_of_week <= christmas <= date
-                or start_of_week <= new_years_day <= date
-            ):
+            if start_of_week <= christmas <= date or start_of_week <= new_years_day <= date:
                 # if christmas or new years day is in the current week
                 if 0 <= christmas.weekday() < 5:  # if christmas is on a weekday
                     date += datetime.timedelta(days=1)

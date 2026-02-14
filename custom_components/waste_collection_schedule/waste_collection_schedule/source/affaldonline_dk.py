@@ -1,8 +1,9 @@
 import logging
 import random
 import re
+from collections.abc import Callable
 from datetime import date, datetime
-from typing import List
+from typing import cast
 
 import requests
 from bs4 import BeautifulSoup
@@ -137,14 +138,14 @@ def select_test_cases(municipalities, mode="random_one_from_each_parser"):
             parser_test_cases[parser].append((name, info))
 
     if mode == "random_one_from_each_parser":
-        for parser, cases in parser_test_cases.items():
+        for _parser, cases in parser_test_cases.items():
             selected_case = random.choice(cases)
             test_cases[selected_case[0]] = {
                 "municipality": selected_case[0],
                 "values": selected_case[1]["values"],
             }
     elif mode == "first_from_each_parser":
-        for parser, cases in parser_test_cases.items():
+        for _parser, cases in parser_test_cases.items():
             selected_case = cases[0]
             test_cases[selected_case[0]] = {
                 "municipality": selected_case[0],
@@ -165,7 +166,7 @@ def select_test_cases(municipalities, mode="random_one_from_each_parser"):
             "values": selected_case[1]["values"],
         }
     elif mode == "all":
-        for parser, cases in parser_test_cases.items():
+        for _parser, cases in parser_test_cases.items():
             for case in cases:
                 test_cases[case[0]] = {
                     "municipality": case[0],
@@ -176,9 +177,7 @@ def select_test_cases(municipalities, mode="random_one_from_each_parser"):
 
 
 # Dynamically generate TEST_CASES from the AFFALDONLINE_MUNICIPALITIES dictionary
-TEST_CASES = select_test_cases(
-    AFFALDONLINE_MUNICIPALITIES, mode="first_from_each_parser"
-)
+TEST_CASES = select_test_cases(AFFALDONLINE_MUNICIPALITIES, mode="first_from_each_parser")
 
 DANISH_MONTHS = [
     "januar",
@@ -198,18 +197,12 @@ DANISH_MONTHS = [
 
 class Source:
     def __init__(self, municipality: str, values: str):
-        _LOGGER.debug(
-            "Initializing Source with municipality=%s, values=%s", municipality, values
-        )
+        _LOGGER.debug("Initializing Source with municipality=%s, values=%s", municipality, values)
         self._api_url = API_URL.format(municipality=municipality)
         self._values = values
-        self._parser_type = AFFALDONLINE_MUNICIPALITIES.get(municipality, {}).get(
-            "parser"
-        )
+        self._parser_type = AFFALDONLINE_MUNICIPALITIES.get(municipality, {}).get("parser")
         if not self._parser_type:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "municipality", municipality, AFFALDONLINE_MUNICIPALITIES.keys()
-            )
+            raise SourceArgumentNotFoundWithSuggestions("municipality", municipality, AFFALDONLINE_MUNICIPALITIES.keys())
 
         parser = getattr(self, f"_parse_{self._parser_type}", None)
         if parser is None:
@@ -217,12 +210,14 @@ class Source:
         if not callable(parser):
             raise ValueError(f"Parser method for {self._parser_type} is not callable")
 
-        self._parser_method = parser
+        self._parser_method: Callable[[BeautifulSoup], list[Collection]] = cast(
+            Callable[[BeautifulSoup], list[Collection]], parser
+        )
 
-    def fetch(self) -> List[Collection]:
+    def fetch(self) -> list[Collection]:
         _LOGGER.debug("Fetching data from %s", self._api_url)
 
-        entries: List[Collection] = []
+        entries: list[Collection] = []
 
         post_data = {"values": self._values}
 
@@ -236,14 +231,12 @@ class Source:
 
         return entries
 
-    def _parse_default(self, soup: BeautifulSoup) -> List[Collection]:
-        entries: List[Collection] = []
+    def _parse_default(self, soup: BeautifulSoup) -> list[Collection]:
+        entries: list[Collection] = []
 
         next_pickup_info = soup.find_all(string=re.compile("Næste tømningsdag:"))
         if not next_pickup_info:
-            raise ValueError(
-                "No waste schemes found. Please check the provided values."
-            )
+            raise ValueError("No waste schemes found. Please check the provided values.")
 
         for info in next_pickup_info:
             text = info.strip()
@@ -263,9 +256,7 @@ class Source:
                         continue
                     waste_types_text = waste_type_search.group(1)
 
-                    waste_types = [
-                        waste_type.strip() for waste_type in waste_types_text.split(",")
-                    ]
+                    waste_types = [waste_type.strip() for waste_type in waste_types_text.split(",")]
 
                     for waste_type in waste_types:
                         entries.append(Collection(date=formatted_date, t=waste_type))
@@ -281,14 +272,12 @@ class Source:
 
         return entries
 
-    def _parse_silkeborg(self, soup: BeautifulSoup) -> List[Collection]:
-        entries: List[Collection] = []
+    def _parse_silkeborg(self, soup: BeautifulSoup) -> list[Collection]:
+        entries: list[Collection] = []
 
         table = soup.find("table")
         if not table:
-            raise ValueError(
-                "No waste collection table found. Please check the provided values."
-            )
+            raise ValueError("No waste collection table found. Please check the provided values.")
 
         current_year = datetime.now().year
         current_month = datetime.now().month
@@ -313,9 +302,7 @@ class Source:
                     collection_date = date(collection_year, month, day)
 
                     for waste_type in waste_types.split(","):
-                        entries.append(
-                            Collection(date=collection_date, t=waste_type.strip())
-                        )
+                        entries.append(Collection(date=collection_date, t=waste_type.strip()))
                         _LOGGER.debug(
                             "Added collection: date=%s, type=%s",
                             collection_date,
@@ -324,20 +311,18 @@ class Source:
 
         return entries
 
-    def _parse_favrskov(self, soup: BeautifulSoup) -> List[Collection]:
-        entries: List[Collection] = []
+    def _parse_favrskov(self, soup: BeautifulSoup) -> list[Collection]:
+        entries: list[Collection] = []
 
         strong_tags = soup.find_all("strong")
         if not strong_tags:
-            raise ValueError(
-                "No waste schemes found. Please check the provided values."
-            )
+            raise ValueError("No waste schemes found. Please check the provided values.")
 
         for strong_tag in strong_tags:
             waste_type = strong_tag.get_text(strip=True)
             next_sibling = strong_tag.find_next_sibling(text=True)
             if next_sibling and "Næste tømningsdag" in next_sibling:
-                match = re.search(r"(\d{1,2})\. (\w+) (\d{4})", next_sibling)
+                match = re.search(r"(\d{1,2})\. (\w+) (\d{4})", str(next_sibling))
                 if match:
                     try:
                         day = int(match.group(1))
@@ -353,9 +338,7 @@ class Source:
                             waste_type,
                         )
                     except ValueError as e:
-                        _LOGGER.error(
-                            "Error parsing date: %s from string: %s", e, next_sibling
-                        )
+                        _LOGGER.error("Error parsing date: %s from string: %s", e, next_sibling)
                 else:
                     _LOGGER.warning("No valid date found in string: %s", next_sibling)
 

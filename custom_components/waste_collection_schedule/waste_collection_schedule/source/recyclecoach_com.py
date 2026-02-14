@@ -43,7 +43,6 @@ ICON_MAP = {
     "Green Bin Collection": "mdi:food",
     "E-waste Event": "mdi:calendar",
     "Additional EnviroDepot Hours": "mdi:calendar",
-    "Garbage Collection": "mdi:trash-can",
     "Recycling Collection": "mdi:recycle",
     "Yard Waste Collection Week": "mdi:leaf",
     "3 Container Exemption Pick-up": "mdi:calendar",
@@ -283,9 +282,7 @@ class Source:
             self.stage = float(city_data[0]["stage"])
 
             if self.stage < 3:
-                raise Exception(
-                    "Found your city, but it is not yet supported fully by recycle coach."
-                )
+                raise Exception("Found your city, but it is not yet supported fully by recycle coach.")
             return
 
         elif len(city_data) > 1:
@@ -372,7 +369,6 @@ class Source:
 
         if not self.zone_id:
             self._lookup_zones()
-
 
         collection_def_url = f"https://us-api-city.recyclecoach.com/collections?project_id={self.project_id}&district_id={self.district_id}&zone_id={self.zone_id}&lang_cd=en_US"
 

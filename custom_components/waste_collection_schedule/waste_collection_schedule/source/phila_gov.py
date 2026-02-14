@@ -82,9 +82,7 @@ class Source:
                 holidays.append(h_date)
 
         # get property info
-        p_json = s.get(
-            f"https://api.phila.gov/ais/v1/addresses/{(self._address)}", headers=HEADERS
-        ).json()
+        p_json = s.get(f"https://api.phila.gov/ais/v1/addresses/{(self._address)}", headers=HEADERS).json()
         # extract collection days
         waste_days = []
         recycle_days = []
@@ -117,12 +115,8 @@ class Source:
 
         entries = []
         for item in waste_schedule:
-            entries.append(
-                Collection(date=item, t="Rubbish", icon=ICON_MAP.get("Rubbish"))
-            )
+            entries.append(Collection(date=item, t="Rubbish", icon=ICON_MAP.get("Rubbish")))
         for item in recycle_schedule:
-            entries.append(
-                Collection(date=item, t="Recycle", icon=ICON_MAP.get("Recycle"))
-            )
+            entries.append(Collection(date=item, t="Recycle", icon=ICON_MAP.get("Recycle")))
 
         return entries

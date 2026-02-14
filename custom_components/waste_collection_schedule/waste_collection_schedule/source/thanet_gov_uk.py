@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import List
 
 import requests
 from waste_collection_schedule import Collection
@@ -53,14 +52,12 @@ class Source:
         self._street_address = str(street_address).upper()
         self._uprn = uprn
 
-    def fetch(self) -> List[Collection]:
+    def fetch(self) -> list[Collection]:
         if self._uprn is None:
             self._uprn = self.get_uprn()
 
         url = "https://www.thanet.gov.uk/wp-content/mu-plugins/collection-day/incl/mu-collection-day-calls.php"
-        collections_json = requests.get(
-            url, headers=self.header_text, params={"pAddress": self._uprn}
-        ).json()
+        collections_json = requests.get(url, headers=self.header_text, params={"pAddress": self._uprn}).json()
 
         entries = []
 
@@ -69,18 +66,14 @@ class Source:
                 if collection["type"] == bin_type:
                     entries.append(
                         Collection(
-                            date=datetime.strptime(
-                                collection["nextDate"][:10], "%d/%m/%Y"
-                            ).date(),
+                            date=datetime.strptime(collection["nextDate"][:10], "%d/%m/%Y").date(),
                             t=TYPES[bin_type]["alias"],
                             icon=TYPES[bin_type]["icon"],
                         )
                     )
                     entries.append(
                         Collection(
-                            date=datetime.strptime(
-                                collection["previousDate"][:10], "%d/%m/%Y"
-                            ).date(),
+                            date=datetime.strptime(collection["previousDate"][:10], "%d/%m/%Y").date(),
                             t=TYPES[bin_type]["alias"],
                             icon=TYPES[bin_type]["icon"],
                         )
@@ -94,15 +87,9 @@ class Source:
                 "A postcode is required if no UPRN has been used. This allows the script to obtain the UPRN for you.",
             )
         url = "https://www.thanet.gov.uk/wp-content/mu-plugins/collection-day/incl/mu-collection-day-calls.php"
-        addresses_json = requests.get(
-            url, headers=self.header_text, params={"searchAddress": self._postcode}
-        ).json()
+        addresses_json = requests.get(url, headers=self.header_text, params={"searchAddress": self._postcode}).json()
         uprn = next(
-            (
-                key
-                for key, value in addresses_json.items()
-                if value[: len(self._street_address)] == self._street_address
-            ),
+            (key for key, value in addresses_json.items() if value[: len(self._street_address)] == self._street_address),
             None,
         )
         if self._street_address is None:

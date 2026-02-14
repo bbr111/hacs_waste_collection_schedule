@@ -1,6 +1,5 @@
 import logging
 from datetime import datetime, timedelta
-from typing import List
 
 import requests
 from waste_collection_schedule import Collection  # type: ignore[attr-defined]
@@ -19,7 +18,9 @@ BENDIGO_BOUNDS = {
 }
 
 # API endpoints
-ZONES_API_URL = "https://connect.pozi.com/userdata/bendigo-publisher/Pozi_Public_City_of_Greater_Bendigo/Waste_Collection_Zones.json"
+ZONES_API_URL = (
+    "https://connect.pozi.com/userdata/bendigo-publisher/Pozi_Public_City_of_Greater_Bendigo/Waste_Collection_Zones.json"
+)
 
 # Test cases for validation
 TEST_CASES = {
@@ -64,30 +65,20 @@ class Source:
             self._latitude = float(latitude)
             self._longitude = float(longitude)
 
-            if (
-                not BENDIGO_BOUNDS["min_lat"]
-                <= self._latitude
-                <= BENDIGO_BOUNDS["max_lat"]
-            ):
+            if not BENDIGO_BOUNDS["min_lat"] <= self._latitude <= BENDIGO_BOUNDS["max_lat"]:
                 raise SourceArgumentNotFound(
                     "latitude",
                     str(self._latitude),
                     f"Latitude must be between {BENDIGO_BOUNDS['min_lat']} and {BENDIGO_BOUNDS['max_lat']}",
                 )
-            if (
-                not BENDIGO_BOUNDS["min_lon"]
-                <= self._longitude
-                <= BENDIGO_BOUNDS["max_lon"]
-            ):
+            if not BENDIGO_BOUNDS["min_lon"] <= self._longitude <= BENDIGO_BOUNDS["max_lon"]:
                 raise SourceArgumentNotFound(
                     "longitude",
                     str(self._longitude),
                     f"Longitude must be between {BENDIGO_BOUNDS['min_lon']} and {BENDIGO_BOUNDS['max_lon']}",
                 )
         except (ValueError, TypeError) as e:
-            raise Exception(
-                f"Invalid coordinate format. Please provide numeric values. Error: {str(e)}"
-            )
+            raise Exception(f"Invalid coordinate format. Please provide numeric values. Error: {str(e)}") from e
 
     def fetch(self):
         session = requests.Session()
@@ -100,9 +91,7 @@ class Source:
         found_zones = []
         for feature in zones_data["features"]:
             zone_name = feature["properties"]["Collection Reference"]
-            if Source.__is_point_in_polygon(
-                (self._latitude, self._longitude), feature["geometry"]
-            ):
+            if Source.__is_point_in_polygon((self._latitude, self._longitude), feature["geometry"]):
                 _LOGGER.debug("Point found in zone: %s", zone_name)
                 found_zones.append(feature)
 
@@ -111,9 +100,7 @@ class Source:
                 f"Coordinates ({self._latitude}, {self._longitude}) not found in any Bendigo collection zone. Please check your location at https://www.bendigo.vic.gov.au/residents/general-waste-recycling-and-organics/bin-night",
             )
         if len(found_zones) > 1:
-            zone_names = [
-                zone["properties"]["Collection Reference"] for zone in found_zones
-            ]
+            zone_names = [zone["properties"]["Collection Reference"] for zone in found_zones]
             _LOGGER.debug("Point found in multiple zones: %s", zone_names)
             raise Exception(
                 f"Coordinates ({self._latitude}, {self._longitude}) are on a boundary between multiple zones: {', '.join(zone_names)}. "
@@ -203,16 +190,11 @@ class Source:
             lat_j, lon_j = polygon[j]
 
             # Check if point is on or near the edge
-            if (
-                abs((lon_j - lon_i) * (lat - lat_i) - (lat_j - lat_i) * (lon - lon_i))
-                < EPSILON
-            ):
+            if abs((lon_j - lon_i) * (lat - lat_i) - (lat_j - lat_i) * (lon - lon_i)) < EPSILON:
                 # Point is on the line, now check if it's within the segment
                 if (
                     min(lon_i, lon_j) - EPSILON <= lon <= max(lon_i, lon_j) + EPSILON
-                    and min(lat_i, lat_j) - EPSILON
-                    <= lat
-                    <= max(lat_i, lat_j) + EPSILON
+                    and min(lat_i, lat_j) - EPSILON <= lat <= max(lat_i, lat_j) + EPSILON
                 ):
                     return True
 
@@ -230,27 +212,19 @@ class Source:
         weeks: int,
         start: str,
         collection_type: str,
-        entries: List[Collection],
+        entries: list[Collection],
     ):
         if not desc:
-            raise ValueError(
-                f"Missing description for {WASTE_NAMES[collection_type]} collection"
-            )
+            raise ValueError(f"Missing description for {WASTE_NAMES[collection_type]} collection")
 
         if not start:
-            raise ValueError(
-                f"Missing start date for {WASTE_NAMES[collection_type]} collection"
-            )
+            raise ValueError(f"Missing start date for {WASTE_NAMES[collection_type]} collection")
 
         if not day:
-            raise ValueError(
-                f"Missing collection day for {WASTE_NAMES[collection_type]} collection"
-            )
+            raise ValueError(f"Missing collection day for {WASTE_NAMES[collection_type]} collection")
 
         if not weeks or weeks < 1:
-            raise ValueError(
-                f"Invalid collection frequency for {WASTE_NAMES[collection_type]} collection"
-            )
+            raise ValueError(f"Invalid collection frequency for {WASTE_NAMES[collection_type]} collection")
 
         try:
             start_date = datetime.strptime(start.strip(), "%d-%b-%Y").date()
@@ -275,9 +249,7 @@ class Source:
                     "Friday",
                     "Saturday",
                     "Sunday",
-                ].index(
-                    start_day
-                )
+                ].index(start_day)
                 if days_ahead <= 0:
                     days_ahead += 7
                 start_date = start_date + timedelta(days=days_ahead)
@@ -297,6 +269,4 @@ class Source:
                 current_date = current_date + timedelta(weeks=weeks)
 
         except ValueError as e:
-            raise ValueError(
-                f"Invalid date format for {WASTE_NAMES[collection_type]} collection: {start}"
-            ) from e
+            raise ValueError(f"Invalid date format for {WASTE_NAMES[collection_type]} collection: {start}") from e

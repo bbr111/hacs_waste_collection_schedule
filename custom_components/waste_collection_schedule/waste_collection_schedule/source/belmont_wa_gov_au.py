@@ -23,9 +23,7 @@ class Source:
 
     def fetch(self):
         params = {"key": self._address}
-        r = requests.get(
-            "https://www.belmont.wa.gov.au/api/intramaps/getaddresses", params=params
-        )
+        r = requests.get("https://www.belmont.wa.gov.au/api/intramaps/getaddresses", params=params)
         r.raise_for_status()
         j = r.json()
 
@@ -33,9 +31,7 @@ class Source:
             raise SourceArgumentNotFound("address", self._address)
 
         if len(j) > 1:
-            raise SourceArgAmbiguousWithSuggestions(
-                "address", self._address, [x.get("Address") for x in j]
-            )
+            raise SourceArgAmbiguousWithSuggestions("address", self._address, [x.get("Address") for x in j])
 
         params = {"mapkey": j[0]["mapkey"], "dbkey": j[0]["dbkey"]}
         r = requests.get(
@@ -48,9 +44,7 @@ class Source:
         entries = []
 
         # get general waste
-        date = datetime.datetime.strptime(
-            data["BinDayGeneralWasteFormatted"], "%Y-%m-%dT%H:%M:%S"
-        ).date()
+        date = datetime.datetime.strptime(data["BinDayGeneralWasteFormatted"], "%Y-%m-%dT%H:%M:%S").date()
         entries.append(
             Collection(
                 date=date,
@@ -60,9 +54,7 @@ class Source:
         )
 
         # get recycling
-        date = datetime.datetime.strptime(
-            data["BinDayRecyclingFormatted"], "%Y-%m-%dT%H:%M:%S"
-        ).date()
+        date = datetime.datetime.strptime(data["BinDayRecyclingFormatted"], "%Y-%m-%dT%H:%M:%S").date()
         entries.append(
             Collection(
                 date=date,

@@ -76,9 +76,7 @@ PARAM_TRANSLATIONS = {  # Optional dict to translate the arguments, will be show
 }
 
 API_URL = "https://servizi.irenambiente.it/bin/iam/api-services"
-COLLECTION_ULR = (
-    "https://net.irenambiente.it/restv1/api/cms/calendarioraccoltacivico/{address_id}"
-)
+COLLECTION_ULR = "https://net.irenambiente.it/restv1/api/cms/calendarioraccoltacivico/{address_id}"
 
 
 class CityResultEntry(TypedDict):
@@ -143,13 +141,9 @@ class Source:
             raise SourceArgumentNotFound("city", self._city)
 
         for city in data:
-            if city["Comune"].lower().replace(" ", "") == self._city.lower().replace(
-                " ", ""
-            ):
+            if city["Comune"].lower().replace(" ", "") == self._city.lower().replace(" ", ""):
                 return city["Istat"]
-        raise SourceArgumentNotFoundWithSuggestions(
-            "city", self._city, [city["Comune"] for city in data]
-        )
+        raise SourceArgumentNotFoundWithSuggestions("city", self._city, [city["Comune"] for city in data])
 
     @staticmethod
     def get_streets(city_id: str, search: str) -> list[StreetResultEntry]:
@@ -172,18 +166,12 @@ class Source:
             data = self.get_streets(city_id, "")
 
         for street in data:
-            if street["Street"].lower().replace(
-                " ", ""
-            ) == self._street.lower().replace(" ", ""):
+            if street["Street"].lower().replace(" ", "") == self._street.lower().replace(" ", ""):
                 return street["StreetCode"]
-        raise SourceArgumentNotFoundWithSuggestions(
-            "street", self._street, [street["Street"] for street in data]
-        )
+        raise SourceArgumentNotFoundWithSuggestions("street", self._street, [street["Street"] for street in data])
 
     @staticmethod
-    def get_house_numbers(
-        city_id: str, street_code: str, search: str
-    ) -> list[HnrRestultEntry]:
+    def get_house_numbers(city_id: str, street_code: str, search: str) -> list[HnrRestultEntry]:
         params = {
             "api": "civici",
             "istat": city_id,
@@ -202,22 +190,18 @@ class Source:
             raise SourceArgumentNotFound("house_number", self._house_number)
 
         for hnr in data:
-            if hnr["Civico"].lower().replace(" ", "") == str(
-                self._house_number
-            ).lower().replace(" ", ""):
+            if hnr["Civico"].lower().replace(" ", "") == str(self._house_number).lower().replace(" ", ""):
                 return hnr["AdrNr"]
-        raise SourceArgumentNotFoundWithSuggestions(
-            "house_number", self._house_number, [hnr["Civico"] for hnr in data]
-        )
+        raise SourceArgumentNotFoundWithSuggestions("house_number", self._house_number, [hnr["Civico"] for hnr in data])
 
     @staticmethod
     def construct_holiday_map(holidays: list[Holiday]) -> dict[date, date]:
         holiday_map = {}
         for holiday in holidays:
             if holiday["DataFestivita"] and holiday["DataConferimento"]:
-                holiday_map[
-                    datetime.strptime(holiday["DataFestivita"], "%Y-%m-%d").date()
-                ] = datetime.strptime(holiday["DataConferimento"], "%Y-%m-%d").date()
+                holiday_map[datetime.strptime(holiday["DataFestivita"], "%Y-%m-%d").date()] = datetime.strptime(
+                    holiday["DataConferimento"], "%Y-%m-%d"
+                ).date()
         return holiday_map
 
     @staticmethod
@@ -264,9 +248,7 @@ class Source:
                 else:
                     rule = rrulestr(rulestr)
             except Exception as e:
-                _LOGGER.warning(
-                    f"ERROR: {e}, could not parse collection rule: {rulestr}, for {bin_type}"
-                )
+                _LOGGER.warning(f"ERROR: {e}, could not parse collection rule: {rulestr}, for {bin_type}")
                 continue
 
             holidays = self.construct_holiday_map(item["FestivitaCalendario"])
@@ -289,9 +271,7 @@ class Source:
                 if end or (date_, bin_type) in already_added:
                     continue
                 already_added.add((date_, bin_type))
-                entries.append(
-                    Collection(date=date_, t=bin_type, icon=ICON_MAP.get(bin_type))
-                )
+                entries.append(Collection(date=date_, t=bin_type, icon=ICON_MAP.get(bin_type)))
         return entries
 
     def fetch(self) -> list[Collection]:

@@ -60,7 +60,6 @@ class Source:
         self._uprn = str(uprn)
 
     def fetch(self):
-
         s = requests.Session()
 
         if self._uprn:

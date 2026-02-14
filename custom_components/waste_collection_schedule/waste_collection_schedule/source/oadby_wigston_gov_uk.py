@@ -11,12 +11,8 @@ TITLE = "Oadby and Wigston Council"
 DESCRIPTION = "Source for Oadby and Wigston Council."
 URL = "https://www.oadby-wigston.gov.uk"
 TEST_CASES = {
-    "111, Main Street, Swithland": {
-        "address": "56, Sussex Road, Wigston, Leicestershire"
-    },
-    "2, The Banks, Sileby": {
-        "address": "89, Leicester Road, Leicester, Leicestershire"
-    },
+    "111, Main Street, Swithland": {"address": "56, Sussex Road, Wigston, Leicestershire"},
+    "2, The Banks, Sileby": {"address": "89, Leicester Road, Leicester, Leicestershire"},
 }
 
 
@@ -38,9 +34,7 @@ class Source:
         self._address_id = None
 
     def _match_address(self, address: str) -> bool:
-        return (
-            address.lower().replace(" ", "").replace(",", "") == self._address_compare
-        )
+        return address.lower().replace(" ", "").replace(",", "") == self._address_compare
 
     @staticmethod
     def _parse_date(date_str: str) -> date:
@@ -60,19 +54,14 @@ class Source:
         r.raise_for_status()
         data = r.json()
         if not data:
-            raise ValueError(
-                "No address found for search term: " + self._address_search
-            )
+            raise ValueError("No address found for search term: " + self._address_search)
 
         for address in data:
             if self._match_address(address["label"]):
                 self._address_id = address["value"]
                 return
 
-        raise ValueError(
-            "Address not found, use one of the following: "
-            + ", ".join([address["label"] for address in data])
-        )
+        raise ValueError("Address not found, use one of the following: " + ", ".join([address["label"] for address in data]))
 
     def fetch(self) -> list[Collection]:
         fresh_id = False

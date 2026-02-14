@@ -40,17 +40,17 @@ class Source:
     def fetch(self):
         entries: list[Collection] = []
         session = requests.Session()
-        session.headers.update({
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        })
+        session.headers.update(
+            {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+            }
+        )
 
         token_response = session.get(API_URLS["get_session"])
         soup = BeautifulSoup(token_response.text, "html.parser")
         token = soup.find("input", {"name": "__token"}).attrs["value"]
         if not token:
-            raise ValueError(
-                "Could not parse CSRF Token from initial response. Won't be able to proceed."
-            )
+            raise ValueError("Could not parse CSRF Token from initial response. Won't be able to proceed.")
 
         form_data = {
             "__token": token,
@@ -61,11 +61,9 @@ class Source:
             "next": "Next",
         }
 
-        collection_response = session.post(
-            API_URLS["collection"], data=form_data)
+        collection_response = session.post(API_URLS["collection"], data=form_data)
 
-        collection_soup = BeautifulSoup(
-            collection_response.text, "html.parser")
+        collection_soup = BeautifulSoup(collection_response.text, "html.parser")
         tr = collection_soup.findAll("tr")
 
         # The council API returns no year for the collections
@@ -79,15 +77,11 @@ class Source:
             waste_type = td[1].text.rstrip()
 
             # We need to replace characters due to encoding in form
-            collection_date_text = (
-                td[0].text.split(" ")[0].replace("\xa0", " ") + " " + str(year)
-            )
+            collection_date_text = td[0].text.split(" ")[0].replace("\xa0", " ") + " " + str(year)
 
             try:
                 # Broxbourne give an empty date field where there is no collection
-                collection_date = datetime.datetime.strptime(
-                    collection_date_text, "%a %d %b %Y"
-                ).date()
+                collection_date = datetime.datetime.strptime(collection_date_text, "%a %d %b %Y").date()
 
             except ValueError as e:
                 LOGGER.warning(

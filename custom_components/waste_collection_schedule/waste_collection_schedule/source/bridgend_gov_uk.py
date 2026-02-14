@@ -52,13 +52,7 @@ class Source:
         entries: list = []
         for i in range(len(waste_types)):
             waste_type = waste_types[i].text.split(" ")[0].replace("\n", "").strip()
-            waste_date = (
-                waste_dates[i]
-                .text.split(" ")[1]
-                .replace("\t", "")
-                .replace("Service\n", "")
-                .strip()
-            )
+            waste_date = waste_dates[i].text.split(" ")[1].replace("\t", "").replace("Service\n", "").strip()
             entries.append(
                 Collection(
                     date=datetime.strptime(waste_date, "%d/%m/%Y").date(),

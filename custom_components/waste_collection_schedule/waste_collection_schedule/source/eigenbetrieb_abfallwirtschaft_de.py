@@ -43,14 +43,12 @@ class Source:
         year = now.year
         # build the urls and fetch the data ...
         # for this year ...
-        url_this_year = (
-            f"{URL}/termine/abfuhrtermine/{year}/{self._city}/{self._street}.html"
-        )
+        url_this_year = f"{URL}/termine/abfuhrtermine/{year}/{self._city}/{self._street}.html"
         entries = self.get_data(url_this_year)
         # and in december for the next year
         if now.month == 12:
             try:
-                url_next_year = f"{URL}/termine/abfuhrtermine/{year +1 }/{self._city}/{self._street}.html"
+                url_next_year = f"{URL}/termine/abfuhrtermine/{year + 1}/{self._city}/{self._street}.html"
                 entries += self.get_data(url_next_year)
             except Exception:
                 pass
@@ -62,9 +60,7 @@ class Source:
 
         # check if the request was successful
         if response.status_code != 200:
-            raise Exception(
-                f"Error loading page {URL}, status code {response.status_code}."
-            )
+            raise Exception(f"Error loading page {URL}, status code {response.status_code}.")
         # parse the response
         soup = BeautifulSoup(response.text, "html.parser")
 

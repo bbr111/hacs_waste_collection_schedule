@@ -16,12 +16,8 @@ TITLE = "Hornsby Shire Council"
 DESCRIPTION = "Source for Hornsby Shire Council."
 URL = "https://hornsby.nsw.gov.au/"
 TEST_CASES = {
-    "1 Cherrybrook Road, West Pennant Hills, 2125": {
-        "address": "1 Cherrybrook Road, West Pennant Hills, 2125"
-    },
-    "10 Albion Street, Pennant Hills, 2120": {
-        "address": "10 Albion Street, Pennant Hills, 2120"
-    },
+    "1 Cherrybrook Road, West Pennant Hills, 2125": {"address": "1 Cherrybrook Road, West Pennant Hills, 2125"},
+    "10 Albion Street, Pennant Hills, 2120": {"address": "10 Albion Street, Pennant Hills, 2120"},
 }
 
 ICON_MAP = {
@@ -105,21 +101,13 @@ def _select_weekly_waste_calendar_pdf_href(hrefs: list[str]) -> str | None:
         return None
 
     # Strong signal: weekly waste calendar under 'suds-waste-and-recycling'
-    cand = [
-        h
-        for h in pdfs
-        if "collection-calendars" in h and "suds-waste-and-recycling" in h
-    ]
+    cand = [h for h in pdfs if "collection-calendars" in h and "suds-waste-and-recycling" in h]
     if cand:
         return cand[0]
 
     # Fallback: any collection-calendars PDF that doesn't look like bulky-waste
     cand = [
-        h
-        for h in pdfs
-        if "collection-calendars" in h
-        and "bulky" not in h.lower()
-        and "suds-bulky-waste" not in h.lower()
+        h for h in pdfs if "collection-calendars" in h and "bulky" not in h.lower() and "suds-bulky-waste" not in h.lower()
     ]
     if cand:
         return cand[0]
@@ -134,11 +122,7 @@ def _select_bulky_waste_calendar_pdf_href(hrefs: list[str]) -> str | None:
         return None
 
     preferred = [
-        h
-        for h in pdfs
-        if ("suds-bulky-waste" in h.lower())
-        or ("bulkywasteflyer" in h.lower())
-        or ("bulkywaste" in h.lower())
+        h for h in pdfs if ("suds-bulky-waste" in h.lower()) or ("bulkywasteflyer" in h.lower()) or ("bulkywaste" in h.lower())
     ]
     if preferred:
         return preferred[0]
@@ -150,9 +134,7 @@ def _select_bulky_waste_calendar_pdf_href(hrefs: list[str]) -> str | None:
     return None
 
 
-def _resolve_pdf_urls_for_address(
-    address: str, language: str = "en-AU"
-) -> dict[str, str | None]:
+def _resolve_pdf_urls_for_address(address: str, language: str = "en-AU") -> dict[str, str | None]:
     """Resolve the PDF URLs for a given address via Hornsby Council API."""
     keywords = urllib.parse.quote(address, safe="")
     search_url = f"{BASE_URL}api/v1/myarea/search?keywords={keywords}"
@@ -166,9 +148,7 @@ def _resolve_pdf_urls_for_address(
         f"&ocsvclang={urllib.parse.quote(language)}"
     )
 
-    ws_json = json.loads(
-        _http_get(waste_services_url).decode("utf-8", errors="replace")
-    )
+    ws_json = json.loads(_http_get(waste_services_url).decode("utf-8", errors="replace"))
     if not ws_json.get("success", False):
         raise ValueError("wasteservices call returned success=false.")
 
@@ -210,10 +190,7 @@ def _extract_events_from_weekly_pdf(pdf_bytes: bytes) -> list[Collection]:
     try:
         import pymupdf
     except ImportError as e:
-        raise ImportError(
-            "PyMuPDF is required for PDF extraction. "
-            "Please install it with: pip install pymupdf"
-        ) from e
+        raise ImportError("PyMuPDF is required for PDF extraction. Please install it with: pip install pymupdf") from e
 
     with pymupdf.open(stream=pdf_bytes, filetype="pdf") as doc:
         if doc.page_count < 1:
@@ -232,9 +209,7 @@ def _extract_events_from_weekly_pdf(pdf_bytes: bytes) -> list[Collection]:
 
         for block in text.get("blocks", []):
             for line in block.get("lines", []):
-                line_text = "".join(
-                    span["text"] for span in line.get("spans", [])
-                ).strip()
+                line_text = "".join(span["text"] for span in line.get("spans", [])).strip()
                 m = rx.match(line_text)
                 if not m:
                     continue
@@ -261,15 +236,10 @@ def _extract_events_from_weekly_pdf(pdf_bytes: bytes) -> list[Collection]:
         xs_sorted = sorted(xs)
         n = len(xs_sorted)
         # Initial seeds at evenly-spaced quantiles
-        centers = [
-            xs_sorted[min(int(q * (n - 1) + 0.5), n - 1)]
-            for q in (0.1 + i * 0.8 / (ncols - 1) for i in range(ncols))
-        ]
+        centers = [xs_sorted[min(int(q * (n - 1) + 0.5), n - 1)] for q in (0.1 + i * 0.8 / (ncols - 1) for i in range(ncols))]
 
         for _ in range(10):
-            assignments = [
-                min(range(ncols), key=lambda c: abs(x - centers[c])) for x in xs
-            ]
+            assignments = [min(range(ncols), key=lambda c: abs(x - centers[c])) for x in xs]
             new_centers = list(centers)
             for c in range(ncols):
                 members = [xs[i] for i in range(len(xs)) if assignments[i] == c]
@@ -321,16 +291,13 @@ def _extract_events_from_weekly_pdf(pdf_bytes: bytes) -> list[Collection]:
             keep = [
                 it
                 for it in items
-                if abs((it["rect"].x1 - it["rect"].x0) - med_w) < 2.0
-                and abs((it["rect"].y1 - it["rect"].y0) - med_h) < 2.0
+                if abs((it["rect"].x1 - it["rect"].x0) - med_w) < 2.0 and abs((it["rect"].y1 - it["rect"].y0) - med_h) < 2.0
             ]
             if len(keep) >= 10:
                 marker_sets[label] = keep
 
         if not {"green", "yellow"}.issubset(marker_sets):
-            raise ValueError(
-                f"Could not detect both marker sets. Detected={list(marker_sets)}"
-            )
+            raise ValueError(f"Could not detect both marker sets. Detected={list(marker_sets)}")
 
         entries: list[Collection] = []
         seen: set[tuple[datetime.date, str]] = set()
@@ -366,9 +333,7 @@ def _extract_events_from_weekly_pdf(pdf_bytes: bytes) -> list[Collection]:
                     range(len(col_centers)),
                     key=lambda i: abs(cx - col_centers[i]),
                 )
-                candidates = [
-                    h for h in headers if h["col"] == col and h["center"][1] <= cy + 1.0
-                ]
+                candidates = [h for h in headers if h["col"] == col and h["center"][1] <= cy + 1.0]
                 if candidates:
                     mh = max(candidates, key=lambda h: h["center"][1])
                 else:
@@ -383,9 +348,7 @@ def _extract_events_from_weekly_pdf(pdf_bytes: bytes) -> list[Collection]:
 
                 if (dt, waste_type) not in seen:
                     seen.add((dt, waste_type))
-                    entries.append(
-                        Collection(date=dt, t=waste_type, icon=ICON_MAP.get(waste_type))
-                    )
+                    entries.append(Collection(date=dt, t=waste_type, icon=ICON_MAP.get(waste_type)))
 
                 # General Waste is collected on both green and recycling weeks
                 if (dt, "General Waste") not in seen:
@@ -406,10 +369,7 @@ def _extract_bulky_events_from_pdf(pdf_bytes: bytes) -> list[Collection]:
     try:
         import pymupdf
     except ImportError as e:
-        raise ImportError(
-            "PyMuPDF is required for PDF extraction. "
-            "Please install it with: pip install pymupdf"
-        ) from e
+        raise ImportError("PyMuPDF is required for PDF extraction. Please install it with: pip install pymupdf") from e
 
     text_parts: list[str] = []
     with pymupdf.open(stream=pdf_bytes, filetype="pdf") as doc:
@@ -436,9 +396,7 @@ def _extract_bulky_events_from_pdf(pdf_bytes: bytes) -> list[Collection]:
         if dt in seen:
             continue
         seen.add(dt)
-        entries.append(
-            Collection(date=dt, t="Bulky Waste", icon=ICON_MAP.get("Bulky Waste"))
-        )
+        entries.append(Collection(date=dt, t="Bulky Waste", icon=ICON_MAP.get("Bulky Waste")))
 
     return entries
 

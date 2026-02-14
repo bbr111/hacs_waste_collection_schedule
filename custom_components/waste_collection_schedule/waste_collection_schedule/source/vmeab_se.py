@@ -94,14 +94,10 @@ class Source:
                     **SWEEDISH_MONTHS,
                     **SWEEDISH_WEEKDAYS,
                 }.items():
-                    date_string = date_string.replace(
-                        sweedish_month, str(english_month)
-                    )
+                    date_string = date_string.replace(sweedish_month, str(english_month))
 
                 # parse date if date does not contain year assume this year if then date is in the past assume next year
-                date_ = parse(
-                    date_string, dayfirst=True, default=datetime(3004, 1, 1)
-                ).date()
+                date_ = parse(date_string, dayfirst=True, default=datetime(3004, 1, 1)).date()
                 if date_.year == 3004:
                     now = datetime.now()
                     year = now.year

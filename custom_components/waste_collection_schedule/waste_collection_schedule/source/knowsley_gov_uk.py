@@ -53,13 +53,21 @@ class Source:
         s: requests.Session,
         action: str,
         x_csrf_token: str,
-        changes: dict = {},
-        objects: list = [],
-        params: dict[str, str | list[str] | dict] = {},
-        profile_data: dict[str, int] = {},
+        changes: dict | None = None,
+        objects: list | None = None,
+        params: dict[str, str | list[str] | dict] | None = None,
+        profile_data: dict[str, int] | None = None,
         operation_id: str | None = None,
         validation_guids: list[str] | None = None,
     ) -> dict:
+        if profile_data is None:
+            profile_data = {}
+        if params is None:
+            params = {}
+        if objects is None:
+            objects = []
+        if changes is None:
+            changes = {}
         time_str = str(int(time.time()))
         headers = {
             "Content-Type": "application/json",
@@ -128,9 +136,7 @@ class Source:
 
         objects = data["objects"]
         changes_postcode = data["changes"]
-        changes_postcode[list(changes_postcode.keys())[0]][
-            "EnquiryPostcodeOrStreetName"
-        ] = {"value": self._postcode}
+        changes_postcode[list(changes_postcode.keys())[0]]["EnquiryPostcodeOrStreetName"] = {"value": self._postcode}
 
         params = {
             "OS_MissedBinEnquiry": {
@@ -153,20 +159,14 @@ class Source:
         uprn_chage_element: tuple[str, dict] | None = None
 
         for change_id, chage_dict in data["changes"].items():
-            if "UPRN" in chage_dict and chage_dict["UPRN"]["value"].strip().strip(
-                "0"
-            ) == str(self._uprn).strip().strip("0"):
+            if "UPRN" in chage_dict and chage_dict["UPRN"]["value"].strip().strip("0") == str(self._uprn).strip().strip("0"):
                 uprn_chage_element = (change_id, chage_dict)
                 break
 
         if uprn_chage_element is None:
             raise SourceArgumentNotFound("uprn", self._uprn)
 
-        objects += [
-            next(
-                iter([o for o in data["objects"] if o["guid"] == uprn_chage_element[0]])
-            )
-        ]
+        objects += [next(iter([o for o in data["objects"] if o["guid"] == uprn_chage_element[0]]))]
         params = {"Generic_Address": {"guid": objects[-1]["guid"]}}
 
         changes = changes_postcode.copy()
@@ -195,9 +195,7 @@ class Source:
                 try:
                     date = datetime.strptime(date_str, "%A %d/%m/%Y").date()
                 except ValueError:
-                    _LOGGER.warning(
-                        f"Could not parse date: {date_str} for bin type {bin_type}"
-                    )
+                    _LOGGER.warning(f"Could not parse date: {date_str} for bin type {bin_type}")
                 icon = ICON_MAP.get(bin_type)
                 entries.append(Collection(date=date, t=bin_type, icon=icon))
 

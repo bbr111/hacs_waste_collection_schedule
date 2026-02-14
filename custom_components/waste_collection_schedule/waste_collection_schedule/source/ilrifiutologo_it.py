@@ -65,13 +65,9 @@ class Source:
                 self.comune_id = citta.get("id", "")
                 break
         if self.comune_id is None:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "town", town, [city.get("name") for city in comuni.json()]
-            )
+            raise SourceArgumentNotFoundWithSuggestions("town", town, [city.get("name") for city in comuni.json()])
 
-        indirizzi = api_get_request(
-            relative_path="/getIndirizzi.php", params={"idComune": self.comune_id}
-        )
+        indirizzi = api_get_request(relative_path="/getIndirizzi.php", params={"idComune": self.comune_id})
         _LOGGER.debug(
             "getIndirizzi.php: %d s - %s - %s",
             indirizzi.elapsed.total_seconds(),
@@ -104,9 +100,7 @@ class Source:
             numeri_civici.reason,
         )
 
-        if numeri_civici.status_code != 200 or not isinstance(
-            numeri_civici.json(), list
-        ):
+        if numeri_civici.status_code != 200 or not isinstance(numeri_civici.json(), list):
             raise Exception("Errore durante il recupero dei numeri civici")
 
         for civico in numeri_civici.json():
@@ -151,13 +145,9 @@ class Source:
             for event in entry.get("conferimenti", []):
                 entries.append(
                     Collection(
-                        date=datetime.datetime.strptime(
-                            entry.get("data"), "%Y-%m-%dT%H:%M:%S+00:00"
-                        ).date(),
+                        date=datetime.datetime.strptime(entry.get("data"), "%Y-%m-%dT%H:%M:%S+00:00").date(),
                         t=event.get("macroprodotto").get("descrizione"),
-                        icon=ICON_MAP.get(
-                            event.get("macroprodotto").get("descrizione")
-                        ),
+                        icon=ICON_MAP.get(event.get("macroprodotto").get("descrizione")),
                     )
                 )
 

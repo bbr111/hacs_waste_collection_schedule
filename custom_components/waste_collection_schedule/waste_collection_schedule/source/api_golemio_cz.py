@@ -93,9 +93,7 @@ def _generate_next_picks(next_pick: date, pick_days: str, frequency: int, count=
     period_duration = frequency // 10
     times_per_week = frequency % 10
 
-    weekdays = [
-        _CZ_DAY_TO_WEEKDAY[day] for day in map(str.strip, pick_days.split(", "))
-    ]
+    weekdays = [_CZ_DAY_TO_WEEKDAY[day] for day in map(str.strip, pick_days.split(", "))]
 
     if times_per_week != len(weekdays):
         _LOGGER.warning(
@@ -181,9 +179,7 @@ class Source:
                 if self._suffix:
                     t = f"{t}{self._suffix}"
 
-                for d in _generate_next_picks(
-                    next_pick, frequency["pick_days"], frequency["id"]
-                ):
+                for d in _generate_next_picks(next_pick, frequency["pick_days"], frequency["id"]):
                     entries.append(
                         Collection(
                             date=d,

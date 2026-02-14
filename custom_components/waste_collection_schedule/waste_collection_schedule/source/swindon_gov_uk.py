@@ -43,24 +43,19 @@ class Source:
             params=params,
             headers=headers,
         )
-        
+
         if r.status_code == 403 or "403 Client Error" in r.text:
             raise Exception("Rate limiting or IP ban may be in effect")
-        
+
         r.raise_for_status()
 
         entries = []
-        for results in BeautifulSoup(r.text, "html.parser").find_all(
-            "div", class_="bin-collection-content"
-        ):
-
+        for results in BeautifulSoup(r.text, "html.parser").find_all("div", class_="bin-collection-content"):
             try:
                 recyclingdate = results.find("span", class_="nextCollectionDate")
 
                 if recyclingdate is not None:
-                    recyclingtype = results.find("div", class_="content-left").find(
-                        "h3"
-                    )
+                    recyclingtype = results.find("div", class_="content-left").find("h3")
                     entries.append(
                         Collection(
                             date=parser.parse(recyclingdate.text, dayfirst=True).date(),

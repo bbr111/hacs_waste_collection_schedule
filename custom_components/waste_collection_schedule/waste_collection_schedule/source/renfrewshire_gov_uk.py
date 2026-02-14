@@ -39,9 +39,7 @@ class Source:
         r.raise_for_status()
 
         soup = BeautifulSoup(r.text, features="html.parser")
-        collections_data = soup.find(
-            "script", {"type": "application/json", "id": "collections-data"}
-        )
+        collections_data = soup.find("script", {"type": "application/json", "id": "collections-data"})
 
         entries = []
 
@@ -57,13 +55,11 @@ class Source:
             for date_str, bins in binData.items():
                 date = datetime.fromisoformat(date_str).date()
 
-                for bin_name, details in bins.items():
+                for _bin_name, details in bins.items():
                     if details is None:
                         continue  # skip empty bins
 
-                    collection_type = details[
-                        "ShortName"
-                    ]  # e.g. "Blue", "Brown", "Grey"
+                    collection_type = details["ShortName"]  # e.g. "Blue", "Brown", "Grey"
 
                     entries.append(
                         Collection(

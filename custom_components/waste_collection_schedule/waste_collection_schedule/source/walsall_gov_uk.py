@@ -58,9 +58,7 @@ class Source:
                     table = soup.findAll("td")
                     for td in table:
                         try:
-                            collection_date = datetime.strptime(
-                                td.text.strip(), "%d/%m/%Y"
-                            )
+                            collection_date = datetime.strptime(td.text.strip(), "%d/%m/%Y")
                             entries.append(
                                 Collection(
                                     date=collection_date.date(),

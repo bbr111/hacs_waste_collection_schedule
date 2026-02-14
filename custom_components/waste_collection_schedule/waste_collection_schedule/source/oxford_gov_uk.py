@@ -36,9 +36,7 @@ class Source:
         soup = BeautifulSoup(form_landing_response.text, "html.parser")
         token = soup.find("input", {"name": "__token"}).attrs["value"]
         if not token:
-            raise ValueError(
-                "Could not parse CSRF Token from initial response. Won't be able to proceed."
-            )
+            raise ValueError("Could not parse CSRF Token from initial response. Won't be able to proceed.")
 
         form_data = {
             "__token": token,
@@ -53,29 +51,17 @@ class Source:
 
         collection_soup = BeautifulSoup(collection_response.text, "html.parser")
         for paragraph in collection_soup.find("div", class_="editor").find_all("p"):
-            matches = re.match(
-                r"^Your next (\w+) collections: (.*), (.*)", paragraph.text
-            )
+            matches = re.match(r"^Your next (\w+) collections: (.*), (.*)", paragraph.text)
             if matches:
-                collection_type, first_date_string, second_date_string = (
-                    matches.groups()
-                )
+                collection_type, first_date_string, second_date_string = matches.groups()
                 try:
-                    first_date = datetime.strptime(
-                        first_date_string, "%A %d %B %Y"
-                    ).date()
+                    first_date = datetime.strptime(first_date_string, "%A %d %B %Y").date()
                 except ValueError:
-                    first_date = datetime.strptime(
-                        first_date_string, "%A %d %b %Y"
-                    ).date()
+                    first_date = datetime.strptime(first_date_string, "%A %d %b %Y").date()
                 try:
-                    second_date = datetime.strptime(
-                        second_date_string.strip(), "%A %d %B %Y"
-                    ).date()
+                    second_date = datetime.strptime(second_date_string.strip(), "%A %d %B %Y").date()
                 except ValueError:
-                    second_date = datetime.strptime(
-                        second_date_string.strip(), "%A %d %b %Y"
-                    ).date()
+                    second_date = datetime.strptime(second_date_string.strip(), "%A %d %b %Y").date()
 
                 entries.append(
                     Collection(
@@ -93,8 +79,6 @@ class Source:
                         )
                     )
         if not entries:
-            raise ValueError(
-                "Could not get collections for the given combination of UPRN and Postcode."
-            )
+            raise ValueError("Could not get collections for the given combination of UPRN and Postcode.")
 
         return entries

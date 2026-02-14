@@ -341,21 +341,15 @@ class Source:
 
     def fetch(self) -> list[Collection]:
         # Retrieve list of places
-        r = requests.get(
-            f"https://awido.cubefour.de/WebServices/Awido.Service.svc/secure/getPlaces/client={self._customer}"
-        )
+        r = requests.get(f"https://awido.cubefour.de/WebServices/Awido.Service.svc/secure/getPlaces/client={self._customer}")
         r.raise_for_status()
         places = r.json()
 
         # create city to key map from retrieved places
-        city_to_oid = {
-            place["value"].strip().lower(): place["key"] for (place) in places
-        }
+        city_to_oid = {place["value"].strip().lower(): place["key"] for (place) in places}
 
         if self._city not in city_to_oid:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "city", self._city, suggestions=list(city_to_oid.keys())
-            )
+            raise SourceArgumentNotFoundWithSuggestions("city", self._city, suggestions=list(city_to_oid.keys()))
 
         oid = city_to_oid[self._city]
 
@@ -382,14 +376,10 @@ class Source:
             streets = r.json()
 
             # create street to key map from retrieved places
-            street_to_oid = {
-                street["value"].strip().lower(): street["key"] for (street) in streets
-            }
+            street_to_oid = {street["value"].strip().lower(): street["key"] for (street) in streets}
 
             if self._street not in street_to_oid:
-                raise SourceArgumentNotFoundWithSuggestions(
-                    "street", self._street, suggestions=list(street_to_oid.keys())
-                )
+                raise SourceArgumentNotFoundWithSuggestions("street", self._street, suggestions=list(street_to_oid.keys()))
 
             oid = street_to_oid[self._street]
 
@@ -402,17 +392,9 @@ class Source:
                 hsnbrs = r.json()
 
                 # create housenumber to key map from retrieved places
-                hsnbr_to_oid = {
-                    hsnbr["value"].strip().lower(): hsnbr["key"] for (hsnbr) in hsnbrs
-                }
-                if (
-                    len(hsnbr_to_oid) == 0
-                    or len(hsnbr_to_oid) == 1
-                    and "" in hsnbr_to_oid
-                ):
-                    _LOGGER.warning(
-                        "No housenumbers found for street, using street only"
-                    )
+                hsnbr_to_oid = {hsnbr["value"].strip().lower(): hsnbr["key"] for (hsnbr) in hsnbrs}
+                if len(hsnbr_to_oid) == 0 or len(hsnbr_to_oid) == 1 and "" in hsnbr_to_oid:
+                    _LOGGER.warning("No housenumbers found for street, using street only")
                 else:
                     if self._housenumber not in hsnbr_to_oid:
                         raise SourceArgumentNotFoundWithSuggestions(

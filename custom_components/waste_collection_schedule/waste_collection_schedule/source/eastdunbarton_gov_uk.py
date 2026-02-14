@@ -43,7 +43,7 @@ class Source:
         r = s.get(
             f"https://www.eastdunbarton.gov.uk/services/a-z-of-services/bins-waste-and-recycling/bins-and-recycling/collections/?uprn={self._uprn}"
         )
-        r.raise_for_status
+        r.raise_for_status()
         soup = BeautifulSoup(r.content, "html.parser")
 
         entries = []
@@ -52,9 +52,7 @@ class Source:
             tds = tr.find_all("td")
             entries.append(
                 Collection(
-                    date=datetime.strptime(
-                        tds[1].text.strip().split(", ")[1], "%d %B %Y"
-                    ).date(),
+                    date=datetime.strptime(tds[1].text.strip().split(", ")[1], "%d %B %Y").date(),
                     t=tds[0].text.strip(),
                     icon=ICON_MAP.get(tds[0].text.strip()),
                 )

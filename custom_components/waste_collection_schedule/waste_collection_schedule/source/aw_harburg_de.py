@@ -16,9 +16,7 @@ TEST_CASES = {
     },
 }
 
-API_URL = (
-    "https://www.landkreis-harburg.de/bauen-umwelt/abfallwirtschaft/abfallkalender/"
-)
+API_URL = "https://www.landkreis-harburg.de/bauen-umwelt/abfallwirtschaft/abfallkalender/"
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64)",
 }
@@ -46,9 +44,7 @@ class Source:
         id = self.parse_level(r.text, 1)
 
         # Get the IDs of the districts on the second level
-        url = (
-            "https://www.landkreis-harburg.de/ajax/abfall_gebiete_struktur_select.html"
-        )
+        url = "https://www.landkreis-harburg.de/ajax/abfall_gebiete_struktur_select.html"
         params = {
             "parent": id,
             "ebene": 1,
@@ -88,7 +84,7 @@ class Source:
         # Sometimes there is no garbage calendar available
         if "Es sind keine Abfuhrbezirke hinterlegt." in r.text:
             raise Exception(
-                f'Error: "Es sind keine Abfuhrbezirke hinterlegt." for "{self._districts[3-1]}". Please use different input data.'
+                f'Error: "Es sind keine Abfuhrbezirke hinterlegt." for "{self._districts[3 - 1]}". Please use different input data.'
             )
 
         soup = BeautifulSoup(r.text, features="html.parser")
@@ -130,8 +126,6 @@ class Source:
             raise Exception(f"Error: Level {level} Dictionary empty")
 
         if self._districts[level - 1] not in level_ids:
-            raise Exception(
-                f"Error: District {self._districts[level]} is not in the dictionary: {level_ids}"
-            )
+            raise Exception(f"Error: District {self._districts[level]} is not in the dictionary: {level_ids}")
 
         return level_ids[self._districts[level - 1]]

@@ -1,11 +1,11 @@
 import requests
 from bs4 import BeautifulSoup
-from waste_collection_schedule.service.ICS import ICS
 from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 from waste_collection_schedule.exceptions import (
     SourceArgumentNotFound,
     SourceArgumentNotFoundWithSuggestions,
 )
+from waste_collection_schedule.service.ICS import ICS
 
 TITLE = "Coburg Entsorgungs- und Baubetrieb CEB"
 DESCRIPTION = "Source for Coburg Entsorgungs- und Baubetrieb CEB."
@@ -42,7 +42,7 @@ class Source:
 
         for a in streets_ul.select("a.street[href]"):
             name = a.get_text(strip=True)
-            href = a["href"]
+            href = str(a["href"])
             if name and href:
                 streets[name] = href
 

@@ -85,19 +85,8 @@ PARAM_TRANSLATIONS = {
 
 def get_source(source: str, args: dict | list[dict]) -> list:
     if isinstance(args, list):
-        return [
-            getattr(
-                importlib.import_module(f"waste_collection_schedule.source.{source}"),
-                "Source",
-            )(**arg)
-            for arg in args
-        ]
-    return [
-        getattr(
-            importlib.import_module(f"waste_collection_schedule.source.{source}"),
-            "Source",
-        )(**args)
-    ]
+        return [importlib.import_module(f"waste_collection_schedule.source.{source}").Source(**arg) for arg in args]
+    return [importlib.import_module(f"waste_collection_schedule.source.{source}").Source(**args)]
 
 
 def check_source_type(data):
@@ -107,11 +96,7 @@ def check_source_type(data):
         if all(isinstance(key, str) for key in data.keys()):
             # Check if all values are either dictionaries or lists of dictionaries
             if all(
-                isinstance(value, dict)
-                or (
-                    isinstance(value, list)
-                    and all(isinstance(value2, dict) for value2 in value)
-                )
+                isinstance(value, dict) or (isinstance(value, list) and all(isinstance(value2, dict) for value2 in value))
                 for value in data.values()
             ):
                 return True

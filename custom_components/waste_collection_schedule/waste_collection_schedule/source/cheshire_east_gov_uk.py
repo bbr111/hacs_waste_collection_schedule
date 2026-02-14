@@ -1,13 +1,14 @@
 from datetime import datetime
 
 import requests
+import urllib3
 from bs4 import BeautifulSoup
 from waste_collection_schedule import Collection
 from waste_collection_schedule.exceptions import (
     SourceArgumentException,
     SourceArgumentExceptionMultiple,
 )
-import urllib3
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 TITLE = "Cheshire East Council"
@@ -53,9 +54,7 @@ class Source:
             s = soup.find("a", attrs={"class": "get-job-details"})
 
             if s is None or s["data-uprn"] is None:
-                raise SourceArgumentExceptionMultiple(
-                    ["postcode", "name_number"], "address not found"
-                )
+                raise SourceArgumentExceptionMultiple(["postcode", "name_number"], "address not found")
             self._uprn = s["data-uprn"]
 
         if self._uprn is None:

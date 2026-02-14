@@ -61,11 +61,7 @@ class WasteCollectionCalendar(CalendarEntity):
         await super().async_added_to_hass()
 
         if self._coordinator:
-            self.async_on_remove(
-                self._coordinator.async_add_listener(
-                    self._handle_coordinator_update, None
-                )
-            )
+            self.async_on_remove(self._coordinator.async_add_listener(self._handle_coordinator_update, None))
 
     @callback
     def _handle_coordinator_update(self) -> None:
@@ -91,9 +87,7 @@ class WasteCollectionCalendar(CalendarEntity):
         else:
             return self._convert(collections[0])
 
-    async def async_get_events(
-        self, hass: HomeAssistant, start_date: datetime, end_date: datetime
-    ) -> list[CalendarEvent]:
+    async def async_get_events(self, hass: HomeAssistant, start_date: datetime, end_date: datetime) -> list[CalendarEvent]:
         """Return all events within specified time span."""
         events: list[CalendarEvent] = []
 
@@ -145,10 +139,7 @@ def create_calendar_entries(
                 coordinator=coordinator,
                 aggregator=CollectionAggregator([shell]),
                 name=shell.calendar_title,
-                exclude_types={
-                    shell.get_collection_type_name(type)
-                    for type in dedicated_calendar_types
-                },
+                exclude_types={shell.get_collection_type_name(type) for type in dedicated_calendar_types},
                 unique_id=calc_unique_calendar_id(shell),
             )
         )
@@ -156,9 +147,7 @@ def create_calendar_entries(
 
 
 # Config flow setup
-async def async_setup_entry(
-    hass: HomeAssistant, config: ConfigEntry, async_add_entities: AddEntitiesCallback
-):
+async def async_setup_entry(hass: HomeAssistant, config: ConfigEntry, async_add_entities: AddEntitiesCallback):
     coordinator: WCSCoordinator = hass.data[DOMAIN][config.entry_id]
     shell = coordinator.shell
 

@@ -34,9 +34,7 @@ class Source:
 
     def fetch(self):
         if self.uprn is None:
-            LOGGER.warning(
-                "Using deprecated API might not work in the future. Please provide a UPRN."
-            )
+            LOGGER.warning("Using deprecated API might not work in the future. Please provide a UPRN.")
             return self.get_data(self.postcode, DEPRECATED_API_URL)
         return self.get_data(self.uprn)
 
@@ -54,17 +52,13 @@ class Source:
         entries = []
 
         if data["status"] != "OK":
-            raise Exception(
-                f"Error fetching data. \"{data['status']}\": \n {data['body']}"
-            )
+            raise Exception(f'Error fetching data. "{data["status"]}": \n {data["body"]}')
 
         schedule = data["body"]
         for schedule_entry in schedule:
             entries.append(
                 Collection(
-                    date=datetime.strptime(
-                        schedule_entry["NextCollection"], "%Y-%m-%d"
-                    ).date(),
+                    date=datetime.strptime(schedule_entry["NextCollection"], "%Y-%m-%d").date(),
                     t=schedule_entry["collectionType"],
                     icon=ICON_MAP.get(schedule_entry["collectionType"]),
                 )

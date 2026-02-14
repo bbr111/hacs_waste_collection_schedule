@@ -2,7 +2,8 @@
 
 import datetime
 import logging
-from typing import TYPE_CHECKING, Callable, Dict, List, Optional
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Optional
 
 import requests
 
@@ -12,7 +13,7 @@ if TYPE_CHECKING:
     from .DeviceKeyStore import DeviceKeyStore
 
 
-_device_key_store_method: Optional[Callable[[], Optional["DeviceKeyStore"]]] = None
+_device_key_store_method: Callable[[], Optional["DeviceKeyStore"]] | None = None
 
 
 def get_device_key_store() -> Optional["DeviceKeyStore"]:
@@ -64,8 +65,8 @@ class WhatBinDayService:
     def __init__(
         self,
         location_key: str,
-        icon_map: Optional[Dict[str, str]] = None,
-        bin_names: Optional[Dict[str, str]] = None,
+        icon_map: dict[str, str] | None = None,
+        bin_names: dict[str, str] | None = None,
         app_package: str = "com.socketsoftware.whatbinday.binston",
     ):
         """
@@ -91,7 +92,7 @@ class WhatBinDayService:
     def register_device(self) -> str:
         """Register a device with the API and get a device key."""
         # Check if we already have a device key in memory
-        if self._device_key:
+        if self._device_key is not None:
             return self._device_key
 
         # Try to load from HA Store first
@@ -99,13 +100,11 @@ class WhatBinDayService:
             store = self._get_storage()
             if store is not None:
                 stored_key = store.get_device_key(self._location_key)
-                if stored_key:
+                if stored_key is not None:
                     self._device_key = stored_key
-                    return self._device_key
+                    return stored_key
         except Exception as e:
-            _LOGGER.error(
-                "Error accessing HA Store for location %s: %s", self._location_key, e
-            )
+            _LOGGER.error("Error accessing HA Store for location %s: %s", self._location_key, e)
 
         # Register new device if no stored key found
         try:
@@ -135,21 +134,20 @@ class WhatBinDayService:
 
             data = response.json()
             if not data.get("success"):
-                raise Exception(
-                    f"Device registration failed: {data.get('info', 'Unknown error')}"
-                )
+                raise Exception(f"Device registration failed: {data.get('info', 'Unknown error')}")
 
-            self._device_key = data["data"]["key"]
+            device_key = data["data"]["key"]
+            self._device_key = device_key
 
             # Save to HA Store
             try:
                 store = self._get_storage()
                 if store is not None:
-                    store.set_device_key(self._location_key, self._device_key)
+                    store.set_device_key(self._location_key, device_key)
             except Exception as save_error:
                 _LOGGER.error("Failed to save device key to HA Store: %s", save_error)
 
-            return self._device_key
+            return device_key
         except Exception as reg_error:
             _LOGGER.error(
                 "Device registration failed for location %s: %s",
@@ -166,8 +164,8 @@ class WhatBinDayService:
         post_code: str,
         state: str = "VIC",
         country: str = "Australia",
-        coordinates: Optional[Dict[str, float]] = None,
-    ) -> Dict:
+        coordinates: dict[str, float] | None = None,
+    ) -> dict:
         """
         Build address data structure from user input.
 
@@ -180,9 +178,7 @@ class WhatBinDayService:
             country: Country (default: Australia)
             coordinates: Optional lat/lng coordinates
         """
-        formatted_address = (
-            f"{street_number} {street_name}, {suburb} {state} {post_code}, {country}"
-        )
+        formatted_address = f"{street_number} {street_name}, {suburb} {state} {post_code}, {country}"
 
         # Create address components structure similar to Google's format
         address_components = [
@@ -229,7 +225,7 @@ class WhatBinDayService:
             "geometry": {"location": coordinates, "location_type": "APPROXIMATE"},
         }
 
-    def get_collection_schedule(self, location_data: Dict) -> List[Collection]:
+    def get_collection_schedule(self, location_data: dict) -> list[Collection]:
         """
         Get bin collection schedule for the location.
 
@@ -251,9 +247,7 @@ class WhatBinDayService:
 
         data = response.json()
         if not data.get("success"):
-            raise Exception(
-                f"Service lookup failed: {data.get('info', 'Unknown error')}"
-            )
+            raise Exception(f"Service lookup failed: {data.get('info', 'Unknown error')}")
 
         # Find the CouncilBinModule in the response
         bin_module = None
@@ -269,13 +263,11 @@ class WhatBinDayService:
         collection_events = bin_module.get("CollectionEvents", [])
 
         for event in collection_events:
-            collection_date = datetime.datetime.strptime(
-                event["Date"], "%Y-%m-%d"
-            ).date()
+            collection_date = datetime.datetime.strptime(event["Date"], "%Y-%m-%d").date()
 
             # Create an entry for each bin type collected on this date
             for bin_type in event["Items"]:
-                bin_name = self._bin_names.get(bin_type, bin_type)
+                bin_name = self._bin_names.get(bin_type) or bin_type
                 icon = self._icon_map.get(bin_type, "mdi:trash-can")
 
                 entries.append(
@@ -296,8 +288,8 @@ class WhatBinDayService:
         post_code: str,
         state: str = "VIC",
         country: str = "Australia",
-        coordinates: Optional[Dict[str, float]] = None,
-    ) -> List[Collection]:
+        coordinates: dict[str, float] | None = None,
+    ) -> list[Collection]:
         """
         Fetch waste collection schedule for an address.
 
@@ -331,8 +323,8 @@ class WhatBinDayService:
             return entries
 
         except requests.RequestException as e:
-            raise Exception(f"Network error: {e}")
+            raise Exception(f"Network error: {e}") from e
         except KeyError as e:
-            raise Exception(f"Unexpected API response format: {e}")
+            raise Exception(f"Unexpected API response format: {e}") from e
         except Exception as e:
-            raise Exception(f"Error fetching collection schedule: {e}")
+            raise Exception(f"Error fetching collection schedule: {e}") from e

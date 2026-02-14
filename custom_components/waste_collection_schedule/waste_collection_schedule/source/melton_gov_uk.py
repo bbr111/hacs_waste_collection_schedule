@@ -56,10 +56,8 @@ class Source:
             "redirect": "collections",
             "rememberloc": "",
         }
-        r = s.get(
-            "https://my.melton.gov.uk/set-location", headers=HEADERS, params=params
-        )
-        r.raise_for_status
+        r = s.get("https://my.melton.gov.uk/set-location", headers=HEADERS, params=params)
+        r.raise_for_status()
         soup: BeautifulSoup = BeautifulSoup(r.content, "html.parser")
 
         entries: list = []

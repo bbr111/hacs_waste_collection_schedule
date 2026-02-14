@@ -56,64 +56,40 @@ class Source:
             raise Exception(f"Error: failed to fetch url: {API_URL}")
 
         soup = BeautifulSoup(r.text, "html.parser")
-        citySelection = [
-            a
-            for a in soup.select("#sf_locid > option[value]")
-            if self.is_city_selection(a, cityName)
-        ]
+        citySelection = [a for a in soup.select("#sf_locid > option[value]") if self.is_city_selection(a, cityName)]
         if len(citySelection) == 0:
             raise SourceArgumentNotFoundWithSuggestions(
                 "city",
                 cityName,
-                {
-                    a.string
-                    for a in soup.select("#sf_locid > option[value]")
-                    if a.get("value", "") != ""
-                }
-                - {None, ""},
+                {a.string for a in soup.select("#sf_locid > option[value]") if a.get("value", "") != ""} - {None, ""},
             )
 
         if len(citySelection) > 1:
             raise SourceArgAmbiguousWithSuggestions(
                 "city",
                 cityName,
-                {
-                    a.string
-                    for a in soup.select("#sf_locid > option[value]")
-                    if a.get("value", "") != ""
-                }
-                - {None, ""},
+                {a.string for a in soup.select("#sf_locid > option[value]") if a.get("value", "") != ""} - {None, ""},
             )
 
         return citySelection[0]["value"]
 
     def fetch_street_id(self, cityId, streetName):
-        r = requests.get(
-            AUTOCOMPLETE_URL.format(cityId, streetName), headers={"Referer": API_URL}
-        )
+        r = requests.get(AUTOCOMPLETE_URL.format(cityId, streetName), headers={"Referer": API_URL})
 
         if not r.ok:
-            raise Exception(
-                "Error: failed to fetch url: {}".format(
-                    AUTOCOMPLETE_URL.format(cityId, streetName)
-                )
-            )
+            raise Exception(f"Error: failed to fetch url: {AUTOCOMPLETE_URL.format(cityId, streetName)}")
 
         streets = json.loads(r.text)
-        if streetName != None:
+        if streetName is not None:
             streetId = [item[0] for item in streets if streetName in item[1]]
         else:
             streetId = [item[0] for item in streets]
 
         if len(streetId) == 0:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "street", streetName, {item[1] for item in streets}
-            )
+            raise SourceArgumentNotFoundWithSuggestions("street", streetName, {item[1] for item in streets})
 
         if len(streetId) > 1:
-            raise SourceArgAmbiguousWithSuggestions(
-                "street", streetName, {item[1] for item in streets}
-            )
+            raise SourceArgAmbiguousWithSuggestions("street", streetName, {item[1] for item in streets})
 
         return streetId[0]
 

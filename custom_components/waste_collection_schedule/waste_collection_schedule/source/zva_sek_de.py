@@ -72,9 +72,7 @@ class Source:
         # get bezirke id
         r = session.get(MAIN_URL.format(year=year, file=f"abfallkalender-{year}.html"))
         if r.status_code == 404:  # try last year URL if this year is not available
-            r = session.get(
-                MAIN_URL.format(year=year, file=f"abfallkalender-{year-1}.html")
-            )
+            r = session.get(MAIN_URL.format(year=year, file=f"abfallkalender-{year - 1}.html"))
         r.raise_for_status()
 
         soup = BeautifulSoup(r.text, features="html.parser")
@@ -89,17 +87,10 @@ class Source:
             raise SourceArgumentNotFoundWithSuggestions(
                 "bezirk",
                 self._bezirk,
-                [
-                    option.text
-                    for option in soup.find("select", {"name": "ak_bezirk"}).find_all(
-                        "option"
-                    )
-                ],
+                [option.text for option in soup.find("select", {"name": "ak_bezirk"}).find_all("option")],
             )
         # get ortsteil id
-        r = session.get(
-            API_URL.format(file="get_ortsteile.php"), params={"bez_id": bezirk_id}
-        )
+        r = session.get(API_URL.format(file="get_ortsteile.php"), params={"bez_id": bezirk_id})
         r.raise_for_status()
         last_orts_id = None
         for part in r.text.split(";")[2:-1]:
@@ -144,14 +135,10 @@ class Source:
                     [part.split(" = ")[1][1:-1] for part in r.text.split(";")[2:-1]],
                 )
 
-        entries = self.get_calendar_data(
-            year, bezirk_id, ortsteil_id, street_id, session
-        )
+        entries = self.get_calendar_data(year, bezirk_id, ortsteil_id, street_id, session)
         if datetime.now().month >= 11:
             try:
-                entries += self.get_calendar_data(
-                    year + 1, bezirk_id, ortsteil_id, street_id, session
-                )
+                entries += self.get_calendar_data(year + 1, bezirk_id, ortsteil_id, street_id, session)
             except Exception:
                 pass
         return entries
@@ -178,7 +165,5 @@ class Source:
 
         entries = []
         for d in dates:
-            entries.append(
-                Collection(d[0], re.sub("[ ]*am [0-9]+.[0-9]+.[0-9]+[ ]*", "", d[1]))
-            )
+            entries.append(Collection(d[0], re.sub("[ ]*am [0-9]+.[0-9]+.[0-9]+[ ]*", "", d[1])))
         return entries
