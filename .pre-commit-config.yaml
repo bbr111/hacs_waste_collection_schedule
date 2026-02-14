@@ -1,7 +1,7 @@
 ---
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.0
+    rev: v0.15.1
     hooks:
       - id: ruff
         args: [--fix]
@@ -13,12 +13,13 @@ repos:
     hooks:
       - id: codespell
         args:
-          - --ignore-words-list=hass,alot,datas,dof,dur,farenheit,hist,iff,ines,ist,lightsensor,mut,nd,pres,referer,ser,serie,te,technik,ue,uint,visability,wan,wanna,withing,Adresse,termine,adresse,oder,alle,assistent,hart,marz,worthing,linz,celle,vor,leibnitz,januar,februar,juni,juli,oktober,dezember,limite,acpi,aci,meda,nome,nowe,brough,woking
+          - --builtin=clear
+          - --ignore-words=.codespellignore
           - --skip="./.*,*.csv,*.json"
           - --quiet-level=2
         exclude_types: [csv, json]
   - repo: https://github.com/PyCQA/bandit
-    rev: 1.8.3
+    rev: 1.9.3
     hooks:
       - id: bandit
         args:
@@ -32,13 +33,13 @@ repos:
       - id: yamlfmt
         args: [--mapping, '2', --sequence, '4', --width, '150', --offset, '2']
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: check-executables-have-shebangs
         stages: [manual]
       - id: check-json
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.16.0
+    rev: v1.19.1
     hooks:
       - id: mypy
         additional_dependencies: [types-requests, types-python-dateutil, types-pyyaml]

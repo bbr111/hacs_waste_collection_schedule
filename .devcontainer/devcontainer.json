@@ -1,15 +1,19 @@
 {
 	"name": "Waste Collection Schedule development",
-	"image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+	"image": "mcr.microsoft.com/devcontainers/python:3.13",
+	"remoteUser": "vscode",
 	"appPort": [
 		"9123:8123"
 	],
+	"portsAttributes": {
+		"8123": {
+			"label": "Home Assistant"
+		}
+	},
 	"containerEnv": {
 		"TZ": "Europe/Berlin"
 	},
-	"features": {
-		"ghcr.io/devcontainers/features/python:1": {}
-	},
+	"postCreateCommand": "pip install --upgrade pip && pip install -e .[dev] homeassistant==2026.2.2 && pre-commit install",
 	"customizations": {
 		"vscode": {
 			"extensions": [
@@ -23,19 +27,25 @@
 				"files.eol": "\n",
 				"editor.tabSize": 4,
 				"terminal.integrated.shell.linux": "/bin/bash",
-				"python.defaultInterpreterPath": "/usr/bin/python3",
+				"python.defaultInterpreterPath": "/usr/local/bin/python",
+				"python.terminal.activateEnvironment": false,
+				"python.venvPath": "",
 				"python.analysis.autoSearchPaths": false,
+				"python.analysis.typeCheckingMode": "basic",
+				"editor.formatOnSave": true,
+				"editor.formatOnPaste": false,
+				"editor.formatOnType": false,
 				"[python]": {
-					"editor.defaultFormatter": "ms-python.python"
+					"editor.defaultFormatter": "charliermarsh.ruff"
 				},
 				"editor.codeActionsOnSave": {
-					"source.organizeImports.ruff": "explicit",
-					"source.fixAll.ruff": "explicit"
+					"source.fixAll.ruff": "explicit",
+					"source.organizeImports.ruff": "explicit"
 				},
-				"editor.formatOnPaste": false,
-				"editor.formatOnSave": true,
-				"editor.formatOnType": true,
-				"files.trimTrailingWhitespace": true
+				"files.trimTrailingWhitespace": true,
+				"[markdown]": {
+					"files.trimTrailingWhitespace": false
+				}
 			}
 		}
 	}

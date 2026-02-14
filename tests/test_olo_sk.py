@@ -10,19 +10,30 @@ from custom_components.waste_collection_schedule.waste_collection_schedule.sourc
 
 # Initialize test fixtures after imports
 # Mock the waste_collection_schedule module before importing olo_sk
-wcs = types.ModuleType('waste_collection_schedule')
-setattr(wcs, 'Collection', MagicMock)
-sys.modules['waste_collection_schedule'] = wcs
+wcs = types.ModuleType("waste_collection_schedule")
+wcs.Collection = MagicMock  # type: ignore[attr-defined]
+sys.modules["waste_collection_schedule"] = wcs
 
-exceptions = types.ModuleType('waste_collection_schedule.exceptions')
+exceptions = types.ModuleType("waste_collection_schedule.exceptions")
+
+
 class SourceArgumentExceptionMultiple(Exception):
     def __init__(self, args, reason):
         super().__init__(f"Arguments required: {args} - {reason}")
-setattr(exceptions, 'SourceArgumentExceptionMultiple', SourceArgumentExceptionMultiple)
-sys.modules['waste_collection_schedule.exceptions'] = exceptions
+
+
+exceptions.SourceArgumentExceptionMultiple = SourceArgumentExceptionMultiple  # type: ignore[attr-defined]
+sys.modules["waste_collection_schedule.exceptions"] = exceptions
 
 # Insert source path to sys.path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "custom_components", "waste_collection_schedule", "waste_collection_schedule")))
+sys.path.insert(
+    0,
+    os.path.abspath(
+        os.path.join(
+            os.path.dirname(__file__), "..", "custom_components", "waste_collection_schedule", "waste_collection_schedule"
+        )
+    ),
+)
 
 
 class FixedDate(date):
@@ -42,6 +53,7 @@ def source():
 # =============================================================================
 # Tests for _is_date_in_season
 # =============================================================================
+
 
 def test_is_date_in_season_within(source):
     """Test date within a normal season range."""
@@ -86,6 +98,7 @@ def test_is_date_in_season_year_spanning_outside(source):
 # =============================================================================
 # Tests for _generate_collection_dates - biweekly patterns
 # =============================================================================
+
 
 def test_generate_dates_every_week(source, monkeypatch):
     """Test generating dates for every week pickup [4,4] (Thursday every week)."""
@@ -166,6 +179,7 @@ def test_generate_dates_no_pickup(source, monkeypatch):
 # Tests for _generate_collection_dates - weekly_multi patterns
 # =============================================================================
 
+
 def test_generate_dates_multi_day(source, monkeypatch):
     """Test generating dates for multi-day pattern [25,25] (Tuesday and Friday)."""
     monkeypatch.setattr(olo_sk.datetime, "date", FixedDate)
@@ -220,6 +234,7 @@ def test_generate_dates_multi_day_mixed(source, monkeypatch):
 # Tests for _generate_collection_dates - monthly patterns
 # =============================================================================
 
+
 def test_generate_dates_monthly(source, monkeypatch):
     """Test generating dates for monthly pattern [-,-,2,-] (3rd Tuesday)."""
     monkeypatch.setattr(olo_sk.datetime, "date", FixedDate)
@@ -229,7 +244,7 @@ def test_generate_dates_monthly(source, monkeypatch):
     # All dates should be the 3rd Tuesday of each month (days 15-21)
     for d in dates:
         assert d.isoweekday() == 2  # Tuesday
-        assert 15 <= d.day <= 21    # 3rd occurrence falls in days 15-21
+        assert 15 <= d.day <= 21  # 3rd occurrence falls in days 15-21
 
 
 def test_generate_dates_monthly_first_week(source, monkeypatch):
@@ -240,7 +255,7 @@ def test_generate_dates_monthly_first_week(source, monkeypatch):
 
     for d in dates:
         assert d.isoweekday() == 4  # Thursday
-        assert 1 <= d.day <= 7      # 1st occurrence falls in days 1-7
+        assert 1 <= d.day <= 7  # 1st occurrence falls in days 1-7
 
 
 def test_generate_dates_monthly_fourth_week(source, monkeypatch):
@@ -251,7 +266,7 @@ def test_generate_dates_monthly_fourth_week(source, monkeypatch):
 
     for d in dates:
         assert d.isoweekday() == 5  # Friday
-        assert 22 <= d.day <= 28    # 4th occurrence falls in days 22-28
+        assert 22 <= d.day <= 28  # 4th occurrence falls in days 22-28
 
 
 def test_generate_dates_monthly_multiple_weeks(source, monkeypatch):
@@ -270,15 +285,13 @@ def test_generate_dates_monthly_multiple_weeks(source, monkeypatch):
 # Tests for _generate_collection_dates - seasonal patterns
 # =============================================================================
 
+
 def test_generate_dates_seasonal(source, monkeypatch):
     """Test generating dates with seasonal frequency."""
     monkeypatch.setattr(olo_sk.datetime, "date", FixedDate)
 
     # Thursday in summer, Friday in winter
-    dates = source._generate_collection_dates(
-        "[4,4];[5,5]",
-        "01/04-31/10, 01/11-31/03"
-    )
+    dates = source._generate_collection_dates("[4,4];[5,5]", "01/04-31/10, 01/11-31/03")
 
     # December 2 is in winter, so we should get Fridays
     # Filter to just December dates for testing
@@ -290,6 +303,7 @@ def test_generate_dates_seasonal(source, monkeypatch):
 # =============================================================================
 # Tests for WASTE_TYPES mapping
 # =============================================================================
+
 
 def test_waste_types_all_have_display_name_and_icon():
     """Test that all waste types have display name and icon."""

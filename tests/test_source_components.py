@@ -192,7 +192,7 @@ def _test_source_has_necessary_parameters_extra_info(extra_info: dict, source: s
         try:
             extra_info = extra_info()
         except Exception as e:
-            assert False, f"EXTRA_INFO() function in source {source} failed with {e}"
+            raise AssertionError(f"EXTRA_INFO() function in source {source} failed with {e}") from e
 
         # check if is iterable (list, tupüle, set)
         assert isinstance(extra_info, list | tuple | set | GeneratorType), (
