@@ -65,7 +65,7 @@ indent-style = "space"
 # =========================
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.13"
 warn_unused_configs = true
 warn_redundant_casts = true
 warn_unused_ignores = false
