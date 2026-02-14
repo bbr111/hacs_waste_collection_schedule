@@ -92,7 +92,7 @@ class WhatBinDayService:
     def register_device(self) -> str:
         """Register a device with the API and get a device key."""
         # Check if we already have a device key in memory
-        if self._device_key:
+        if self._device_key is not None:
             return self._device_key
 
         # Try to load from HA Store first
@@ -100,9 +100,9 @@ class WhatBinDayService:
             store = self._get_storage()
             if store is not None:
                 stored_key = store.get_device_key(self._location_key)
-                if stored_key:
+                if stored_key is not None:
                     self._device_key = stored_key
-                    return self._device_key
+                    return stored_key
         except Exception as e:
             _LOGGER.error("Error accessing HA Store for location %s: %s", self._location_key, e)
 
@@ -136,17 +136,18 @@ class WhatBinDayService:
             if not data.get("success"):
                 raise Exception(f"Device registration failed: {data.get('info', 'Unknown error')}")
 
-            self._device_key = data["data"]["key"]
+            device_key = data["data"]["key"]
+            self._device_key = device_key
 
             # Save to HA Store
             try:
                 store = self._get_storage()
                 if store is not None:
-                    store.set_device_key(self._location_key, self._device_key)
+                    store.set_device_key(self._location_key, device_key)
             except Exception as save_error:
                 _LOGGER.error("Failed to save device key to HA Store: %s", save_error)
 
-            return self._device_key
+            return device_key
         except Exception as reg_error:
             _LOGGER.error(
                 "Device registration failed for location %s: %s",
@@ -266,7 +267,7 @@ class WhatBinDayService:
 
             # Create an entry for each bin type collected on this date
             for bin_type in event["Items"]:
-                bin_name = self._bin_names.get(bin_type, bin_type)
+                bin_name = self._bin_names.get(bin_type) or bin_type
                 icon = self._icon_map.get(bin_type, "mdi:trash-can")
 
                 entries.append(
@@ -322,8 +323,8 @@ class WhatBinDayService:
             return entries
 
         except requests.RequestException as e:
-            raise Exception(f"Network error: {e}")
+            raise Exception(f"Network error: {e}") from e
         except KeyError as e:
-            raise Exception(f"Unexpected API response format: {e}")
+            raise Exception(f"Unexpected API response format: {e}") from e
         except Exception as e:
-            raise Exception(f"Error fetching collection schedule: {e}")
+            raise Exception(f"Error fetching collection schedule: {e}") from e

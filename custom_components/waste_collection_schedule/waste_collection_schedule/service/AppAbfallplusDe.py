@@ -10,7 +10,6 @@ import requests
 from bs4 import BeautifulSoup, Tag
 
 from waste_collection_schedule.exceptions import (
-    SourceArgumentNotFound,
     SourceArgumentNotFoundWithSuggestions,
     SourceArgumentRequiredWithSuggestions,
 )
@@ -410,7 +409,7 @@ def extract_onclicks(data: BeautifulSoup | str | requests.Response, hnr=False) -
 
     to_return = []
     for a in data.find_all("a"):
-        onclick: str = a.attrs["onclick"].replace("('#f_ueberspringen').val('0')", "")
+        onclick: str = str(a.attrs["onclick"]).replace("('#f_ueberspringen').val('0')", "")
         start = onclick.find("(") + 1
         end = onclick.find("})") + 1
         if end == 0:
@@ -427,7 +426,7 @@ def extract_onclicks(data: BeautifulSoup | str | requests.Response, hnr=False) -
         try:
             to_return.append(json.loads(string))
         except json.decoder.JSONDecodeError:
-            raise Exception(f"Failed to parse '{string}', onclick: '{onclick}'")
+            raise Exception(f"Failed to parse '{string}', onclick: '{onclick}'") from None
         if hnr:
             res = re.search(r"\.val\([0-9]+\)", onclick)
             if res:
@@ -538,11 +537,11 @@ class AppAbfallplusDe:
 
     def get_kom_or_lk_name(self) -> str | bool:
         """Get the landkreis or kommune name if the app is designed for a specific one."""
-        if self._kommune_id and "|" in self._kommune_id:
+        if isinstance(self._kommune_id, str) and self._kommune_id and "|" in self._kommune_id:
             if self._kommune_id.split("|")[0] != "0":
                 return self._kommune_id.split("|")[-1]
 
-        if self._landkreis_id and "|" in self._landkreis_id:
+        if isinstance(self._landkreis_id, str) and self._landkreis_id and "|" in self._landkreis_id:
             if self._landkreis_id and "|" in self._landkreis_id:
                 if self._landkreis_id.split("|")[0] != "0":
                     return self._landkreis_id.split("|")[-1]
@@ -568,7 +567,7 @@ class AppAbfallplusDe:
             elif input.attrs["name"] == "f_id_kommune":
                 self._kommune_id = input.attrs["value"]
         to_request = [
-            a["href"].split("#awk_assistent_step_standort_")[1]
+            str(a["href"]).split("#awk_assistent_step_standort_")[1]
             for a in soup.find_all("a", href=re.compile(r"#awk_assistent_step_standort_[a-z]*"))
         ]
         self._bezirk_needed = False
@@ -673,7 +672,7 @@ class AppAbfallplusDe:
                 self._kommune_id = region["kommune_id"] if region["kommune_id"] is not None else region["id"]
                 return
 
-        raise SourceArgumentNotFound("city", self._region_search, [r["name"] for r in regions])
+        raise SourceArgumentNotFoundWithSuggestions("city", self._region_search, [r["name"] for r in regions])
 
     def get_bezirke(self):
         data = {}
@@ -725,7 +724,7 @@ class AppAbfallplusDe:
                     )
                 return bezirk["finished"]
 
-        raise SourceArgumentNotFound("bezirk", self._bezirk_search, [b["name"] for b in bezirke])
+        raise SourceArgumentNotFoundWithSuggestions("bezirk", self._bezirk_search, [b["name"] for b in bezirke])
 
     def get_streets(self, search=None):
         if search:
@@ -763,7 +762,7 @@ class AppAbfallplusDe:
         if self._strasse_search is None and len(streets) == 0:
             return
         elif self._strasse_search is None:
-            SourceArgumentRequiredWithSuggestions("strasse", [s["name"] for s in streets])
+            raise SourceArgumentRequiredWithSuggestions("strasse", "multiple streets available", [s["name"] for s in streets])
 
         for street in streets:
             if compare(street["name"], self._strasse_search):
@@ -812,7 +811,9 @@ class AppAbfallplusDe:
         elif self._hnr_search is None and len(hnrs) == 0:
             return
         elif self._hnr_search is None:
-            raise SourceArgumentRequiredWithSuggestions("hnr", [hnr["name"] for hnr in hnrs])
+            raise SourceArgumentRequiredWithSuggestions(
+                "hnr", "multiple house numbers available", [hnr["name"] for hnr in hnrs]
+            )
         for hnr in hnrs:
             if compare(hnr["name"], self._hnr_search, remove_space=True):
                 self._hnr = hnr["id"]
@@ -840,26 +841,32 @@ class AppAbfallplusDe:
             to_skip_element = soup.find("h2", text=to_skip)
             div_to_skip = to_skip_element.find_parent("div") if to_skip_element else None
             if div_to_skip:
-                for input in to_skip_element.find_parent("div").find_all("input", {"name": "f_id_abfallart[]"}):
-                    if compare(input.text, self._region_search, remove_space=True):
-                        id = input.attrs["id"].split("_")[-1]
-                        self._f_id_abfallart.append(input.attrs["value"])
-                        self._needs_subtitle.append(id)
-                        if id.isdigit():
-                            self._needs_subtitle.append(str(int(id) - 1))
-                        break
-                # remove sondermuell h2 from soup
-                div_to_skip.decompose()
+                parent_div = to_skip_element.find_parent("div") if to_skip_element else None
+                if parent_div:
+                    for input in parent_div.find_all("input", {"name": "f_id_abfallart[]"}):
+                        if compare(input.text, self._region_search, remove_space=True):
+                            id_attr = input.attrs.get("id")
+                            if id_attr:
+                                id = str(id_attr).split("_")[-1]
+                                self._f_id_abfallart.append(input.attrs["value"])
+                                self._needs_subtitle.append(id)
+                                if id.isdigit():
+                                    self._needs_subtitle.append(str(int(id) - 1))
+                            break
+                    # remove sondermuell h2 from soup
+                    div_to_skip.decompose()
 
         for input in soup.find_all("input", {"name": "f_id_abfallart[]"}):
             if input.attrs["value"] == "0":
                 if "id" not in input.attrs:
                     continue
-                id = input.attrs["id"].split("_")[-1]
-                self._f_id_abfallart.append(id)
-                self._needs_subtitle.append(id)
-                if id.isdigit():
-                    self._needs_subtitle.append(str(int(id) - 1))
+                id_attr = input.attrs.get("id")
+                if id_attr:
+                    id = str(id_attr).split("_")[-1]
+                    self._f_id_abfallart.append(id)
+                    self._needs_subtitle.append(id)
+                    if id.isdigit():
+                        self._needs_subtitle.append(str(int(id) - 1))
                 continue
 
             self._f_id_abfallart.append(input.attrs["value"])
@@ -926,33 +933,55 @@ class AppAbfallplusDe:
         categories = {}
 
         for category in soup_array.find_all("dict"):
-            id = category.find("key", text="id").find_next_sibling("string").text
-            name = (
-                category.find("key", text="name")
-                .find_next_sibling("string")
-                .text.replace("![CDATA[", "")
-                .replace("]]", "")
-                .strip()
-            )
+            id_elem = category.find("key", text="id")
+            if not id_elem:
+                continue
+            id_sibling = id_elem.find_next_sibling("string")
+            if not id_sibling:
+                continue
+            id = id_sibling.text
+
+            name_elem = category.find("key", text="name")
+            if not name_elem:
+                continue
+            name_sibling = name_elem.find_next_sibling("string")
+            if not name_sibling:
+                continue
+            name = name_sibling.text.replace("![CDATA[", "").replace("]]", "").strip()
             if any(s_id in id for s_id in self._needs_subtitle):
-                subtitle = (
-                    category.find("key", text="subtitle")
-                    .find_next_sibling("string")
-                    .text.replace("![CDATA[", "")
-                    .replace("]]", "")
-                    .strip()
-                )
-                name += " - " + subtitle
+                subtitle_elem = category.find("key", text="subtitle")
+                if subtitle_elem:
+                    subtitle_sibling = subtitle_elem.find_next_sibling("string")
+                    if subtitle_sibling:
+                        subtitle = subtitle_sibling.text.replace("![CDATA[", "").replace("]]", "").strip()
+                        name += " - " + subtitle
             categories[id] = name
 
         collections: list[dict] = []
-        for collection in soup.find("key", text="dates").find_next_sibling("array").find_all("dict"):
-            category = collection.find("key", text="category_id").find_next_sibling("string").text
-            category_name = categories[category]
-            pickup_date_str = collection.find("key", text="pickup_date").find_next_sibling("string").text
-            pickup_date = datetime.strptime(pickup_date_str, "%Y-%m-%dT%H:%M:%S%z").date()
+        dates_elem = soup.find("key", text="dates")
+        if dates_elem:
+            dates_sibling = dates_elem.find_next_sibling("array")
+            if dates_sibling:
+                for collection in dates_sibling.find_all("dict"):
+                    category_elem = collection.find("key", text="category_id")
+                    if not category_elem:
+                        continue
+                    category_sibling = category_elem.find_next_sibling("string")
+                    if not category_sibling:
+                        continue
+                    category = category_sibling.text
+                    category_name = categories.get(category, "")
 
-            collections.append({"category": category_name, "date": pickup_date})
+                    pickup_date_elem = collection.find("key", text="pickup_date")
+                    if not pickup_date_elem:
+                        continue
+                    pickup_date_sibling = pickup_date_elem.find_next_sibling("string")
+                    if not pickup_date_sibling:
+                        continue
+                    pickup_date_str = pickup_date_sibling.text
+                    pickup_date = datetime.strptime(pickup_date_str, "%Y-%m-%dT%H:%M:%S%z").date()
+
+                    collections.append({"category": category_name, "date": pickup_date})
 
         return collections
 
@@ -1096,7 +1125,7 @@ def get_newly_supported_apps():
         soup = BeautifulSoup(driver.page_source, "html.parser")
         for link in soup.find_all("a"):
             href = link.get("href")
-            if link and "/store/apps/details?id=" in href:
+            if link and href and isinstance(href, str) and "/store/apps/details?id=" in href:
                 app_id = href.split("=")[-1]
                 app_ids.add(app_id)
 

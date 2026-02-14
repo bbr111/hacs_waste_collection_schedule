@@ -24,7 +24,7 @@ urllib3
 parser = argparse.ArgumentParser(
     description="Searches for new bin types not yet included in NAME_MAP. Searches all addresses in the database if not otherwise specified."
 )
-parser.add_argument("--street", type=str, help="Specify a street adress or part of it.")
+parser.add_argument("--street", type=str, help="Specify a street address or part of it.")
 parser.add_argument("--city", type=str, help="Specify a city.")
 parser.add_argument("--char", type=str, help='exclude characters from search (eg "abcdef")')
 args = parser.parse_args()
@@ -111,7 +111,7 @@ def waste_searcher(arg1):  # sourcery skip: use-fstring-for-concatenation
 
     soup = BeautifulSoup(wasteschedule.text, "html.parser")
 
-    # Calender uses diffrent tags for the last week of the month
+    # Calender uses different tags for the last week of the month
     wastedays = soup.find_all("td", {"style": "styleDayHit"}) + soup.find_all("td", "styleDayHit")
 
     # get a list of all tags with waste collection days for the current year
@@ -130,7 +130,7 @@ def waste_searcher(arg1):  # sourcery skip: use-fstring-for-concatenation
     return
 
 
-# input any character alredy searched
+# input any character already searched
 # used_char = ["a", "b",]
 used_char: list[str] = []
 checked_addresses: list[str] = []
@@ -156,7 +156,7 @@ with alive_bar(bar_count) as bar:
             adresslist.raise_for_status()
             new_addressarray = adresslist.text.lower().splitlines()
             for line in new_addressarray:
-                # if line contains an alredy searched character then don"t write it
+                # if line contains an already searched character then don"t write it
                 found_char = 0
                 for x in used_char:
                     if x in line.strip("\n"):
@@ -205,6 +205,6 @@ if NEW_NAME_MAP:
         "Map these new waste types to a common name using https://samiljo.se/avfallshamtning/hamtningskalender in conjunction with addresses above. Add the new common name to the NAME_MAP in samiljo_se.py and Samiljo_se_wastetype_searcher.py"
     )
 elif args.city and args.street:
-    print(f"The waste types for {args.street}, {args.city} are alredy included in the NAME_MAP.")
+    print(f"The waste types for {args.street}, {args.city} are already included in the NAME_MAP.")
 else:
     print("Found no new waste types.")

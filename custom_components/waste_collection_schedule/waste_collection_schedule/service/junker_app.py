@@ -56,8 +56,10 @@ class Junker:
         area: int | None = None,
         area_name: str | None = None,
         use_embed_url: bool = True,
-        municipalities_with_area: dict[str, list[int]] = {},
+        municipalities_with_area: dict[str, list[int]] | None = None,
     ):
+        if municipalities_with_area is None:
+            municipalities_with_area = {}
         self._municipality: str = municipality
         self._area: int | None = area
         self._municipalities_with_area = municipalities_with_area
