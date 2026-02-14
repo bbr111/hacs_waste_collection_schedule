@@ -27,9 +27,7 @@ class Source:
     def fetch(self):
         url = "https://www.lakemac.com.au/api/v1/myarea/search"
 
-        headers = {
-            "referer": "https://www.lakemac.com.au/For-residents/Waste-and-recycling/When-are-your-bins-collected"
-        }
+        headers = {"referer": "https://www.lakemac.com.au/For-residents/Waste-and-recycling/When-are-your-bins-collected"}
 
         params = {"keywords": self._address}
 
@@ -60,8 +58,8 @@ class Source:
         for tag in soup.find_all("div", {"class": "next-service"}):
             try:
                 date_object = datetime.strptime(tag.text.strip(), "%a %d/%m/%Y").date()
-            except:
-                continue    
+            except Exception:
+                continue
             waste_date.append(date_object)
 
         waste = list(zip(waste_type, waste_date))

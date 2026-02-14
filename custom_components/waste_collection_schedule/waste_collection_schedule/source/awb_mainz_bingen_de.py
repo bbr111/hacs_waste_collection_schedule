@@ -4,7 +4,6 @@ import requests
 from bs4 import BeautifulSoup
 from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 from waste_collection_schedule.exceptions import (
-    SourceArgumentNotFound,
     SourceArgumentNotFoundWithSuggestions,
     SourceArgumentRequired,
 )
@@ -81,9 +80,7 @@ class Source:
 
         args = {
             "xjxfun": "show_ortsteil_dropdown",
-            "xjxargs[]": xjxargs_string.format(
-                bezirk_id=bezirk_id, ort_id=0, strasse_id=0
-            ),
+            "xjxargs[]": xjxargs_string.format(bezirk_id=bezirk_id, ort_id=0, strasse_id=0),
         }
 
         # send request to get dropdown with for ort id
@@ -96,25 +93,17 @@ class Source:
         if not teilorte_div:
             raise Exception("invalid response from server", soup)
 
-        teilorte = BeautifulSoup(
-            teilorte_div.text.replace("<![CDATA[", "").replace("]]>", ""), "html.parser"
-        )
+        teilorte = BeautifulSoup(teilorte_div.text.replace("<![CDATA[", "").replace("]]>", ""), "html.parser")
 
-        ort = teilorte.find(
-            "option", text=re.compile(re.escape(self._ort), re.IGNORECASE)
-        )
+        ort = teilorte.find("option", text=re.compile(re.escape(self._ort), re.IGNORECASE))
         if not ort:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "ort", self._ort, [i.text for i in teilorte.find_all("option")][1:]
-            )
+            raise SourceArgumentNotFoundWithSuggestions("ort", self._ort, [i.text for i in teilorte.find_all("option")][1:])
 
         ort_id = ort.get("value")
 
         args = {
             "xjxfun": "show_strasse_dropdown_or_abfuhrtermine",
-            "xjxargs[]": xjxargs_string.format(
-                bezirk_id=bezirk_id, ort_id=ort_id, strasse_id=0
-            ),
+            "xjxargs[]": xjxargs_string.format(bezirk_id=bezirk_id, ort_id=ort_id, strasse_id=0),
         }
 
         r = session.post(API_URL, data=args)
@@ -126,9 +115,7 @@ class Source:
         if not div_strasse:
             raise Exception("invalid response from server")
 
-        strassen_soup = BeautifulSoup(
-            div_strasse.text.replace("<![CDATA[", "").replace("]]>", ""), "html.parser"
-        )
+        strassen_soup = BeautifulSoup(div_strasse.text.replace("<![CDATA[", "").replace("]]>", ""), "html.parser")
 
         # If strasse is needed
         if strassen_soup.find("option"):
@@ -136,14 +123,10 @@ class Source:
                 raise SourceArgumentRequired("strasse")
 
             # get strasse id
-            strasse_id = strassen_soup.find(
-                "option", text=re.compile(re.escape(self._strasse), re.IGNORECASE)
-            )
+            strasse_id = strassen_soup.find("option", text=re.compile(re.escape(self._strasse), re.IGNORECASE))
             if not strasse_id:
                 found = [i.text for i in strassen_soup.find_all("option")][1:]
-                raise SourceArgumentNotFoundWithSuggestions(
-                    "strasse", self._strasse, found
-                )
+                raise SourceArgumentNotFoundWithSuggestions("strasse", self._strasse, found)
 
             strasse_id = strasse_id.get("value")
             xjxargs = {
@@ -165,9 +148,7 @@ class Source:
 
         if not cal_wrapper:
             raise Exception("No calendar found", r.text)
-        cal_soup = BeautifulSoup(
-            cal_wrapper.text.replace("<![CDATA[", "").replace("]]>", ""), "html.parser"
-        )
+        cal_soup = BeautifulSoup(cal_wrapper.text.replace("<![CDATA[", "").replace("]]>", ""), "html.parser")
 
         entries = []
         # get ical file url

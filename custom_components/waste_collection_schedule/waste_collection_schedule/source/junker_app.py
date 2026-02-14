@@ -355,10 +355,6 @@ class Source(Junker):
         try:
             return super().fetch()
         except AreaRequired as e:
-            raise SourceArgumentRequiredWithSuggestions(
-                "area", "required for this municipality", [a[0] for a in e.areas]
-            )
+            raise SourceArgumentRequiredWithSuggestions("area", "required for this municipality", [a[0] for a in e.areas])
         except AreaNotFound as e:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "area", self._area, [a[0] for a in e.areas]
-            )
+            raise SourceArgumentNotFoundWithSuggestions("area", self._area, [a[0] for a in e.areas])

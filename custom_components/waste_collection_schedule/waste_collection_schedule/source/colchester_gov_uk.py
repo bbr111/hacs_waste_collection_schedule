@@ -31,9 +31,7 @@ class Source:
 
     def fetch(self):
         # get json file
-        r = requests.get(
-            f"https://new-llpg-app.azurewebsites.net/api/calendar/{self._llpgid}"
-        )
+        r = requests.get(f"https://new-llpg-app.azurewebsites.net/api/calendar/{self._llpgid}")
 
         # extract data from json
         data = json.loads(r.text)
@@ -53,9 +51,7 @@ class Source:
                         # or the second, a 'Green' week. If the week is not `WeekOne`, a 'Blue' week,  then 7 days need
                         # to be added to the `DatesOfFirstCollectionDays` date to provide the correct 'Green' week
                         # collection date.
-                        date = datetime.strptime(
-                            data["DatesOfFirstCollectionDays"][key], "%Y-%m-%dT%H:%M:%S"
-                        )
+                        date = datetime.strptime(data["DatesOfFirstCollectionDays"][key], "%Y-%m-%dT%H:%M:%S")
                         if not weeks["WeekOne"]:
                             date = date + timedelta(days=7)
                         if date > datetime.now():

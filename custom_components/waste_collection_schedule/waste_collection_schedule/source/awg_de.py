@@ -51,9 +51,7 @@ ICON_MAP = {
 }
 
 
-API_URL = (
-    "https://wastemanagement.awg.de/WasteManagementDonauwald/WasteManagementServlet"
-)
+API_URL = "https://wastemanagement.awg.de/WasteManagementDonauwald/WasteManagementServlet"
 
 
 class Source:
@@ -62,15 +60,11 @@ class Source:
         self._street = street
         self._house_number = hnr
         self._address_suffix = addition
-        self._boundary = "WebKitFormBoundary" + "".join(
-            random.sample(string.ascii_letters + string.digits, 16)
-        )
+        self._boundary = "WebKitFormBoundary" + "".join(random.sample(string.ascii_letters + string.digits, 16))
         self._ics = ICS()
 
     def __str__(self):
-        return (
-            f"{self._city} {self._street} {self._house_number} {self._address_suffix}"
-        )
+        return f"{self._city} {self._street} {self._house_number} {self._address_suffix}"
 
     @staticmethod
     def _parse_data(data, boundary):
@@ -82,9 +76,7 @@ class Source:
 
     @staticmethod
     def _parse_response_input(text):
-        parsed = re.findall(
-            '<INPUT\\sNAME="([^"]+?)"\\sID="[^"]+?"(?:\\sVALUE="([^"]*?)")?', text
-        )
+        parsed = re.findall('<INPUT\\sNAME="([^"]+?)"\\sID="[^"]+?"(?:\\sVALUE="([^"]*?)")?', text)
         return {k: v for k, v in parsed}
 
     def _address(self):
@@ -107,18 +99,10 @@ class Source:
 
     def _get_dates(self, session, init_request, calendar=""):
         kwargs = {"Ort": self._city, "Strasse": ""}
-        payload = self._payload(
-            init_request, action="CITYCHANGED", period=calendar, **kwargs
-        )
-        city_response = session.post(
-            API_URL, headers=self._headers(), data=payload, verify=False
-        )
-        payload = self._payload(
-            city_response.text, action="forward", period=calendar, **self._address()
-        )
-        final_response = session.post(
-            API_URL, headers=self._headers(), data=payload, verify=False
-        )
+        payload = self._payload(init_request, action="CITYCHANGED", period=calendar, **kwargs)
+        city_response = session.post(API_URL, headers=self._headers(), data=payload, verify=False)
+        payload = self._payload(city_response.text, action="forward", period=calendar, **self._address())
+        final_response = session.post(API_URL, headers=self._headers(), data=payload, verify=False)
 
         payload = self._payload(
             final_response.text,
@@ -127,9 +111,7 @@ class Source:
             **self._address(),
         )
 
-        ics_response = session.post(
-            API_URL, headers=self._headers(), data=payload, verify=False
-        )
+        ics_response = session.post(API_URL, headers=self._headers(), data=payload, verify=False)
         return self._ics.convert(ics_response.text)
 
     def fetch(self):
@@ -140,16 +122,10 @@ class Source:
             verify=False,
         ).text
         if calendars := re.findall('NAME="Zeitraum" VALUE="([^"]+?)"', init_request):
-            dates = [
-                date
-                for calendar in calendars
-                for date in self._get_dates(session, init_request, calendar)
-            ]
+            dates = [date for calendar in calendars for date in self._get_dates(session, init_request, calendar)]
         else:
             dates = self._get_dates(session, init_request)
         entries = []
         for date, bin_type in dates:
-            entries.append(
-                Collection(date, bin_type.strip(), ICON_MAP.get(bin_type.strip()))
-            )
+            entries.append(Collection(date, bin_type.strip(), ICON_MAP.get(bin_type.strip())))
         return entries

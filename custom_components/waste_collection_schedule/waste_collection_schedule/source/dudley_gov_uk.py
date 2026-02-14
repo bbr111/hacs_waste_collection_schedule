@@ -60,11 +60,7 @@ class Source:
         return e
 
     def get_xmas_map(self, footer_panel) -> dict[date, date]:
-        if not (
-            footer_panel
-            and footer_panel.find("table")
-            and footer_panel.find("table").find("tr")
-        ):
+        if not (footer_panel and footer_panel.find("table") and footer_panel.find("table").find("tr")):
             return {}
         xmas_map: dict = {}
         today = datetime.now()
@@ -85,16 +81,12 @@ class Source:
         yr = int(today.year)
 
         s = requests.Session()
-        r = s.get(
-            f"https://maps.dudley.gov.uk/?action=SetAddress&UniqueId={self._uprn}"
-        )
+        r = s.get(f"https://maps.dudley.gov.uk/?action=SetAddress&UniqueId={self._uprn}")
         soup = BeautifulSoup(r.text, "html.parser")
 
         panel = soup.find("div", {"aria-label": "Refuse and Recycling Collection"})
         panel_data = panel.find("div", {"class": "atPanelData"})
-        waste_data = panel_data.text.split("Next")[
-            1:
-        ]  # remove first element it just contains general info
+        waste_data = panel_data.text.split("Next")[1:]  # remove first element it just contains general info
 
         # get table of holiday moved dates (only around xmas)
         footer_panel = panel.find("div", {"class": "atPanelFooter"})

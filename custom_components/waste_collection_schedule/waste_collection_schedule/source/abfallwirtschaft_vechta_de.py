@@ -101,13 +101,7 @@ class Source:
             dates = self._ics.convert(r.text.replace("UID:", "NOTUID: "))
 
             for d in dates:
-                bin_type = (
-                    d[1]
-                    .replace("Abfuhrtermin", "")
-                    .replace("Erinnerung", "")
-                    .replace("für", "")
-                    .strip()
-                )
+                bin_type = d[1].replace("Abfuhrtermin", "").replace("Erinnerung", "").replace("für", "").strip()
 
                 if f"{bin_type} {str(d[0])}" in string_entries:
                     continue
@@ -117,9 +111,7 @@ class Source:
                     Collection(
                         d[0],
                         bin_type,
-                        ICON_MAP.get(
-                            re.sub("[0-9]", "", bin_type).strip().replace("  ", " ")
-                        ),
+                        ICON_MAP.get(re.sub("[0-9]", "", bin_type).strip().replace("  ", " ")),
                     )
                 )
         return collection_entries

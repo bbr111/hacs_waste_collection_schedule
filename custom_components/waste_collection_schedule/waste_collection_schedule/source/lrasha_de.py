@@ -7,11 +7,7 @@ TEST_CASES = {"BROKEN": {"location": "BROKEN"}}
 
 class Source:
     def __init__(self, location):
-        raise Exception(
-            "This source is no longer supported. Use app_abfallplus_de instead."
-        )
+        raise Exception("This source is no longer supported. Use app_abfallplus_de instead.")
 
     def fetch(self):
-        raise Exception(
-            "This source is no longer supported. Use app_abfallplus_de instead."
-        )
+        raise Exception("This source is no longer supported. Use app_abfallplus_de instead.")

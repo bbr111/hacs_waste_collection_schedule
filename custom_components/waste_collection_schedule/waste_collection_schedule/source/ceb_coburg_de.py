@@ -74,11 +74,7 @@ class Source:
             try:
                 supported_streets = self._get_all_supported_streets()
             except Exception as e:
-                raise SourceArgumentNotFound(
-                    "street", self._street, f"Failed to fetch supported streets: {e}"
-                )
-            raise SourceArgumentNotFoundWithSuggestions(
-                "street", self._street, supported_streets
-            )
+                raise SourceArgumentNotFound("street", self._street, f"Failed to fetch supported streets: {e}")
+            raise SourceArgumentNotFoundWithSuggestions("street", self._street, supported_streets)
 
         return entries

@@ -18,9 +18,7 @@ TEST_CASES = {
         # The flat above Bargain Hut on Wood Road
         "premises_id": "10010688168"
     },
-    "Allestree Home Improvements, 512 Duffield Road, Derby, DE22 2DL": {
-        "premises_id": "100030310335"
-    },
+    "Allestree Home Improvements, 512 Duffield Road, Derby, DE22 2DL": {"premises_id": "100030310335"},
 }
 
 ICON_MAP = {
@@ -69,9 +67,7 @@ class Source:
 
     def fetch(self):
         entries = []
-        r = self._session.get(
-            f"https://secure.derby.gov.uk/binday/Bindays/{self._premises_id}"
-        )
+        r = self._session.get(f"https://secure.derby.gov.uk/binday/Bindays/{self._premises_id}")
         r.raise_for_status()
         soup = BeautifulSoup(r.text, features="html.parser")
         results = soup.find_all("div", {"class": "binresult"})

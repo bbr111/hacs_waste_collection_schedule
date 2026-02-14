@@ -8,6 +8,7 @@ from datetime import date, datetime
 
 import requests
 from bs4 import BeautifulSoup, Tag
+
 from waste_collection_schedule.exceptions import (
     SourceArgumentNotFound,
     SourceArgumentNotFoundWithSuggestions,
@@ -394,14 +395,14 @@ def get_extra_info():
 API_BASE = "https://app.abfallplus.de/{}"
 API_ASSISTANT = API_BASE.format("assistent/{}")  # ignore: E501
 USER_AGENT = "Android / {} 8.1.1 (1915081010) / DM=unknown;DT=vbox86p;SN=Google;SV=8.1.0 (27);MF=unknown"
-USER_AGENT_ASSISTANT = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Abfallwecker"
+USER_AGENT_ASSISTANT = (
+    "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Abfallwecker"
+)
 ABFALLARTEN_H2_SKIP = ["Sondermüll"]
 VERIFY_SSL = True
 
 
-def extract_onclicks(
-    data: BeautifulSoup | str | requests.Response, hnr=False
-) -> list[list]:
+def extract_onclicks(data: BeautifulSoup | str | requests.Response, hnr=False) -> list[list]:
     if isinstance(data, requests.Response):
         data = data.text
     if isinstance(data, str):
@@ -501,9 +502,7 @@ class AppAbfallplusDe:
             headers["Accept-Language"] = "de-DE,de;q=0.9"
 
         else:
-            headers["User-Agent"] = USER_AGENT.format(
-                MAP_APP_USERAGENTS.get(self._app_id, "%")
-            )
+            headers["User-Agent"] = USER_AGENT.format(MAP_APP_USERAGENTS.get(self._app_id, "%"))
 
         if "config.xml" in url_ending:
             headers["Accept-Encoding"] = "gzip, deflate, br"
@@ -570,9 +569,7 @@ class AppAbfallplusDe:
                 self._kommune_id = input.attrs["value"]
         to_request = [
             a["href"].split("#awk_assistent_step_standort_")[1]
-            for a in soup.find_all(
-                "a", href=re.compile(r"#awk_assistent_step_standort_[a-z]*")
-            )
+            for a in soup.find_all("a", href=re.compile(r"#awk_assistent_step_standort_[a-z]*"))
         ]
         self._bezirk_needed = False
 
@@ -673,16 +670,10 @@ class AppAbfallplusDe:
                 if region["landkreis_id"] is not None:
                     self._landkreis_id = region["landkreis_id"]
                 self._region_id = region["id"]
-                self._kommune_id = (
-                    region["kommune_id"]
-                    if region["kommune_id"] is not None
-                    else region["id"]
-                )
+                self._kommune_id = region["kommune_id"] if region["kommune_id"] is not None else region["id"]
                 return
 
-        raise SourceArgumentNotFound(
-            "city", self._region_search, [r["name"] for r in regions]
-        )
+        raise SourceArgumentNotFound("city", self._region_search, [r["name"] for r in regions])
 
     def get_bezirke(self):
         data = {}
@@ -730,15 +721,11 @@ class AppAbfallplusDe:
                 self._bezirk_id = bezirk["id"]
                 if bezirk["finished"] or "street_id" in bezirk:
                     self._f_id_strasse = self._strasse_id = (
-                        bezirk["street_id"]
-                        if bezirk.get("street_id") is not None
-                        else bezirk["id"]
+                        bezirk["street_id"] if bezirk.get("street_id") is not None else bezirk["id"]
                     )
                 return bezirk["finished"]
 
-        raise SourceArgumentNotFound(
-            "bezirk", self._bezirk_search, [b["name"] for b in bezirke]
-        )
+        raise SourceArgumentNotFound("bezirk", self._bezirk_search, [b["name"] for b in bezirke])
 
     def get_streets(self, search=None):
         if search:
@@ -760,12 +747,8 @@ class AppAbfallplusDe:
                 {
                     "id": a[0],
                     "name": a[1],
-                    "id_kommune": (
-                        a[5]["set_id_kommune"] if "set_id_kommune" in a[5] else None
-                    ),
-                    "id_beirk": (
-                        a[5]["set_id_bezirk"] if "set_id_bezirk" in a[5] else None
-                    ),
+                    "id_kommune": (a[5]["set_id_kommune"] if "set_id_kommune" in a[5] else None),
+                    "id_beirk": (a[5]["set_id_bezirk"] if "set_id_bezirk" in a[5] else None),
                     "hrns": a[3] != "fertig",
                 }
             )
@@ -780,9 +763,7 @@ class AppAbfallplusDe:
         if self._strasse_search is None and len(streets) == 0:
             return
         elif self._strasse_search is None:
-            SourceArgumentRequiredWithSuggestions(
-                "strasse", [s["name"] for s in streets]
-            )
+            SourceArgumentRequiredWithSuggestions("strasse", [s["name"] for s in streets])
 
         for street in streets:
             if compare(street["name"], self._strasse_search):
@@ -794,9 +775,7 @@ class AppAbfallplusDe:
                 self._hnrs = street["hrns"]
                 return
         street_names = [s["name"] for s in streets]
-        raise SourceArgumentNotFoundWithSuggestions(
-            "strasse", self._strasse_search, street_names
-        )
+        raise SourceArgumentNotFoundWithSuggestions("strasse", self._strasse_search, street_names)
 
     def get_hrn_needed(self) -> bool:
         return self._hnrs
@@ -833,18 +812,14 @@ class AppAbfallplusDe:
         elif self._hnr_search is None and len(hnrs) == 0:
             return
         elif self._hnr_search is None:
-            raise SourceArgumentRequiredWithSuggestions(
-                "hnr", [hnr["name"] for hnr in hnrs]
-            )
+            raise SourceArgumentRequiredWithSuggestions("hnr", [hnr["name"] for hnr in hnrs])
         for hnr in hnrs:
             if compare(hnr["name"], self._hnr_search, remove_space=True):
                 self._hnr = hnr["id"]
                 if hnr["f_id_strasse"] is not None:
                     self._f_id_strasse = hnr["f_id_strasse"]
                 return
-        raise SourceArgumentNotFoundWithSuggestions(
-            "hnr", self._hnr_search, [hnr["name"] for hnr in hnrs]
-        )
+        raise SourceArgumentNotFoundWithSuggestions("hnr", self._hnr_search, [hnr["name"] for hnr in hnrs])
 
     def select_all_waste_types(self):
         data = {
@@ -863,13 +838,9 @@ class AppAbfallplusDe:
         self._f_id_abfallart = []
         for to_skip in ABFALLARTEN_H2_SKIP:
             to_skip_element = soup.find("h2", text=to_skip)
-            div_to_skip = (
-                to_skip_element.find_parent("div") if to_skip_element else None
-            )
+            div_to_skip = to_skip_element.find_parent("div") if to_skip_element else None
             if div_to_skip:
-                for input in to_skip_element.find_parent("div").find_all(
-                    "input", {"name": "f_id_abfallart[]"}
-                ):
+                for input in to_skip_element.find_parent("div").find_all("input", {"name": "f_id_abfallart[]"}):
                     if compare(input.text, self._region_search, remove_space=True):
                         id = input.attrs["id"].split("_")[-1]
                         self._f_id_abfallart.append(input.attrs["value"])
@@ -975,23 +946,11 @@ class AppAbfallplusDe:
             categories[id] = name
 
         collections: list[dict] = []
-        for collection in (
-            soup.find("key", text="dates").find_next_sibling("array").find_all("dict")
-        ):
-            category = (
-                collection.find("key", text="category_id")
-                .find_next_sibling("string")
-                .text
-            )
+        for collection in soup.find("key", text="dates").find_next_sibling("array").find_all("dict"):
+            category = collection.find("key", text="category_id").find_next_sibling("string").text
             category_name = categories[category]
-            pickup_date_str = (
-                collection.find("key", text="pickup_date")
-                .find_next_sibling("string")
-                .text
-            )
-            pickup_date = datetime.strptime(
-                pickup_date_str, "%Y-%m-%dT%H:%M:%S%z"
-            ).date()
+            pickup_date_str = collection.find("key", text="pickup_date").find_next_sibling("string").text
+            pickup_date = datetime.strptime(pickup_date_str, "%Y-%m-%dT%H:%M:%S%z").date()
 
             collections.append({"category": category_name, "date": pickup_date})
 
@@ -1122,9 +1081,7 @@ def get_newly_supported_apps():
     options.add_argument("--disable-dev-shm-usage")
 
     # Initialize the Firefox driver
-    driver = webdriver.Firefox(
-        service=FirefoxService(GeckoDriverManager().install()), options=options
-    )
+    driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()), options=options)
     driver.get(base_url)
 
     app_ids = set()

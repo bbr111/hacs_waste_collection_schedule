@@ -9,9 +9,7 @@ from waste_collection_schedule.service.AbfallIO import SERVICE_MAP
 from waste_collection_schedule.service.ICS import ICS
 
 TITLE = "Abfall.IO / AbfallPlus"
-DESCRIPTION = (
-    "Source for AbfallPlus.de waste collection. Service is hosted on abfall.io."
-)
+DESCRIPTION = "Source for AbfallPlus.de waste collection. Service is hosted on abfall.io."
 URL = "https://www.abfallplus.de"
 COUNTRY = "de"
 
@@ -155,9 +153,7 @@ class Source:
         params = {"key": self._key, "modus": MODUS_KEY, "waction": "export_ics"}
 
         # get csv file
-        r = requests.post(
-            "https://api.abfall.io", params=params, data=args, headers=HEADERS
-        )
+        r = requests.post("https://api.abfall.io", params=params, data=args, headers=HEADERS)
 
         # parse ics file
         r.encoding = "utf-8"  # requests doesn't guess the encoding correctly

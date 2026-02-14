@@ -97,9 +97,7 @@ class Source:
 
     def _register_device(self):
         if not self._street_address:  # should not happen
-            raise SourceArgumentRequired(
-                "street_address", "Street address required to register device"
-            )
+            raise SourceArgumentRequired("street_address", "Street address required to register device")
         uuid = uuid4().hex[:16]
 
         # if not self._api_key:
@@ -113,9 +111,7 @@ class Source:
             "model": "sdk_gphone64_x86_64",
             "test": False,
         }
-        response = requests.post(
-            url, json=params, timeout=30, headers={"X-App-Identifier": uuid}
-        )
+        response = requests.post(url, json=params, timeout=30, headers={"X-App-Identifier": uuid})
         if response.ok:
             _LOGGER.info("Registered new API Key %s", uuid)
         else:
@@ -140,16 +136,12 @@ class Source:
         address = None
         # Make sure the response is valid and contains data
         if address_data and len(address_data) > 0:
-            addresses = [
-                a for _, address_list in address_data.items() for a in address_list
-            ]
+            addresses = [a for _, address_list in address_data.items() for a in address_list]
             _LOGGER.debug("Got the following addresses from search: %s", addresses)
             # Check if the request was successful
             for a in addresses:
                 # The request can be successful but still not return any buildings at the specified address
-                if a["address"].lower().replace(
-                    " ", ""
-                ) == self._street_address.lower().replace(" ", ""):
+                if a["address"].lower().replace(" ", "") == self._street_address.lower().replace(" ", ""):
                     address = a
                     break
             if not address:
@@ -200,15 +192,11 @@ class Source:
             self._register_address()
             # If fact everything was ok if reaching here, but need to store the registered API Key
             # in configuration by the user selecting it in config-flow dialog.
-            raise SourceArgumentRequiredWithSuggestions(
-                "api_key", "Select the generated api_key from list", [self._api_key]
-            )
+            raise SourceArgumentRequiredWithSuggestions("api_key", "Select the generated api_key from list", [self._api_key])
 
         # Use the API key to get the waste collection schedule for registered addresses.
         url = self._url + "/next-pickup/list?"
-        response = requests.get(
-            url, headers={"X-App-Identifier": self._api_key}, timeout=30
-        )
+        response = requests.get(url, headers={"X-App-Identifier": self._api_key}, timeout=30)
         data = json.loads(response.text)
         multi_config = False
         if len(data) > 1:
@@ -232,8 +220,6 @@ class Source:
                         waste_type,
                         pickup_date.strftime("%Y-%m-%d"),
                     )
-                    entries.append(
-                        Collection(date=pickup_date, t=waste_type, icon=icon)
-                    )
+                    entries.append(Collection(date=pickup_date, t=waste_type, icon=icon))
 
         return entries

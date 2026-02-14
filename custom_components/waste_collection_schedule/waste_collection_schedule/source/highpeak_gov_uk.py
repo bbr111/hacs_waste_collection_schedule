@@ -51,7 +51,11 @@ class Source:
                 if name.lower().endswith("_variables"):
                     form_data[name] = "e30="
         form_url_tag = soup.find("form", id="FINDBINDAYSHIGHPEAK_FORM")
-        form_url = form_url_tag.get("action") if isinstance(form_url_tag, Tag) else None
+        form_url = form_url_tag.get("action") if isinstance(form_url_tag, Tag) else ""
+        if isinstance(form_url, list):
+            form_url = form_url[0] if form_url else ""
+        if not isinstance(form_url, str):
+            form_url = ""
 
         return form_data, form_url
 
@@ -75,7 +79,7 @@ class Source:
         form_data, next_url = self._extract_all_form_data(soup)
 
         form_data["FINDBINDAYSHIGHPEAK_FORMACTION_NEXT"] = "FINDBINDAYSHIGHPEAK_POSTCODESELECT_PAGE1NEXT"
-        
+
         if next_url.startswith("/"):
             next_url = BASE_URL + next_url
 
@@ -86,7 +90,7 @@ class Source:
         form_data, next_url = self._extract_all_form_data(soup)
 
         form_data["FINDBINDAYSHIGHPEAK_FORMACTION_NEXT"] = "FINDBINDAYSHIGHPEAK_ADDRESSSELECT_ADDRESSSELECTNEXTBTN"
-        
+
         if next_url.startswith("/"):
             next_url = BASE_URL + next_url
         r = s.post(next_url, data=form_data)
@@ -95,17 +99,11 @@ class Source:
         entries = []
         for month_heading in soup.select("h3.bin-collection__title--month"):
             month = month_heading.text.strip()
-            collections_panel = month_heading.find_next(
-                "ol", class_="bin-collection__list"
-            )
+            collections_panel = month_heading.find_next("ol", class_="bin-collection__list")
             if not isinstance(collections_panel, Tag):
-                _LOGGER.warning(
-                    "Could not find collections panel for month %s, skipping", month
-                )
+                _LOGGER.warning("Could not find collections panel for month %s, skipping", month)
                 continue
-            for day_tag in collections_panel.find_all(
-                "span", class_="bin-collection__number"
-            ):
+            for day_tag in collections_panel.find_all("span", class_="bin-collection__number"):
                 day = day_tag.text.strip()
                 bin_type_tag = day_tag.find_next("span", class_="bin-collection__type")
                 bin_type = bin_type_tag.text.strip()

@@ -1,7 +1,7 @@
 import datetime
 import logging
 import re
-from typing import Any, List, Optional, Tuple
+from typing import Any
 
 import jinja2
 from icalevents import icalevents
@@ -12,9 +12,9 @@ _LOGGER = logging.getLogger(__name__)
 class ICS:
     def __init__(
         self,
-        offset: Optional[int] = None,
-        regex: Optional[str] = None,
-        split_at: Optional[str] = None,
+        offset: int | None = None,
+        regex: str | None = None,
+        split_at: str | None = None,
         title_template: str = "{{date.summary}}",
     ):
         self._offset = offset
@@ -29,11 +29,9 @@ class ICS:
 
         self._title_template = title_template
 
-    def convert(self, ics_data: str) -> List[Tuple[datetime.date, str]]:
+    def convert(self, ics_data: str) -> list[tuple[datetime.date, str]]:
         # calculate start- and end-date for recurring events
-        start_date = datetime.datetime.now().replace(
-            hour=0, minute=0, second=0, microsecond=0
-        )
+        start_date = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
         if self._offset is not None:
             start_date -= datetime.timedelta(days=self._offset)
         end_date = start_date + datetime.timedelta(days=365)
@@ -45,15 +43,13 @@ class ICS:
         )
 
         # parse ics data
-        events: List[Any] = icalevents.events(
-            start=start_date, end=end_date, string_content=ics_data.encode()
-        )
+        events: list[Any] = icalevents.events(start=start_date, end=end_date, string_content=ics_data.encode())
 
-        entries: List[Tuple[datetime.date, str]] = []
+        entries: list[tuple[datetime.date, str]] = []
 
         for e in events:
             # calculate date
-            dtstart: Optional[datetime.date] = None
+            dtstart: datetime.date | None = None
 
             if isinstance(e.start, datetime.datetime):
                 dtstart = e.start.date()
@@ -76,9 +72,7 @@ class ICS:
 
                 if self._split_at is not None:
                     entry_title_list = re.split(self._split_at, entry_title)
-                    entries.extend(
-                        (dtstart, t.strip().title()) for t in entry_title_list
-                    )
+                    entries.extend((dtstart, t.strip().title()) for t in entry_title_list)
                 else:
                     entries.append((dtstart, entry_title))
 

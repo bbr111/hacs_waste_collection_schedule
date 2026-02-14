@@ -74,9 +74,7 @@ class Source:
         self._hausnr: str | None = str(hausnr) if hausnr else None
 
     def fetch(self):
-        r = requests.get(
-            "https://api.heilbronn.de/garbage-calendar?method=get&datatype=districts"
-        )
+        r = requests.get("https://api.heilbronn.de/garbage-calendar?method=get&datatype=districts")
         r.raise_for_status()
         data = r.json()
 
@@ -102,13 +100,9 @@ class Source:
             districts: dict = street[self._hausnr]
 
         # filter waste type
-        collection_keys = {
-            value for key, value in districts.items() if key not in ("city", "district")
-        }
+        collection_keys = {value for key, value in districts.items() if key not in ("city", "district")}
 
-        r = requests.get(
-            "https://api.heilbronn.de/garbage-calendar?method=get&datatype=pickupdates"
-        )
+        r = requests.get("https://api.heilbronn.de/garbage-calendar?method=get&datatype=pickupdates")
         r.raise_for_status()
         pickupDates = r.json()
 

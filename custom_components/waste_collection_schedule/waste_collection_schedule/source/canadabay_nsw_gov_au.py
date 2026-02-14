@@ -28,6 +28,7 @@ TEST_CASES = {
 HEADERS = {"user-agent": "Mozilla/5.0"}
 API_URL = "https://canada-bay.waste-info.com.au/api/v1"
 
+
 class Source:
     def __init__(self, suburb, street_name, street_number):
         self.suburb = suburb
@@ -35,7 +36,6 @@ class Source:
         self.street_number = street_number
 
     def fetch(self):
-
         suburb_id = 0
         street_id = 0
         property_id = 0
@@ -110,31 +110,14 @@ class Source:
             if "start" in item:
                 collection_date = date.fromisoformat(item["start"])
                 if (collection_date - today).days >= 0:
-
-                    if item["event_type"] in ["recycle","organic"]:
+                    if item["event_type"] in ["recycle", "organic"]:
                         # Every collection day includes rubbish
-                        entries.append(
-                            Collection(
-                                date=collection_date, t="Waste", icon="mdi:trash-can"
-                            )
-                        )
+                        entries.append(Collection(date=collection_date, t="Waste", icon="mdi:trash-can"))
                         if item["event_type"] == "recycle":
-                            entries.append(
-                                Collection(
-                                    date=collection_date, t="Recycling", icon="mdi:recycle"
-                                )
-                            )
+                            entries.append(Collection(date=collection_date, t="Recycling", icon="mdi:recycle"))
                         if item["event_type"] == "organic":
-                            entries.append(
-                                Collection(
-                                    date=collection_date, t="Organics", icon="mdi:leaf"
-                                )
-                            )
+                            entries.append(Collection(date=collection_date, t="Organics", icon="mdi:leaf"))
                     elif item["event_type"] == "clean_up":
-                        entries.append(
-                            Collection(
-                                date=collection_date, t="Bulk Household", icon="mdi:couch"
-                            )
-                        )
+                        entries.append(Collection(date=collection_date, t="Bulk Household", icon="mdi:couch"))
 
         return entries

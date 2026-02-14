@@ -50,9 +50,7 @@ class Source:
                 "till": (date.today() + timedelta(days=365)).strftime("%Y-%m-%d"),
             }
 
-            r = requests.get(
-                f"{API_URL}/afvalkalender.json", params=req_params, cookies=cookies
-            )
+            r = requests.get(f"{API_URL}/afvalkalender.json", params=req_params, cookies=cookies)
             r.raise_for_status()
 
             for item in r.json()["customData"]["response"]["garbage"]:

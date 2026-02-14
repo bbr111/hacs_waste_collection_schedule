@@ -58,9 +58,7 @@ class Source:
         entries = []
 
         for container in containers:
-            name = container.get("containerType", {}).get(
-                "description", "Ukendt beholder"
-            )
+            name = container.get("containerType", {}).get("description", "Ukendt beholder")
             collect_dates = container.get("collectDates", [])
 
             # Renodjurs-style matching logic - most specific first
@@ -74,9 +72,7 @@ class Source:
             elif "rest" in lower_name and "mad" in lower_name:
                 fraktion = "Rest- og Madaffald"
                 icon = ICON_MAP.get("REST-MAD")
-            elif ("papir" in lower_name or "pap" in lower_name) and (
-                "metal" in lower_name and "plast" in lower_name
-            ):
+            elif ("papir" in lower_name or "pap" in lower_name) and ("metal" in lower_name and "plast" in lower_name):
                 fraktion = "Blandet genanvendelse"  # Mixed recycling
                 icon = ICON_MAP.get("PLAST-GLAS-METAL")
             elif "papir" in lower_name or "pap" in lower_name:

@@ -64,16 +64,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass,
         source_shell=shell,
         separator=options.get(const.CONF_SEPARATOR, const.CONF_SEPARATOR_DEFAULT),
-        fetch_time=cv.time(
-            options.get(const.CONF_FETCH_TIME, const.CONF_FETCH_TIME_DEFAULT)
-        ),
+        fetch_time=cv.time(options.get(const.CONF_FETCH_TIME, const.CONF_FETCH_TIME_DEFAULT)),
         random_fetch_time_offset=options.get(
             const.CONF_RANDOM_FETCH_TIME_OFFSET,
             const.CONF_RANDOM_FETCH_TIME_OFFSET_DEFAULT,
         ),
-        day_switch_time=cv.time(
-            options.get(const.CONF_DAY_SWITCH_TIME, const.CONF_DAY_SWITCH_TIME_DEFAULT)
-        ),
+        day_switch_time=cv.time(options.get(const.CONF_DAY_SWITCH_TIME, const.CONF_DAY_SWITCH_TIME_DEFAULT)),
     )
 
     await coordinator.async_config_entry_first_refresh()
@@ -85,9 +81,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     entry.async_on_unload(entry.add_update_listener(async_update_listener))
 
     # Register new Service fetch_data
-    hass.services.async_register(
-        const.DOMAIN, "fetch_data", get_fetch_all_service(hass), schema=vol.Schema({})
-    )
+    hass.services.async_register(const.DOMAIN, "fetch_data", get_fetch_all_service(hass), schema=vol.Schema({}))
 
     return True
 
@@ -111,15 +105,12 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
 
     # Version number has gone backwards
     if const.CONFIG_VERSION < config_entry.version:
-        _LOGGER.error(
-            "Backwards migration not possible. Please update the integration."
-        )
+        _LOGGER.error("Backwards migration not possible. Please update the integration.")
         return False
 
     # Version number has gone up
     if config_entry.version < const.CONFIG_VERSION or (
-        config_entry.version == const.CONFIG_VERSION
-        and config_entry.minor_version < const.CONFIG_MINOR_VERSION
+        config_entry.version == const.CONFIG_VERSION and config_entry.minor_version < const.CONFIG_MINOR_VERSION
     ):
         _LOGGER.debug("Migrating from version %s", config_entry.version)
         new_data = {**config_entry.data}
@@ -132,17 +123,13 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
                 new_data["args"]["council"] = "Wychavon"
 
         # Implicitly migrate from any version <= 2.1 to 2.2 (or higher)
-        if config_entry.version < 2 or (
-            config_entry.version == 2 and config_entry.minor_version < 2
-        ):
+        if config_entry.version < 2 or (config_entry.version == 2 and config_entry.minor_version < 2):
             # Migrate from chiltern_gov_uk to iapp_itouchvision_com
             if new_data.get("name", "") == "chiltern_gov_uk":
                 _LOGGER.debug("Migrating from chiltern_gov_uk to iapp_itouchvision_com")
                 new_data["name"] = "iapp_itouchvision_com"
                 new_data["args"]["municipality"] = "BUCKINGHAMSHIRE"
-        if config_entry.version < 2 or (
-            config_entry.version == 2 and config_entry.minor_version < 3
-        ):
+        if config_entry.version < 2 or (config_entry.version == 2 and config_entry.minor_version < 3):
             # Migrate from sicaapp_lu to sica_lu
             if new_data.get("name", "") == "sicaapp_lu":
                 if not new_data["args"].get("commune"):
@@ -152,45 +139,33 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
                 new_data["args"]["municipality"] = new_data["args"].get("commune")
                 del new_data["args"]["commune"]
 
-        if config_entry.version < 2 or (
-            config_entry.version == 2 and config_entry.minor_version < 4
-        ):
+        if config_entry.version < 2 or (config_entry.version == 2 and config_entry.minor_version < 4):
             # remove version from ics source
             if new_data.get("name", "") == "ics":
                 _LOGGER.debug("Migrating ics source")
                 if new_data["args"].get("version"):
                     del new_data["args"]["version"]
-        if config_entry.version < 2 or (
-            config_entry.version == 2 and config_entry.minor_version < 5
-        ):
+        if config_entry.version < 2 or (config_entry.version == 2 and config_entry.minor_version < 5):
             # Migrate was_wolfsburg_de remove city argument
             if new_data.get("name", "") == "was_wolfsburg_de":
                 _LOGGER.debug("Migrating was_wolfsburg_de source")
                 if new_data["args"].get("city"):
                     del new_data["args"]["city"]
 
-        if config_entry.version < 2 or (
-            config_entry.version == 2 and config_entry.minor_version < 5
-        ):
+        if config_entry.version < 2 or (config_entry.version == 2 and config_entry.minor_version < 5):
             # source name change from fkf_bp_hu to mohu_bp_hu
             if new_data.get("name", "") == "fkf_bp_hu":
                 new_data["name"] = "mohu_bp_hu"
                 _LOGGER.debug("Migrating fkf_bp_hu to mohu_bp_hu")
 
         # Migrate aylesburyvaledc_gov_uk to iapp_itouchvision_com.py
-        if config_entry.version < 2 or (
-            config_entry.version == 2 and config_entry.minor_version < 6
-        ):
+        if config_entry.version < 2 or (config_entry.version == 2 and config_entry.minor_version < 6):
             if new_data.get("name", "") == "aylesburyvaledc_gov_uk":
-                _LOGGER.info(
-                    "Migrating from aylesburyvaledc_gov_uk to iapp_itouchvision_com"
-                )
+                _LOGGER.info("Migrating from aylesburyvaledc_gov_uk to iapp_itouchvision_com")
                 new_data["name"] = "iapp_itouchvision_com"
                 new_data["args"]["municipality"] = "AYLESBURY VALE"
 
-        if config_entry.version < 2 or (
-            config_entry.version == 2 and config_entry.minor_version < 7
-        ):
+        if config_entry.version < 2 or (config_entry.version == 2 and config_entry.minor_version < 7):
             # Migrate bsr_de source to new format
             if new_data.get("name", "") == "bsr_de":
                 _LOGGER.info("Migrating bsr_de source to new format")
@@ -199,11 +174,7 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
                     abf_hausnr = new_data["args"]["abf_hausnr"]
                     abf_strasse_as_list = abf_strasse.split(",", 1)
                     street_only = abf_strasse_as_list[0].strip()
-                    postal_code_and_area = (
-                        abf_strasse_as_list[1].strip()
-                        if len(abf_strasse_as_list) > 1
-                        else ""
-                    )
+                    postal_code_and_area = abf_strasse_as_list[1].strip() if len(abf_strasse_as_list) > 1 else ""
 
                     params = {"searchQuery": f"{street_only}:::{abf_hausnr}"}
                     with requests.Session() as bsr_de_migrate_session:
@@ -214,15 +185,9 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
                         bsr_de_migrate_response.raise_for_status()
                     data = bsr_de_migrate_response.json()
                 except Exception:
-                    _LOGGER.exception(
-                        "Error migrating bsr_de source. Please reconfigure bsr_de."
-                    )
+                    _LOGGER.exception("Error migrating bsr_de source. Please reconfigure bsr_de.")
                 else:
-                    candidates = [
-                        candidate["value"]
-                        for candidate in data
-                        if postal_code_and_area in candidate["label"]
-                    ]
+                    candidates = [candidate["value"] for candidate in data if postal_code_and_area in candidate["label"]]
                     if len(candidates) == 1:
                         # we have a single candidate, use it
                         del new_data["args"]["abf_strasse"]
@@ -241,14 +206,10 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
                             abf_hausnr,
                         )
 
-        if config_entry.version < 2 or (
-            config_entry.version == 2 and config_entry.minor_version < 8
-        ):
+        if config_entry.version < 2 or (config_entry.version == 2 and config_entry.minor_version < 8):
             # Migrate iweb_itouchvision_com to iapp_itouchvision_com
             if new_data.get("name", "") == "iweb_itouchvision_com":
-                _LOGGER.info(
-                    "Migrating from iweb_itouchvision_com to iapp_itouchvision_com"
-                )
+                _LOGGER.info("Migrating from iweb_itouchvision_com to iapp_itouchvision_com")
                 if not new_data["args"].get("council"):
                     return False
                 new_data["name"] = "iapp_itouchvision_com"
@@ -259,9 +220,7 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
                 del new_data["args"]["council"]
                 del new_data["args"]["postcode"]
 
-        if config_entry.version < 2 or (
-            config_entry.version == 2 and config_entry.minor_version < 9
-        ):
+        if config_entry.version < 2 or (config_entry.version == 2 and config_entry.minor_version < 9):
             # Migrate kuringgai_nsw_gov_au to impactapps.com_au
             if new_data.get("name", "") == "kuringgai_nsw_gov_au":
                 _LOGGER.info("Migrating from kuringgai_nsw_gov_au to impactapps_com_au")
@@ -270,9 +229,7 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
                 # postcode arg no longer needed, so delete it
                 del new_data["args"]["postcode"]
 
-        if config_entry.version < 2 or (
-            config_entry.version == 2 and config_entry.minor_version < 10
-        ):
+        if config_entry.version < 2 or (config_entry.version == 2 and config_entry.minor_version < 10):
             # Migrate from birmingham_gov_uk to roundlookup_uk
             if new_data.get("name", "") == "peterborough_gov_uk":
                 _LOGGER.debug("Migrating from peterborough_gov_uk to ics configuration")
@@ -284,17 +241,10 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
                 if "name" in new_data["args"]:
                     del new_data["args"]["name"]
 
-        if config_entry.version < 2 or (
-            config_entry.version == 2 and config_entry.minor_version < 11
-        ):
+        if config_entry.version < 2 or (config_entry.version == 2 and config_entry.minor_version < 11):
             # Migrate Cambridge City and South Cambs to Greater Cambridge Waste
-            if (
-                new_data.get("name", "") == "cambridge_gov_uk"
-                or new_data.get("name", "") == "scambs_gov_uk"
-            ):
-                _LOGGER.info(
-                    "Migrating cambridge_gov_uk and scambs_gov_uk to greater_cambridge_waste_org"
-                )
+            if new_data.get("name", "") == "cambridge_gov_uk" or new_data.get("name", "") == "scambs_gov_uk":
+                _LOGGER.info("Migrating cambridge_gov_uk and scambs_gov_uk to greater_cambridge_waste_org")
                 new_data["name"] = "greater_cambridge_waste_org"
                 # map across old args
                 new_data["args"]["postcode"] = new_data["args"]["post_code"]
@@ -304,9 +254,7 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
                 del new_data["args"]["post_code"]
                 del new_data["args"]["number"]
 
-        if config_entry.version < 2 or (
-            config_entry.version == 2 and config_entry.minor_version < 12
-        ):
+        if config_entry.version < 2 or (config_entry.version == 2 and config_entry.minor_version < 12):
             # Migrate Cambridge City and South Cambs to Greater Cambridge Waste
             if new_data.get("name", "") == "abfall_lippe_de":
                 _LOGGER.info("Migrating abfall_lippe_de to abfallnavi_de")
@@ -319,15 +267,11 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
                 if "bezirk" in new_data["args"]:
                     del new_data["args"]["bezirk"]
 
-        if config_entry.version < 2 or (
-            config_entry.version == 2 and config_entry.minor_version < 13
-        ):
+        if config_entry.version < 2 or (config_entry.version == 2 and config_entry.minor_version < 13):
             # Remove deprecated region arg for afvalstoffendienst_nl
             if new_data.get("name", "") == "afvalstoffendienst_nl":
                 if "region" in new_data["args"]:
-                    _LOGGER.info(
-                        "Migrating afvalstoffendienst_nl source by dropping region argument"
-                    )
+                    _LOGGER.info("Migrating afvalstoffendienst_nl source by dropping region argument")
                     del new_data["args"]["region"]
             # Migrate Cambridge City and South Cambs to Greater Cambridge Waste
             if new_data.get("name", "") == "alw_wf_de":

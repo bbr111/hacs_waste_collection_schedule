@@ -1,4 +1,5 @@
-from typing import Any, Generic, Iterable, Type, TypeVar
+from collections.abc import Iterable
+from typing import Any, Generic, TypeVar
 
 T = TypeVar("T")
 
@@ -61,16 +62,14 @@ class SourceArgumentSuggestionsExceptionBase(SourceArgumentException, Generic[T]
         message += f", {message_addition}" if message_addition else ""
         super().__init__(argument=argument, message=message)
         self._suggestions = suggestions
-        self._suggestion_type: Type[T] | None = (
-            type(list(suggestions)[0]) if suggestions else None
-        )
+        self._suggestion_type: type[T] | None = type(list(suggestions)[0]) if suggestions else None
 
     @property
     def suggestions(self) -> Iterable[T]:
         return self._suggestions
 
     @property
-    def suggestion_type(self) -> Type[T] | None:
+    def suggestion_type(self) -> type[T] | None:
         return self._suggestion_type
 
     @property
@@ -125,9 +124,7 @@ class SourceArgumentNotFoundWithSuggestions(SourceArgumentSuggestionsExceptionBa
             message += ", We could not find any suggestions. Please also check other arguments."
             message_addition = ""
         else:
-            message_addition = (
-                f"you may want to use one of the following: {suggestions}"
-            )
+            message_addition = f"you may want to use one of the following: {suggestions}"
         super().__init__(
             argument=argument,
             message=message,
@@ -194,9 +191,7 @@ class SourceArgumentRequiredWithSuggestions(SourceArgumentSuggestionsExceptionBa
             suggestions (Iterable[T]): An iterable of suggestions for the provided argument.
         """
         message = f"Argument '{argument}' must be provided"
-        message_addition = (
-            f"you may want to use one of the following: {list(suggestions)}"
-        )
+        message_addition = f"you may want to use one of the following: {list(suggestions)}"
         if reason:
             message += f", {reason}"
         super().__init__(

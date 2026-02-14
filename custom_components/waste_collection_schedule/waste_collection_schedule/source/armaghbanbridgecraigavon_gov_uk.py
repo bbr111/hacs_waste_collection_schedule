@@ -66,17 +66,13 @@ class Source:
             icon = ICON_MAP.get(bin_type)
 
             # Find the parent div with class containing 'col-sm-12'
-            parent_div = heading.find_parent(
-                "div", class_=lambda x: x and "col-sm-12" in x
-            )
+            parent_div = heading.find_parent("div", class_=lambda x: x and "col-sm-12" in x)
 
             if not parent_div:
                 continue
 
             # Find the next sibling div that contains the dates
-            dates_div = parent_div.find_next_sibling(
-                "div", class_=lambda x: x and "col-sm-12" in x and "col-md-9" in x
-            )
+            dates_div = parent_div.find_next_sibling("div", class_=lambda x: x and "col-sm-12" in x and "col-md-9" in x)
 
             if not dates_div:
                 continue

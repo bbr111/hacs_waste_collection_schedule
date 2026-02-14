@@ -1,6 +1,5 @@
 import logging
 import re
-import typing
 from datetime import datetime
 
 import requests
@@ -15,9 +14,7 @@ DESCRIPTION = "Source for Banyule City Council rubbish collection."
 URL = "https://www.banyule.vic.gov.au"
 TEST_CASES = {
     "Monday A": {"street_address": "6 Mandall Avenue, IVANHOE"},
-    "Monday A Geolocation ID": {
-        "geolocation_id": "4f7ebfca-1526-4363-8b87-df3103a10a87"
-    },
+    "Monday A Geolocation ID": {"geolocation_id": "4f7ebfca-1526-4363-8b87-df3103a10a87"},
     "Monday B": {"street_address": "10 Burke Road North, IVANHOE EAST"},
     "Thursday A": {"street_address": "255 St Helena Road, GREENSBOROUGH"},
     "Thursday B": {"street_address": "35 Para Road, MONTMORENCY"},
@@ -46,8 +43,8 @@ class Source:
 
     def __init__(
         self,
-        street_address: typing.Optional[str] = None,
-        geolocation_id: typing.Optional[str] = None,
+        street_address: str | None = None,
+        geolocation_id: str | None = None,
     ):
         if street_address is None and geolocation_id is None:
             raise SourceArgumentExceptionMultiple(
@@ -73,34 +70,26 @@ class Source:
             _LOGGER.debug(f"Search response: {geolocation_response!r}")
 
             if "success" in geolocation_result and not geolocation_result["success"]:
-                raise SourceParseError(
-                    "Unspecified server-side error when searching address"
-                )
+                raise SourceParseError("Unspecified server-side error when searching address")
 
             if (
                 "Items" not in geolocation_result
                 or geolocation_result["Items"] is None
                 or len(geolocation_result["Items"]) < 1
             ):
-                raise SourceParseError(
-                    "Expected list of locations from address search, got empty or missing list"
-                )
+                raise SourceParseError("Expected list of locations from address search, got empty or missing list")
 
             geolocation_data = geolocation_result["Items"][0]
 
             if "Id" not in geolocation_data:
-                raise SourceParseError(
-                    "Location in address search result but missing geolocation ID"
-                )
+                raise SourceParseError("Location in address search result but missing geolocation ID")
 
             self._geolocation_id = geolocation_data["Id"]
-            _LOGGER.info(
-                f"Address {self._street_address} mapped to geolocation ID {self._geolocation_id}"
-            )
+            _LOGGER.info(f"Address {self._street_address} mapped to geolocation ID {self._geolocation_id}")
 
         return self._geolocation_id
 
-    def fetch(self) -> typing.List[Collection]:
+    def fetch(self) -> list[Collection]:
         # Calendar lookup cares about a cookie, so a Session must be used
         calendar_session = requests.Session()
 
@@ -117,14 +106,10 @@ class Source:
         _LOGGER.debug(f"Calendar response: {calendar_result!r}")
 
         if "success" in calendar_result and not calendar_result["success"]:
-            raise SourceParseError(
-                "Unspecified server-side error when getting calendar"
-            )
+            raise SourceParseError("Unspecified server-side error when getting calendar")
 
         # Extract entries from bundled HTML
-        calendar_parser = BeautifulSoup(
-            calendar_result["responseContent"], "html.parser"
-        )
+        calendar_parser = BeautifulSoup(calendar_result["responseContent"], "html.parser")
 
         pickup_entries = []
 
@@ -134,9 +119,7 @@ class Source:
             waste_type = element.h3.string
 
             # Extract and parse collection date
-            waste_date_match = self.OC_RE_DATE_STR.match(
-                element.find(class_="next-service").string.strip()
-            )
+            waste_date_match = self.OC_RE_DATE_STR.match(element.find(class_="next-service").string.strip())
 
             if waste_date_match is None:
                 continue
@@ -147,8 +130,6 @@ class Source:
             waste_icon = ICON_MAP.get(waste_type.lower())
 
             pickup_entries.append(Collection(waste_date, waste_type, waste_icon))
-            _LOGGER.info(
-                f"Collection for {waste_type} (icon: {waste_icon}) on {waste_date}"
-            )
+            _LOGGER.info(f"Collection for {waste_type} (icon: {waste_icon}) on {waste_date}")
 
         return pickup_entries

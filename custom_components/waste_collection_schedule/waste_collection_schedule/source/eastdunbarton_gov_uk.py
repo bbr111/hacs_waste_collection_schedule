@@ -52,9 +52,7 @@ class Source:
             tds = tr.find_all("td")
             entries.append(
                 Collection(
-                    date=datetime.strptime(
-                        tds[1].text.strip().split(", ")[1], "%d %B %Y"
-                    ).date(),
+                    date=datetime.strptime(tds[1].text.strip().split(", ")[1], "%d %B %Y").date(),
                     t=tds[0].text.strip(),
                     icon=ICON_MAP.get(tds[0].text.strip()),
                 )

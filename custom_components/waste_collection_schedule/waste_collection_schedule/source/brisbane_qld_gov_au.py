@@ -45,9 +45,7 @@ class Source:
         nextyear = today + timedelta(365)
 
         # Retrieve suburbs
-        r = requests.get(
-            "https://brisbane.waste-info.com.au/api/v1/localities.json", headers=HEADERS
-        )
+        r = requests.get("https://brisbane.waste-info.com.au/api/v1/localities.json", headers=HEADERS)
         data = json.loads(r.text)
 
         # Find the ID for our suburb
@@ -57,9 +55,7 @@ class Source:
                 break
 
         if suburb_id == 0:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "suburb", self.suburb, [x["name"] for x in data["localities"]]
-            )
+            raise SourceArgumentNotFoundWithSuggestions("suburb", self.suburb, [x["name"] for x in data["localities"]])
 
         # Retrieve the streets in our suburb
         r = requests.get(
@@ -75,9 +71,7 @@ class Source:
                 break
 
         if street_id == 0:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "street_name", self.street_name, [x["name"] for x in data["streets"]]
-            )
+            raise SourceArgumentNotFoundWithSuggestions("street_name", self.street_name, [x["name"] for x in data["streets"]])
 
         # Retrieve the properties in our street
         r = requests.get(
@@ -96,11 +90,7 @@ class Source:
             raise SourceArgumentNotFoundWithSuggestions(
                 "street_number",
                 self.street_number,
-                [
-                    x["name"].split(f" {self.street_name}")[0]
-                    for x in data["properties"]
-                    if self.street_name in x["name"]
-                ],
+                [x["name"].split(f" {self.street_name}")[0] for x in data["properties"] if self.street_name in x["name"]],
             )
 
         # Retrieve the upcoming collections for our property
@@ -122,18 +112,10 @@ class Source:
             # Only consider recycle and organic events
             if item["event_type"] in ["recycle", "organic"]:
                 # Every collection day includes rubbish
-                entries.append(
-                    Collection(date=collection_date, t="Rubbish", icon="mdi:trash-can")
-                )
+                entries.append(Collection(date=collection_date, t="Rubbish", icon="mdi:trash-can"))
                 if item["event_type"] == "recycle":
-                    entries.append(
-                        Collection(
-                            date=collection_date, t="Recycling", icon="mdi:recycle"
-                        )
-                    )
+                    entries.append(Collection(date=collection_date, t="Recycling", icon="mdi:recycle"))
                 if item["event_type"] == "organic":
-                    entries.append(
-                        Collection(date=collection_date, t="Garden", icon="mdi:leaf")
-                    )
+                    entries.append(Collection(date=collection_date, t="Garden", icon="mdi:leaf"))
 
         return entries

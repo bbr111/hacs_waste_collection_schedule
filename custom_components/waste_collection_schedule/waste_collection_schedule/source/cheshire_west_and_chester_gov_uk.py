@@ -6,9 +6,7 @@ import requests
 from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 
 TITLE = "Cheshire West and Chester Council"
-DESCRIPTION = (
-    "Source for waste collection services for Cheshire West and Chester Council"
-)
+DESCRIPTION = "Source for waste collection services for Cheshire West and Chester Council"
 URL = "https://www.cheshirewestandchester.gov.uk"
 
 TEST_CASES = {
@@ -68,9 +66,7 @@ class Source:
             API_URLS["authResp"] + "&_" + urlNonce + "&sid=" + sessionKey,
             headers=HEADERS,
         )
-        authenticateResponseNonce = self.achieveFormsData(authRespRequest)["0"][
-            "AuthenticateResponse"
-        ]
+        authenticateResponseNonce = self.achieveFormsData(authRespRequest)["0"]["AuthenticateResponse"]
 
         # This payload is used for all subsequent requests
         uprnPayload = {
@@ -135,9 +131,7 @@ class Source:
         entries = []
 
         for collection in data.values():
-            date = datetime.strptime(
-                collection["collectionDateTime"], "%Y-%m-%dT%H:%M:%S"
-            ).date()
+            date = datetime.strptime(collection["collectionDateTime"], "%Y-%m-%dT%H:%M:%S").date()
             collection_type = collection["serviceType"]
             # Only emit the collection if it's a recognised collection type (I.e. Ignore: "BULKY BOOKINGS" and whatever else crops up)
             if serviceTypeToGenericService.get(collection_type) is not None:

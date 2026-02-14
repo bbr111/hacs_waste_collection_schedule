@@ -10,12 +10,8 @@ TITLE = "City of Hobart "
 DESCRIPTION = "Source for City of Hobart"
 URL = "https://www.hobartcity.com.au"
 TEST_CASES = {
-    "154 FOREST ROAD, WEST HOBART 7000": {
-        "address": "154 FOREST ROAD, WEST HOBART 7000"
-    },
-    "151 AUGUSTA ROAD, LENAH VALLEY 7008": {
-        "address": "151 AUGUSTA ROAD, LENAH VALLEY 7008"
-    },
+    "154 FOREST ROAD, WEST HOBART 7000": {"address": "154 FOREST ROAD, WEST HOBART 7000"},
+    "151 AUGUSTA ROAD, LENAH VALLEY 7008": {"address": "151 AUGUSTA ROAD, LENAH VALLEY 7008"},
 }
 
 
@@ -64,9 +60,7 @@ class Source:
             return
 
         for address in addresses:
-            if address["AddressSingleLine"].lower().replace(
-                " ", ""
-            ) == self._address.lower().replace(" ", ""):
+            if address["AddressSingleLine"].lower().replace(" ", "") == self._address.lower().replace(" ", ""):
                 self._address_id = address["Id"]
                 return
         raise SourceArgumentNotFoundWithSuggestions(

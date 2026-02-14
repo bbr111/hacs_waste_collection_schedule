@@ -19,12 +19,8 @@ TEST_CASES = {
     # "Empty Address": {_STREET_ADDRESS_ARG_NAME: ""},
     # "Invalid Address": {_STREET_ADDRESS_ARG_NAME: "Blah blah i dont exist"},
     # "Ambiguous Address": {_STREET_ADDRESS_ARG_NAME: "55 Vi"},
-    "Butlers Kitchen": {
-        _STREET_ADDRESS_ARG_NAME: "55 Victor Crescent NARRE WARREN VIC 3805"
-    },
-    "Daniel's Donuts Cranbourne": {
-        _STREET_ADDRESS_ARG_NAME: "Shop 14/1085 South Gippsland Highway CRANBOURNE NORTH VIC 3977"
-    },
+    "Butlers Kitchen": {_STREET_ADDRESS_ARG_NAME: "55 Victor Crescent NARRE WARREN VIC 3805"},
+    "Daniel's Donuts Cranbourne": {_STREET_ADDRESS_ARG_NAME: "Shop 14/1085 South Gippsland Highway CRANBOURNE NORTH VIC 3977"},
 }
 
 SEARCH_PAGE_URL = "https://www.casey.vic.gov.au/find-your-bin-collection-day"
@@ -83,9 +79,7 @@ class Source:
 
     def fetch(self) -> list[Collection]:
         if not self._street_address:
-            raise SourceArgumentRequired(
-                _STREET_ADDRESS_ARG_NAME, "A street address was not provided."
-            )
+            raise SourceArgumentRequired(_STREET_ADDRESS_ARG_NAME, "A street address was not provided.")
 
         session = requests.Session()
 
@@ -133,23 +127,15 @@ class Source:
 
         if len(search_results["result"]) > 1:
             address_suggestions = [x["full_address"] for x in search_results["result"]]
-            raise SourceArgAmbiguousWithSuggestions(
-                _STREET_ADDRESS_ARG_NAME, self._street_address, address_suggestions
-            )
+            raise SourceArgAmbiguousWithSuggestions(_STREET_ADDRESS_ARG_NAME, self._street_address, address_suggestions)
 
         entries = []
 
         for key, value in search_results["result"][0].items():
             # properties come through like "NextGarbageDate", "NextRecycleDate" or "PrevGardenDate" etc
             # extracting waste type name from the middle of "Next{x}Date" to support future waste types without direct mapping
-            if key.endswith(_DATE_STRING) and (
-                key.startswith(_NEXT_STRING) or key.startswith(_PREV_STRING)
-            ):
-                name = (
-                    key.replace(_DATE_STRING, "")
-                    .replace(_NEXT_STRING, "")
-                    .replace(_PREV_STRING, "")
-                )
+            if key.endswith(_DATE_STRING) and (key.startswith(_NEXT_STRING) or key.startswith(_PREV_STRING)):
+                name = key.replace(_DATE_STRING, "").replace(_NEXT_STRING, "").replace(_PREV_STRING, "")
 
                 date = datetime.strptime(value, "%Y-%m-%d").date()
                 icon = ICON_MAP[name] if name in ICON_MAP else None

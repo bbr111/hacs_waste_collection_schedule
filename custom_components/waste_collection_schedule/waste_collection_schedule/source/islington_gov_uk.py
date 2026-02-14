@@ -42,18 +42,14 @@ class Source:
         entries = []
 
         waste_table = (
-            soup.find(string="Waste and recycling collections")
-            .find_next("div", class_="m-toggle-content")
-            .find("table")
+            soup.find(string="Waste and recycling collections").find_next("div", class_="m-toggle-content").find("table")
         )
 
         if waste_table:
             rows = waste_table.find_all("tr")
             for row in rows:
                 waste_type = row.find("td").text.strip().split(",")[0].split(" - ")[0]
-                collection_day = (
-                    row.find("td").text.strip().split(",")[1].split(" on ")[1]
-                )
+                collection_day = row.find("td").text.strip().split(",")[1].split(" on ")[1]
 
                 entries.append(
                     Collection(

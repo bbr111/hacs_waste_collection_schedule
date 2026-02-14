@@ -59,18 +59,14 @@ class Source:
         self._uprn_args["ctl00$ContentPlaceHolder1$FF5683DDL"] = f"U{self._uprn}"
         self._postcode_args["ctl00$ContentPlaceHolder1$FF5683TB"] = f"{self._postcode}"
 
-    def __get_hidden_fiels(
-        self, response: requests.Response, to_update: dict[str, str]
-    ):
+    def __get_hidden_fiels(self, response: requests.Response, to_update: dict[str, str]):
         response.raise_for_status()
         r_list = response.text.split("|")
 
         if r_list[1] == "error":
             raise Exception("could not get valid data from ashford.gov.uk")
 
-        indexes = [
-            index for index, value in enumerate(r_list) if value == "hiddenField"
-        ]
+        indexes = [index for index, value in enumerate(r_list) if value == "hiddenField"]
 
         for index in indexes:
             key = r_list[index + 1]
@@ -97,9 +93,7 @@ class Source:
         r.raise_for_status()
 
         if "No addresses were found for the post code you entered." in r.text:
-            raise SourceArgumentException(
-                "postcode", "No addresses were found for the post code you entered."
-            )
+            raise SourceArgumentException("postcode", "No addresses were found for the post code you entered.")
 
         self.__get_hidden_fiels(r, self._uprn_args)
 
@@ -108,9 +102,7 @@ class Source:
 
         self.__get_hidden_fiels(r, self._submit_args)
 
-        self._submit_args[
-            "ctl00$ContentPlaceHolder1$btnSubmit"
-        ] = "ctl00$ContentPlaceHolder1$btnSubmit"
+        self._submit_args["ctl00$ContentPlaceHolder1$btnSubmit"] = "ctl00$ContentPlaceHolder1$btnSubmit"
         r = s.post(API_URL, data=self._submit_args)
         r.raise_for_status()
 
@@ -148,13 +140,9 @@ class Source:
                 if collection.text == "":
                     continue
                 try:
-                    date = datetime.datetime.strptime(
-                        collection.text, "%A, %d %B %Y"
-                    ).date()
+                    date = datetime.datetime.strptime(collection.text, "%A, %d %B %Y").date()
                 except ValueError:
-                    _LOGGER.warning(
-                        f"could not parse date {collection.text} for collection type {bint_type}: skipping"
-                    )
+                    _LOGGER.warning(f"could not parse date {collection.text} for collection type {bint_type}: skipping")
                     continue
 
                 icon = ICON_MAP.get(bint_type.split(" ")[0])  # Collection icon

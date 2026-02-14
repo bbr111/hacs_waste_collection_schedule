@@ -1,4 +1,3 @@
-import json
 from datetime import datetime
 
 import requests
@@ -37,13 +36,10 @@ class Source:
             for round_type in collection["roundTypes"]:
                 entries.append(
                     Collection(
-                        date=datetime.strptime(
-                            collection["date"], "%Y-%m-%dT%H:%M:%SZ"
-                        ).date(),
+                        date=datetime.strptime(collection["date"], "%Y-%m-%dT%H:%M:%SZ").date(),
                         t=round_type.title(),
                         icon=ICON_MAP.get(round_type),
                     )
                 )
-
 
         return entries

@@ -51,10 +51,7 @@ TEST_CASES = {
         "house_number": "76",
         "service": "mijnblink",
     },
-    "ZRD": {
-        "postal_code": "4691DH", 
-        "house_number": "4", 
-        "service": "zrd"},
+    "ZRD": {"postal_code": "4691DH", "house_number": "4", "service": "zrd"},
 }
 
 _LOGGER = logging.getLogger(__name__)
@@ -266,10 +263,10 @@ SERVICE_MAP = [
         "title": "ZRD",
         "api_url": "https://www.zrd.nl",
         "icons": {
-            "appel en blad": "mdi:leaf",         # GFT-afval
-            "pet pak blik": "mdi:recycle",       # PMD
-            "zak rest rest": "mdi:trash-can",    # Restafval
-            "karton": "mdi:archive",             # Papier en karton
+            "appel en blad": "mdi:leaf",  # GFT-afval
+            "pet pak blik": "mdi:recycle",  # PMD
+            "zak rest rest": "mdi:trash-can",  # Restafval
+            "karton": "mdi:archive",  # Papier en karton
         },
     },
 ]
@@ -282,10 +279,7 @@ def extract_service_name(api_url):
 
 
 def get_service_name_map():
-    return {
-        extract_service_name(s["api_url"]): (s["api_url"], s["icons"])
-        for s in SERVICE_MAP
-    }
+    return {extract_service_name(s["api_url"]): (s["api_url"], s["icons"]) for s in SERVICE_MAP}
 
 
 def get_main_url(url):
@@ -295,9 +289,7 @@ def get_main_url(url):
 
 
 class Source:
-    def __init__(
-        self, postal_code, house_number, house_letter="", suffix="", service="hvcgroep"
-    ):
+    def __init__(self, postal_code, house_number, house_letter="", suffix="", service="hvcgroep"):
         self.postal_code = postal_code
         self.house_number = house_number
         self.house_letter = postal_code
@@ -318,10 +310,7 @@ class Source:
         if len(data) > 1 and self.house_letter and self.suffix:
             _LOGGER.info(f"Checking {self.house_letter} {self.suffix}")
             for address in data:
-                if (
-                    address["huisletter"] == self.house_letter
-                    and address["toevoeging"] == self.suffix
-                ):
+                if address["huisletter"] == self.house_letter and address["toevoeging"] == self.suffix:
                     bag_id = address["bagid"]
                     break
 
@@ -331,18 +320,14 @@ class Source:
         waste_flows = r.json()
 
         # Retrieve the pickup calendar for waste.
-        r = requests.get(
-            f"{self._url}/rest/adressen/{bag_id}/kalender/{datetime.today().year}"
-        )
+        r = requests.get(f"{self._url}/rest/adressen/{bag_id}/kalender/{datetime.today().year}")
         r.raise_for_status()
         data = r.json()
 
         entries = []
 
         for item in data:
-            waste_details = [
-                x for x in waste_flows if x["id"] == item["afvalstroom_id"]
-            ]
+            waste_details = [x for x in waste_flows if x["id"] == item["afvalstroom_id"]]
             entries.append(
                 Collection(
                     date=datetime.strptime(item["ophaaldatum"], "%Y-%m-%d").date(),

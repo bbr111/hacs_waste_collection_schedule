@@ -66,9 +66,7 @@ class Source:
                 try:
                     date = datetime.strptime(date_str, "%A, %d %B %Y").date()
                 except ValueError as e:
-                    LOGGER.warning(
-                        f"Failed to parse date '{date_str}' for wastetype {waste_type}: {e}"
-                    )
+                    LOGGER.warning(f"Failed to parse date '{date_str}' for wastetype {waste_type}: {e}")
                     continue
 
                 entries.append(

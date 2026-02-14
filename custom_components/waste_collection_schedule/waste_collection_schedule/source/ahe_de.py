@@ -44,9 +44,7 @@ class Source:
         r = s.get(API_URL.format(search="pickup-dates"))
         r.raise_for_status()
 
-        token = BeautifulSoup(r.text, "html.parser").find(
-            "input", {"name": "pickup_date[_token]"}
-        )["value"]
+        token = BeautifulSoup(r.text, "html.parser").find("input", {"name": "pickup_date[_token]"})["value"]
 
         r = s.get(
             SEARCH_API_URL.format(search="postalcode"),
@@ -94,9 +92,7 @@ class Source:
                 street_id = entry["id"]
                 break
         if street_id is None:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "strasse", self._strasse, (entry["name"] for entry in data)
-            )
+            raise SourceArgumentNotFoundWithSuggestions("strasse", self._strasse, (entry["name"] for entry in data))
 
         data = {
             "pickup_date[postalCode]": post_id,
@@ -110,9 +106,7 @@ class Source:
         r = s.post(API_URL.format(search="pickup-dates"), data=data)
         r.raise_for_status()
         if "Es wurden keine Termine gefunden." in r.text:
-            raise Exception(
-                "No dates found for provided addresses please check https://ahe.atino.net/pickup-dates"
-            )
+            raise Exception("No dates found for provided addresses please check https://ahe.atino.net/pickup-dates")
 
         dates = self._ics.convert(r.text)
 

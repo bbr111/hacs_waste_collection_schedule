@@ -9,9 +9,7 @@ from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 _LOGGER = logging.getLogger(__name__)
 
 TITLE = "Afvalstoffendienst.nl"
-DESCRIPTION = (
-    "Source for 's Hertogenbosch, Heusden, Vught, Oisterwijk, Altena, Bernheze"
-)
+DESCRIPTION = "Source for 's Hertogenbosch, Heusden, Vught, Oisterwijk, Altena, Bernheze"
 URL = "https://www.afvalstoffendienst.nl/"
 
 
@@ -97,9 +95,7 @@ class Source:
         year = date.today().year
         entries: list[dict] = []
         for target_year in (year, year + 1):
-            response = requests.get(
-                f"{API_URL}/rest/adressen/{bag_id}/kalender/{target_year}"
-            )
+            response = requests.get(f"{API_URL}/rest/adressen/{bag_id}/kalender/{target_year}")
             response.raise_for_status()
             entries.extend(response.json())
         return entries

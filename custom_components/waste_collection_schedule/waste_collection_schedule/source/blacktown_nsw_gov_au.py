@@ -61,9 +61,7 @@ ICON_MAP = {
 
 
 class Source:
-    def __init__(
-        self, post_code: str, suburb: str, street_name: str, street_number: str
-    ):
+    def __init__(self, post_code: str, suburb: str, street_name: str, street_number: str):
         self.post_code = post_code
         self.suburb = suburb
         self.street_name = street_name
@@ -85,9 +83,7 @@ class Source:
             locationId = item["Id"]
             break
         if locationId == 0:
-            raise ValueError(
-                f"Unable to find location ID for {address}, maybe you misspelled your address?"
-            )
+            raise ValueError(f"Unable to find location ID for {address}, maybe you misspelled your address?")
 
         # Retrieve the upcoming collections for our property
         payload = {"geolocationid": locationId, "ocsvclang": "en-AU"}
@@ -105,9 +101,7 @@ class Source:
             date_format = "%a %d/%m/%Y"
             try:
                 # Strip carriage returns and newlines out of the HTML content
-                cleaned_date_text = (
-                    date_text.text.replace("\r", "").replace("\n", "").strip()
-                )
+                cleaned_date_text = date_text.text.replace("\r", "").replace("\n", "").strip()
                 # Parse the date
                 date = datetime.datetime.strptime(cleaned_date_text, date_format).date()
             except ValueError:

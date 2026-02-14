@@ -33,9 +33,7 @@ ICON_MAP = {
 class Source:
     API_URL = "https://grafikai.svara.lt/api/"
 
-    def __init__(
-        self, region, street, house_number, district=None, waste_object_ids=None
-    ):
+    def __init__(self, region, street, house_number, district=None, waste_object_ids=None):
         if waste_object_ids is None:
             waste_object_ids = []
         self._region = region
@@ -45,7 +43,6 @@ class Source:
         self._waste_object_ids = waste_object_ids
 
     def fetch(self):
-
         address_query = {
             "pageSize": 20,
             "pageIndex": 0,
@@ -82,9 +79,7 @@ class Source:
                     for collection_waste_object in data_waste_object:
                         entries.append(
                             Collection(
-                                date=datetime.strptime(
-                                    collection_waste_object["date"], "%Y-%m-%dT%H:%M:%S"
-                                ).date(),
+                                date=datetime.strptime(collection_waste_object["date"], "%Y-%m-%dT%H:%M:%S").date(),
                                 t=collection["descriptionFmt"].title(),
                                 icon=ICON_MAP.get(type),
                             )
@@ -103,8 +98,4 @@ class Source:
 
     def check_for_error_status(self, collection):
         if "status" in collection:
-            raise Exception(
-                "Error: failed to fetch get data, got status: {}".format(
-                    collection["status"]
-                )
-            )
+            raise Exception("Error: failed to fetch get data, got status: {}".format(collection["status"]))

@@ -55,8 +55,7 @@ class Source:
             # Check if address was found - if table is missing, likely invalid UPRN
             address_check = soup.find(
                 "p",
-                string=lambda text: text
-                and "Currently showing collection days for:" in text,
+                string=lambda text: text and "Currently showing collection days for:" in text,
             )
             if not address_check:
                 raise SourceArgumentNotFound(
@@ -102,9 +101,7 @@ class Source:
             if next_collection_p:
                 _LOGGER.debug(f"Found collection text: {next_collection_p.get_text()}")
                 # Extract date from text like "Monday 15 December 2025 will be your next collection."
-                date_match = re.search(
-                    r"(\w+\s+\d{1,2}\s+\w+\s+\d{4})", next_collection_p.get_text()
-                )
+                date_match = re.search(r"(\w+\s+\d{1,2}\s+\w+\s+\d{4})", next_collection_p.get_text())
                 if date_match:
                     date_str = date_match.group(1)
                     _LOGGER.debug(f"Extracted date string: {date_str}")
@@ -113,13 +110,9 @@ class Source:
                     date_parts = date_str.split()
                     if len(date_parts) >= 4:
                         # Reconstruct without day name: "15 December 2025"
-                        date_str_clean = (
-                            f"{date_parts[1]} {date_parts[2]} {date_parts[3]}"
-                        )
+                        date_str_clean = f"{date_parts[1]} {date_parts[2]} {date_parts[3]}"
                         try:
-                            collection_date = datetime.strptime(
-                                date_str_clean, "%d %B %Y"
-                            ).date()
+                            collection_date = datetime.strptime(date_str_clean, "%d %B %Y").date()
 
                             entries.append(
                                 Collection(
@@ -128,14 +121,10 @@ class Source:
                                     icon=ICON_MAP.get(waste_type),
                                 )
                             )
-                            _LOGGER.debug(
-                                f"Added collection: {collection_date} - {waste_type}"
-                            )
+                            _LOGGER.debug(f"Added collection: {collection_date} - {waste_type}")
                         except ValueError as e:
                             # Skip if date parsing fails
-                            _LOGGER.warning(
-                                f"Failed to parse date '{date_str_clean}': {e}"
-                            )
+                            _LOGGER.warning(f"Failed to parse date '{date_str_clean}': {e}")
                             continue
                     else:
                         _LOGGER.debug(f"Date parts insufficient: {date_parts}")

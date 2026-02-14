@@ -56,14 +56,8 @@ class Source:
         address_ids = [
             x
             for x in addresses["results"]
-            if (
-                x["LPI"].get("PAO_TEXT")
-                and x["LPI"]["PAO_TEXT"].lower() == self._number.lower()
-            )
-            or (
-                x["LPI"].get("PAO_START_NUMBER")
-                and x["LPI"]["PAO_START_NUMBER"].lower() == self._number.lower()
-            )
+            if (x["LPI"].get("PAO_TEXT") and x["LPI"]["PAO_TEXT"].lower() == self._number.lower())
+            or (x["LPI"].get("PAO_START_NUMBER") and x["LPI"]["PAO_START_NUMBER"].lower() == self._number.lower())
         ]
 
         if len(address_ids) == 0:
@@ -72,11 +66,7 @@ class Source:
             raise SourceArgumentNotFoundWithSuggestions(
                 "number",
                 self._number,
-                {
-                    x["LPI"].get("PAO_TEXT") or x["LPI"].get("PAO_START_NUMBER")
-                    for x in addresses["results"]
-                }
-                - {None},
+                {x["LPI"].get("PAO_TEXT") or x["LPI"].get("PAO_START_NUMBER") for x in addresses["results"]} - {None},
             )
 
         q = str(API_URLS["collection"])

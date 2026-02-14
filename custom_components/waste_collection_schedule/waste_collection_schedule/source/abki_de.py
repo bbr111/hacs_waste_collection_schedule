@@ -41,33 +41,26 @@ class Source:
 
         # get street id
         params = f"filter[logic]=and&filter[filters][0][value]={self._street}&filter[filters][0][field]=Strasse&filter[filters][0][operator]=startswith&filter[filters][0][ignoreCase]=true"
-        r = session.get(
-            "https://abki.de/abki-services/strassennamen", params=params
-        )  # , params=params)
+        r = session.get("https://abki.de/abki-services/strassennamen", params=params)  # , params=params)
         r.raise_for_status()
 
         streets = r.json()
         if len(streets) > 1:
-            _LOGGER.warning(
-                "Multiple streets found please be more specific, using first one: "
-                + streets[0]["Strasse"]
-            )
+            _LOGGER.warning("Multiple streets found please be more specific, using first one: " + streets[0]["Strasse"])
         if len(streets) < 1:
             raise SourceArgumentNotFound("street", self._street)
 
         street_id = streets[0]["IDSTREET"]
 
         # get number id
-        r = session.get(
-            "https://abki.de/abki-services/streetnumber", params={"IDSTREET": street_id}
-        )
+        r = session.get("https://abki.de/abki-services/streetnumber", params={"IDSTREET": street_id})
         r.raise_for_status()
         numbers = r.json()
         number_id, standort_id = None, None
         for number in numbers:
-            if number["NUMBER"].lower().replace(" ", "").replace(
+            if number["NUMBER"].lower().replace(" ", "").replace("-", "") == self._number.lower().replace(" ", "").replace(
                 "-", ""
-            ) == self._number.lower().replace(" ", "").replace("-", ""):
+            ):
                 number_id = number["id"]
                 standort_id = number["IDSTANDORT"]
                 break
@@ -108,13 +101,26 @@ class Source:
                         "IDSTANDORT": standort_id,
                         "Hausnummernwahl": number_id,
                     },
+                    timeout=10,
                 )
                 r.raise_for_status()
-                request_data = r.json()["dataFile"]
-                r = session.get(ICAL_URL, params={"data": request_data})
+
+                json_data = r.json()
+                request_data = json_data.get("dataFile")
+                if not request_data:
+                    raise ValueError("dataFile fehlt in der API-Antwort")
+
+                r = session.get(ICAL_URL, params={"data": request_data}, timeout=10)
+                r.raise_for_status()
+
                 dates += self._ics.convert(r.text)
-            except:
-                pass
+
+            except requests.RequestException as e:
+                _LOGGER.error("HTTP-Fehler beim Laden der Januar-Daten: %s", e)
+            except ValueError as e:
+                _LOGGER.error("Ungültige API-Antwort: %s", e)
+            except Exception:
+                _LOGGER.exception("Unerwarteter Fehler beim Laden der Januar-Daten")
 
         entries = []
         for d in dates:

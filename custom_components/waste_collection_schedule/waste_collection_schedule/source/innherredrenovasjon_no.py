@@ -5,9 +5,7 @@ import requests
 from waste_collection_schedule import Collection
 
 TITLE = "Innherred Renovasjon"
-DESCRIPTION = (
-    "Source for innherredrenovasjon.no services for Innherred Renovasjon, Norway."
-)
+DESCRIPTION = "Source for innherredrenovasjon.no services for Innherred Renovasjon, Norway."
 URL = "https://innherredrenovasjon.no/"
 
 TEST_CASES = {
@@ -16,9 +14,7 @@ TEST_CASES = {
     "Test_003": {"address": "Nordregata 2"},
 }
 
-API_URL = (
-    "https://innherredrenovasjon.no/wp-json/ir/v1/garbage-disposal-dates-by-address"
-)
+API_URL = "https://innherredrenovasjon.no/wp-json/ir/v1/garbage-disposal-dates-by-address"
 
 ICON_MAP = {
     "Restavfall": "mdi:trash-can",

@@ -43,10 +43,7 @@ class Source:
 
         entries = []
         for item in data["data"]:
-            if (
-                self._city in item["abfallkreisIds"]
-                or self._city in item["abfallkreisNameList"]
-            ):
+            if self._city in item["abfallkreisIds"] or self._city in item["abfallkreisNameList"]:
                 next_pickup = item["_anlassDate-sort"].split()[0]
                 next_pickup_date = datetime.fromisoformat(next_pickup).date()
 

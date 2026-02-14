@@ -33,9 +33,7 @@ PARAM_TRANSLATIONS = {
 
 
 class Source:
-    def __init__(
-        self, street
-    ):  # argX correspond to the args dict in the source configuration
+    def __init__(self, street):  # argX correspond to the args dict in the source configuration
         self.street = street
 
     def fetch(self):
@@ -52,9 +50,7 @@ class Source:
             for waste_type in waste_type_list:
                 entries.append(
                     Collection(
-                        date=datetime.strptime(
-                            date, "%d.%m.%Y"
-                        ).date(),  # Collection date
+                        date=datetime.strptime(date, "%d.%m.%Y").date(),  # Collection date
                         t=waste_type,  # Collection type
                         icon=ICON_MAP.get(waste_type),  # Collection icon
                     )

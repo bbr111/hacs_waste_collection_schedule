@@ -95,19 +95,13 @@ class Source:
         #  and extract date and waste type details
         municipality_name = _normalize_municipality_name(self.municipality)
         if not municipality_name:
-            raise SourceArgumentNotFound(
-                "municipality", self.municipality, "Empty municipality name."
-            )
+            raise SourceArgumentNotFound("municipality", self.municipality, "Empty municipality name.")
         if municipality_name not in MUNICIPALITY_NAMES:
-            raise SourceArgumentException(
-                "municipality", f"Invalid municipality name: {self.municipality}."
-            )
+            raise SourceArgumentException("municipality", f"Invalid municipality name: {self.municipality}.")
 
         if self.sector:
             if municipality_name != "chateauguay":
-                raise SourceArgumentException(
-                    self.sector, f"Invalid sector for {municipality_name.capitalize()}"
-                )
+                raise SourceArgumentException(self.sector, f"Invalid sector for {municipality_name.capitalize()}")
             if self.sector not in ["nord-ouest", "est"]:
                 raise SourceArgumentException(
                     self.sector,
@@ -125,18 +119,14 @@ class Source:
         cal = resp.json()["data"]
 
         if not cal:
-            raise Exception(
-                "Failed to get collection schedule"
-            )  # DO NOT JUST return []
+            raise Exception("Failed to get collection schedule")  # DO NOT JUST return []
 
         entries = []  # List that holds collection schedule
 
         for day in cal:
             entries.append(
                 Collection(
-                    date=datetime.strptime(
-                        day["date"], "%Y%m%d"
-                    ).date(),  # Collection date
+                    date=datetime.strptime(day["date"], "%Y%m%d").date(),  # Collection date
                     t=day["icone"][0],  # Collection type
                     icon=ICON_MAP.get(day["icone"][0]),  # Collection icon
                 )

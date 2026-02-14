@@ -21,7 +21,7 @@ TEST_CASES = {
 ICON_MAP = {
     "Graue tonne": "mdi:trash-can",
     "Gelber sack": "mdi:recycle",
-    "Gelbe tonne" "Tannenbaum": "mdi:pine-tree",
+    "Gelbe tonneTannenbaum": "mdi:pine-tree",
 }
 
 

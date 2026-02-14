@@ -117,21 +117,11 @@ class Source:
         r1.raise_for_status()
 
         page_data = r1.json()["data"]
-        key = (
-            re.findall(r"data-unique_key=\"C_[a-f0-9]+\"", page_data)[-1]
-            .replace('data-unique_key="', "")
-            .replace('"', "")
-        )
+        key = re.findall(r"data-unique_key=\"C_[a-f0-9]+\"", page_data)[-1].replace('data-unique_key="', "").replace('"', "")
         soup = BeautifulSoup(page_data, features="html.parser")
-        submitted_widget_group_id = soup.findAll(
-            "input", {"name": "submitted_widget_group_id"}
-        )[-1].attrs["value"]
-        submission_token = soup.find("input", {"name": "submission_token"}).attrs[
-            "value"
-        ]
-        submitted_page_id = soup.find("input", {"name": "submitted_page_id"}).attrs[
-            "value"
-        ]
+        submitted_widget_group_id = soup.findAll("input", {"name": "submitted_widget_group_id"})[-1].attrs["value"]
+        submission_token = soup.find("input", {"name": "submission_token"}).attrs["value"]
+        submitted_page_id = soup.find("input", {"name": "submitted_page_id"}).attrs["value"]
 
         # Use postcode and houseID to find address
         addressID = "0"
@@ -202,24 +192,12 @@ class Source:
         entries = []
         for pickup in schedule:
             # Get the waste type
-            waste_type = pickup.find_all(
-                "div", {"class": "fragment_presenter_template_show"}
-            )[0].text.strip()
+            waste_type = pickup.find_all("div", {"class": "fragment_presenter_template_show"})[0].text.strip()
 
             try:  # Get the next collection date
-                waste_date = (
-                    pickup.find("div", {"class": "bin-collection-next"})
-                    .attrs["data-current_value"]
-                    .strip()
-                )
-            except (
-                AttributeError
-            ):  # If it fails, the collection is schedule for today, so look for that date
-                waste_date = (
-                    pickup.find("div", {"class": "bin-collection-today"})
-                    .attrs["data-current_value"]
-                    .strip()
-                )
+                waste_date = pickup.find("div", {"class": "bin-collection-next"}).attrs["data-current_value"].strip()
+            except AttributeError:  # If it fails, the collection is schedule for today, so look for that date
+                waste_date = pickup.find("div", {"class": "bin-collection-today"}).attrs["data-current_value"].strip()
 
             entries.append(
                 Collection(

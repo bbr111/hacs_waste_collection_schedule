@@ -70,9 +70,7 @@ ICON_MAP = {
 }
 
 # Global variables for encryption key and IV
-KEY = binascii.unhexlify(
-    "F57E76482EE3DC3336495DEDEEF3962671B054FE353E815145E29C5689F72FEC"
-)
+KEY = binascii.unhexlify("F57E76482EE3DC3336495DEDEEF3962671B054FE353E815145E29C5689F72FEC")
 IV = binascii.unhexlify("2CBF4FC35C69B82362D393A4F0B9971A")
 
 
@@ -245,7 +243,7 @@ EXTRA_INFO = [
 class Source:
     def __init__(self, uprn: str | int, municipality: MUNICIPALITY_LITERALS):
         self._uprn: str | int = uprn
-        if not municipality.upper() in MUNICIPALITIES:
+        if municipality.upper() not in MUNICIPALITIES:
             raise ValueError(f"Unknown municipality: {municipality}")
         self._payload = MUNICIPALITIES[municipality.upper()]["PAYLOAD"]
         self._api_url = MUNICIPALITIES[municipality.upper()]["API_URL"]
@@ -281,21 +279,13 @@ class Source:
         # Process the collection dates
         entries = []
         for service in servicedata["collectionDay"]:
-            collection_dates = [
-                datetime.strptime(service["collectionDay"], "%d-%m-%Y").date()
-            ]
+            collection_dates = [datetime.strptime(service["collectionDay"], "%d-%m-%Y").date()]
             try:
-                collection_dates.append(
-                    datetime.strptime(service["followingDay"], "%d-%m-%Y").date()
-                )
+                collection_dates.append(datetime.strptime(service["followingDay"], "%d-%m-%Y").date())
             except Exception:
                 pass
             bin_type = service["binType"].split(" (")[0].split(":")[0]
             for collection_date in collection_dates:
-                entries.append(
-                    Collection(
-                        date=collection_date, t=bin_type, icon=ICON_MAP.get(bin_type)
-                    )
-                )
+                entries.append(Collection(date=collection_date, t=bin_type, icon=ICON_MAP.get(bin_type)))
 
         return entries

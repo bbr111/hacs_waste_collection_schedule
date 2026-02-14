@@ -105,9 +105,7 @@ class Source:
         for val, text in muns.items():
             if cmp(val, self._municipality) or cmp(text, self._municipality):
                 return val
-        raise SourceArgumentNotFoundWithSuggestions(
-            "municipality", self._municipality, list(muns.values())
-        )
+        raise SourceArgumentNotFoundWithSuggestions("municipality", self._municipality, list(muns.values()))
 
     def match_city(self, cities: list[str]):
         for city in cities:
@@ -139,12 +137,8 @@ class Source:
 
         if soup.select_one("select#gemeindewahl"):
             # Request failed and returned default page
-            self.match_municipality(
-                self.get_municipalities(soup)
-            )  # should raise exception if municipality is not found
-            self.match_city(
-                self.get_city(self._municipality)
-            )  # should raise exception if city is not found
+            self.match_municipality(self.get_municipalities(soup))  # should raise exception if municipality is not found
+            self.match_city(self.get_city(self._municipality))  # should raise exception if city is not found
             raise Exception("Unknown error occurred")
 
         entries = []

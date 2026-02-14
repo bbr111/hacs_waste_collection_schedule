@@ -43,13 +43,10 @@ class Source:
         self._uprn = str(uprn)
 
     def fetch(self):
-
         # Use customised TLS/cipher settings
         s = requests.Session()
         s.mount("https://", LegacyTLSAdapter())
-        _LOGGER.warning(
-            "Forcing requests to use legacy TLSv1.2 & AES256-SHA256 to match horsham.gov.uk website"
-        )
+        _LOGGER.warning("Forcing requests to use legacy TLSv1.2 & AES256-SHA256 to match horsham.gov.uk website")
 
         r = s.post(
             API_URL,
@@ -61,17 +58,11 @@ class Source:
         entries = []
         for result in results:
             result_row = result.find_all("td")
-            if (
-                len(result_row) == 0
-            ):  # This removes the first header row, or any rows with no data
+            if len(result_row) == 0:  # This removes the first header row, or any rows with no data
                 continue
             else:
-                date = datetime.strptime(
-                    result_row[1].text, "%d/%m/%Y"
-                ).date()  # Pull out the rows date
-                collection_text = result_row[2].text.replace(
-                    "\xa0", " "
-                )  # This is to remove a non-blanking space
+                date = datetime.strptime(result_row[1].text, "%d/%m/%Y").date()  # Pull out the rows date
+                collection_text = result_row[2].text.replace("\xa0", " ")  # This is to remove a non-blanking space
                 collection_items = collection_text.split(
                     "AND"
                 )  # Sometimes there will be multiple bins, split with the word AND
@@ -80,9 +71,7 @@ class Source:
                         Collection(
                             date=date,
                             t=collection_type.strip(),  # Strip added to remove trailing white space
-                            icon=ICON_MAP.get(
-                                collection_type.strip()
-                            ),  # Strip added to remove trailing white space
+                            icon=ICON_MAP.get(collection_type.strip()),  # Strip added to remove trailing white space
                         )
                     )
 

@@ -6,9 +6,7 @@ import requests
 from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 
 TITLE = "City of Doncaster Council"
-DESCRIPTION = (
-    "Source for doncaster.gov.uk services for the City of Doncaster Council, UK."
-)
+DESCRIPTION = "Source for doncaster.gov.uk services for the City of Doncaster Council, UK."
 URL = "https://doncaster.gov.uk"
 
 TEST_CASES = {

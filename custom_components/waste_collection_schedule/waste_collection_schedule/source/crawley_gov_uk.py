@@ -105,11 +105,7 @@ class Source:
         date_parse_failed = []
         entries = []
         for collection in collections:
-            for key in [
-                k
-                for k in collection.keys()
-                if k.endswith("DateCurrent") or k.endswith("DateNext")
-            ]:
+            for key in [k for k in collection.keys() if k.endswith("DateCurrent") or k.endswith("DateNext")]:
                 date_str = collection[key]
                 try:
                     date = parse(date_str, dayfirst=True).date()
@@ -123,8 +119,6 @@ class Source:
 
         if not entries:
             if date_parse_failed:
-                raise ValueError(
-                    f"Failed to parse dates: {', '.join(date_parse_failed)}"
-                )
+                raise ValueError(f"Failed to parse dates: {', '.join(date_parse_failed)}")
             raise ValueError(f"No collections found for {self._uprn}")
         return entries

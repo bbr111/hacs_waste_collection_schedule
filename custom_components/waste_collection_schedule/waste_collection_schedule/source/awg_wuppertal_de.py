@@ -84,9 +84,7 @@ class Source:
         soup = BeautifulSoup(r.text, "html.parser")
 
         # get all links where text ends on "als iCal"
-        ical_links = soup.find_all(
-            "a", text=lambda text: text and text.lower().strip().endswith("als ical")
-        )
+        ical_links = soup.find_all("a", text=lambda text: text and text.lower().strip().endswith("als ical"))
         entries = []
         for link in ical_links:
             href = link["href"]

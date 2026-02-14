@@ -4,16 +4,13 @@ import unicodedata
 from datetime import datetime
 
 import requests
+
 from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 
 EMBED_URL = "https://differenziata.junker.app/embed/{municipality}/calendario"
-EMBED_URL_WITH_AREA = (
-    "https://differenziata.junker.app/embed/{municipality}/area/{area}/calendario"
-)
+EMBED_URL_WITH_AREA = "https://differenziata.junker.app/embed/{municipality}/area/{area}/calendario"
 PLAIN_URL = "https://differenziata.junkerapp.it/{municipality}/calendario"
-PLAIN_URL_WITH_AREA = (
-    "https://differenziata.junkerapp.it/{municipality}/{area}/calendario"
-)
+PLAIN_URL_WITH_AREA = "https://differenziata.junkerapp.it/{municipality}/{area}/calendario"
 
 
 EVENTS_REGEX = re.compile(r"var\s+events\s*=\s*(\[.*?\])\s*;")
@@ -38,8 +35,7 @@ class AreaNotFound(Exception):
         super().__init__("Area not found")
 
 
-class AreaRequired(AreaNotFound):
-    ...
+class AreaRequired(AreaNotFound): ...
 
 
 def replace_accents(text: str) -> str:
@@ -47,9 +43,7 @@ def replace_accents(text: str) -> str:
     normalized_text = unicodedata.normalize("NFD", text)
 
     # Filter out combining diacritical marks
-    filtered_text = "".join(
-        char for char in normalized_text if unicodedata.category(char) != "Mn"
-    )
+    filtered_text = "".join(char for char in normalized_text if unicodedata.category(char) != "Mn")
 
     # Normalize back to NFC (Normalization Form Composition)
     return unicodedata.normalize("NFC", filtered_text)
@@ -73,9 +67,7 @@ class Junker:
         self._area_url = EMBED_URL_WITH_AREA if use_embed_url else PLAIN_URL_WITH_AREA
 
     def fetch(self) -> list[Collection]:
-        mun_str = replace_accents(
-            self._municipality.lower().strip().replace(" ", "-").replace("'", "-")
-        )
+        mun_str = replace_accents(self._municipality.lower().strip().replace(" ", "-").replace("'", "-"))
         if self._area:
             url = self._area_url.format(municipality=mun_str, area=self._area)
         else:
@@ -95,17 +87,9 @@ class Junker:
 
             if self._area_name:
                 for area in areas:
-                    if replace_accents(area[0]).lower().strip().replace(
-                        " ", ""
-                    ).replace(",", "").replace("'", "") == replace_accents(
-                        self._area_name
-                    ).lower().strip().replace(
-                        " ", ""
-                    ).replace(
-                        ",", ""
-                    ).replace(
+                    if replace_accents(area[0]).lower().strip().replace(" ", "").replace(",", "").replace(
                         "'", ""
-                    ):
+                    ) == replace_accents(self._area_name).lower().strip().replace(" ", "").replace(",", "").replace("'", ""):
                         if self._area in (str(area[1]), area[1]):
                             raise ValueError("Something went wrong with the area")
                         self._area = area[1]
@@ -131,15 +115,10 @@ class Junker:
             muns = [
                 m
                 for m in self._municipalities_with_area
-                if m.lower().replace(" ", "")
-                == self._municipality.lower().replace(" ", "")
+                if m.lower().replace(" ", "") == self._municipality.lower().replace(" ", "")
             ]
             mun = muns[0] if muns else self._municipality
-            if (
-                not self._area
-                and mun in self._municipalities_with_area
-                and len(self._municipalities_with_area[mun]) == 1
-            ):
+            if not self._area and mun in self._municipalities_with_area and len(self._municipalities_with_area[mun]) == 1:
                 # If municipality needs region but only one region is available use it
                 self._area = self._municipalities_with_area[self._municipality][0]
                 return self.fetch()

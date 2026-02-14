@@ -2,7 +2,8 @@
 
 import datetime
 import logging
-from typing import TYPE_CHECKING, Callable, Dict, List, Optional
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Optional
 
 import requests
 
@@ -12,7 +13,7 @@ if TYPE_CHECKING:
     from .DeviceKeyStore import DeviceKeyStore
 
 
-_device_key_store_method: Optional[Callable[[], Optional["DeviceKeyStore"]]] = None
+_device_key_store_method: Callable[[], Optional["DeviceKeyStore"]] | None = None
 
 
 def get_device_key_store() -> Optional["DeviceKeyStore"]:
@@ -64,8 +65,8 @@ class WhatBinDayService:
     def __init__(
         self,
         location_key: str,
-        icon_map: Optional[Dict[str, str]] = None,
-        bin_names: Optional[Dict[str, str]] = None,
+        icon_map: dict[str, str] | None = None,
+        bin_names: dict[str, str] | None = None,
         app_package: str = "com.socketsoftware.whatbinday.binston",
     ):
         """
@@ -103,9 +104,7 @@ class WhatBinDayService:
                     self._device_key = stored_key
                     return self._device_key
         except Exception as e:
-            _LOGGER.error(
-                "Error accessing HA Store for location %s: %s", self._location_key, e
-            )
+            _LOGGER.error("Error accessing HA Store for location %s: %s", self._location_key, e)
 
         # Register new device if no stored key found
         try:
@@ -135,9 +134,7 @@ class WhatBinDayService:
 
             data = response.json()
             if not data.get("success"):
-                raise Exception(
-                    f"Device registration failed: {data.get('info', 'Unknown error')}"
-                )
+                raise Exception(f"Device registration failed: {data.get('info', 'Unknown error')}")
 
             self._device_key = data["data"]["key"]
 
@@ -166,8 +163,8 @@ class WhatBinDayService:
         post_code: str,
         state: str = "VIC",
         country: str = "Australia",
-        coordinates: Optional[Dict[str, float]] = None,
-    ) -> Dict:
+        coordinates: dict[str, float] | None = None,
+    ) -> dict:
         """
         Build address data structure from user input.
 
@@ -180,9 +177,7 @@ class WhatBinDayService:
             country: Country (default: Australia)
             coordinates: Optional lat/lng coordinates
         """
-        formatted_address = (
-            f"{street_number} {street_name}, {suburb} {state} {post_code}, {country}"
-        )
+        formatted_address = f"{street_number} {street_name}, {suburb} {state} {post_code}, {country}"
 
         # Create address components structure similar to Google's format
         address_components = [
@@ -229,7 +224,7 @@ class WhatBinDayService:
             "geometry": {"location": coordinates, "location_type": "APPROXIMATE"},
         }
 
-    def get_collection_schedule(self, location_data: Dict) -> List[Collection]:
+    def get_collection_schedule(self, location_data: dict) -> list[Collection]:
         """
         Get bin collection schedule for the location.
 
@@ -251,9 +246,7 @@ class WhatBinDayService:
 
         data = response.json()
         if not data.get("success"):
-            raise Exception(
-                f"Service lookup failed: {data.get('info', 'Unknown error')}"
-            )
+            raise Exception(f"Service lookup failed: {data.get('info', 'Unknown error')}")
 
         # Find the CouncilBinModule in the response
         bin_module = None
@@ -269,9 +262,7 @@ class WhatBinDayService:
         collection_events = bin_module.get("CollectionEvents", [])
 
         for event in collection_events:
-            collection_date = datetime.datetime.strptime(
-                event["Date"], "%Y-%m-%d"
-            ).date()
+            collection_date = datetime.datetime.strptime(event["Date"], "%Y-%m-%d").date()
 
             # Create an entry for each bin type collected on this date
             for bin_type in event["Items"]:
@@ -296,8 +287,8 @@ class WhatBinDayService:
         post_code: str,
         state: str = "VIC",
         country: str = "Australia",
-        coordinates: Optional[Dict[str, float]] = None,
-    ) -> List[Collection]:
+        coordinates: dict[str, float] | None = None,
+    ) -> list[Collection]:
         """
         Fetch waste collection schedule for an address.
 

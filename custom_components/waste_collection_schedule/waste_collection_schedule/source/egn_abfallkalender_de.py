@@ -84,29 +84,15 @@ class Source:
         data = r.json()
 
         if data.get("error"):
-            raise Exception(
-                "\n".join(
-                    [
-                        f"{type} - {errormsg}"
-                        for type, errormsg in data["errors"].items()
-                    ]
-                )
-            )
+            raise Exception("\n".join([f"{type} - {errormsg}" for type, errormsg in data["errors"].items()]))
 
         entries = []
         for year, months in data["waste_discharge"].items():
             for month, days in months.items():
                 for day, types in days.items():
-                    date = datetime.datetime(
-                        year=int(year), month=int(month), day=int(day)
-                    ).date()
+                    date = datetime.datetime(year=int(year), month=int(month), day=int(day)).date()
                     for type in types:
-                        color = (
-                            data["trash_type_colors"].get(str(type).lower(), type)
-                            or type
-                        ).capitalize()
-                        entries.append(
-                            Collection(date=date, t=color, icon=ICON_MAP.get(color))
-                        )
+                        color = (data["trash_type_colors"].get(str(type).lower(), type) or type).capitalize()
+                        entries.append(Collection(date=date, t=color, icon=ICON_MAP.get(color)))
 
         return entries

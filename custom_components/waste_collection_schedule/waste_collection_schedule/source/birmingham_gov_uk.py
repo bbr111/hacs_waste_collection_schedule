@@ -44,9 +44,7 @@ class Source:
         soup = BeautifulSoup(token_response.text, "html.parser")
         token = soup.find("input", {"name": "__token"}).attrs["value"]
         if not token:
-            raise ValueError(
-                "Could not parse CSRF Token from initial response. Won't be able to proceed."
-            )
+            raise ValueError("Could not parse CSRF Token from initial response. Won't be able to proceed.")
 
         form_data = {
             "__token": token,
@@ -61,15 +59,11 @@ class Source:
 
         collection_soup = BeautifulSoup(collection_response.text, "html.parser")
 
-        for table_row in collection_soup.find(
-            "table", class_="data-table"
-        ).tbody.find_all("tr"):
+        for table_row in collection_soup.find("table", class_="data-table").tbody.find_all("tr"):
             collection_type = table_row.contents[0].text
             collection_next = table_row.contents[1].text
 
-            collection_date_obj = datetime.strptime(
-                collection_next, "%a %d/%m/%Y"
-            ).date()
+            collection_date_obj = datetime.strptime(collection_next, "%a %d/%m/%Y").date()
 
             entries.append(
                 Collection(
@@ -80,8 +74,6 @@ class Source:
             )
 
         if not entries:
-            raise ValueError(
-                "Could not get collections for the given combination of UPRN and Postcode."
-            )
+            raise ValueError("Could not get collections for the given combination of UPRN and Postcode.")
 
         return entries

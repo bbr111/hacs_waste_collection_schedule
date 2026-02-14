@@ -1,5 +1,4 @@
 import logging
-from typing import List
 
 from waste_collection_schedule import Collection
 
@@ -46,9 +45,7 @@ BIN_NAMES = {
 
 
 class Source:
-    def __init__(
-        self, street_number: str, street_name: str, suburb: str, post_code: str
-    ):
+    def __init__(self, street_number: str, street_name: str, suburb: str, post_code: str):
         self.street_number = str(street_number)
         self.street_name = str(street_name)
         self.suburb = str(suburb)
@@ -72,7 +69,7 @@ class Source:
 
         return self._service
 
-    def fetch(self) -> List[Collection]:
+    def fetch(self) -> list[Collection]:
         """Fetch waste collection schedule."""
         service = self._get_service()
         return service.fetch_collections(

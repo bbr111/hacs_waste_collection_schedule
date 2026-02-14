@@ -144,7 +144,9 @@ class Source:
         entries = []
 
         for year in [now.year, now.year + 1]:
-            ical_url = f"https://abfallkalender.prezero.network/{self._city}/download/ical/{street_id}/{self._house_number}/{year}"
+            ical_url = (
+                f"https://abfallkalender.prezero.network/{self._city}/download/ical/{street_id}/{self._house_number}/{year}"
+            )
 
             # Download iCal file
             r = requests.post(ical_url)
@@ -155,8 +157,6 @@ class Source:
 
             for d in dates:
                 waste_type = d[1]
-                entries.append(
-                    Collection(date=d[0], t=waste_type, icon=ICON_MAP.get(waste_type))
-                )
+                entries.append(Collection(date=d[0], t=waste_type, icon=ICON_MAP.get(waste_type)))
 
         return entries

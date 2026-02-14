@@ -51,10 +51,7 @@ class Source:
             # check is a collection row
             title = collection.find("h2", {"class": "panel-title"}).text.strip()
 
-            if (
-                title == "Other Services"
-                or "You are not currently subscribed" in collection.text
-            ):
+            if title == "Other Services" or "You are not currently subscribed" in collection.text:
                 continue
 
             for date in self._extract_dates(collection.text):

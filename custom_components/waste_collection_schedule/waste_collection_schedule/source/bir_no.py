@@ -5,7 +5,9 @@ from bs4 import BeautifulSoup
 from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 
 TITLE = "BIR (Bergensområdets Interkommunale Renovasjonsselskap)"
-DESCRIPTION = "Askøy, Bergen, Bjørnafjorden, Eidfjord, Kvam, Osterøy, Samnanger, Ulvik, Vaksdal, Øygarden og Voss Kommune (Norway)."
+DESCRIPTION = (
+    "Askøy, Bergen, Bjørnafjorden, Eidfjord, Kvam, Osterøy, Samnanger, Ulvik, Vaksdal, Øygarden og Voss Kommune (Norway)."
+)
 URL = "https://bir.no"
 
 TEST_CASES = {
@@ -61,9 +63,7 @@ class Source:
             headers=headers,
         )
         doc = BeautifulSoup(r.content, "html.parser")
-        month_containers = doc.select(
-            ".main-content .address-page-box .month-container"
-        )
+        month_containers = doc.select(".main-content .address-page-box .month-container")
 
         return [
             Collection(

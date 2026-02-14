@@ -44,7 +44,6 @@ class Source:
         self._uprn = uprn
 
     def fetch(self):
-
         s = requests.Session()
 
         # Used https://github.com/robbrad/UKBinCollectionData/blob/master/uk_bin_collection/uk_bin_collection/councils/SouthOxfordshireCouncil.py
@@ -61,7 +60,7 @@ class Source:
 
         headers = {
             # latest chrome UA
-            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36",
         }
 
         # GET request returns schedule for matching uprn

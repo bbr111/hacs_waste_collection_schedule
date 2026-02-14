@@ -7,8 +7,7 @@ from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 from waste_collection_schedule.exceptions import (
     SourceArgumentNotFoundWithSuggestions,
 )
-from waste_collection_schedule.service.ICS import \
-    ICS  # type: ignore[attr-defined]
+from waste_collection_schedule.service.ICS import ICS  # type: ignore[attr-defined]
 
 TITLE = "Stadtservice Korneuburg"
 DESCRIPTION = "Source for Stadtservice Korneuburg"
@@ -70,31 +69,20 @@ class Source:
             street_number_idx += 1
 
         possible_numbers = json.loads(
-            scripts[street_number_idx]
-            .string[19:]
-            .replace("\r\n", "")
-            .replace(", ]", "]")
-            .replace("'", '"')
+            scripts[street_number_idx].string[19:].replace("\r\n", "").replace(", ]", "]").replace("'", '"')
         )
 
         number_dict = dict()
 
         for idx, street_id in enumerate(possible_numbers):
-            number_dict[street_id[0]] = {
-                e[1]: (e[0], e[2]) for _idx, e in enumerate(possible_numbers[idx][1])
-            }
+            number_dict[street_id[0]] = {e[1]: (e[0], e[2]) for _idx, e in enumerate(possible_numbers[idx][1])}
 
         return number_dict
 
     @staticmethod
     def extract_street_names(soup):
-        street_selector = soup.find(
-            "select", {"id": "225991280_boxmuellkalenderstrassedd"}
-        ).findAll("option")
-        available_streets = {
-            street.string: int(street["value"])
-            for _idx, street in enumerate(street_selector)
-        }
+        street_selector = soup.find("select", {"id": "225991280_boxmuellkalenderstrassedd"}).findAll("option")
+        available_streets = {street.string: int(street["value"]) for _idx, street in enumerate(street_selector)}
 
         return available_streets
 
@@ -127,15 +115,13 @@ class Source:
         street_found = self.street_name in available_streets.keys()
 
         if not street_found:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "street_name", self.street_name, list(available_streets.keys())
-            )
+            raise SourceArgumentNotFoundWithSuggestions("street_name", self.street_name, list(available_streets.keys()))
 
         self._street_name_id = available_streets.get(self.street_name)
 
-        self._street_number_id, street_number_link = number_dict.get(
-            available_streets.get(self.street_name)
-        ).get(str(self.street_number), (-1, "not found"))
+        self._street_number_id, street_number_link = number_dict.get(available_streets.get(self.street_name)).get(
+            str(self.street_number), (-1, "not found")
+        )
 
         if street_number_link == "not found":
             raise SourceArgumentNotFoundWithSuggestions(
@@ -145,9 +131,7 @@ class Source:
             )
 
         # add selection cookie
-        self._cookies["riscms_muellkalender"] = str(
-            f"{self._street_name_id}_{self._street_number_id}"
-        )
+        self._cookies["riscms_muellkalender"] = str(f"{self._street_name_id}_{self._street_number_id}")
 
         # request overview with address selection to get the region
         url = urljoin(URL, "system/web/kalender.aspx")

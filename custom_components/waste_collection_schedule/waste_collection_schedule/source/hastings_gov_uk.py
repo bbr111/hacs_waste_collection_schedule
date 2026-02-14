@@ -48,12 +48,8 @@ class Source:
     def __init__(
         self,
         uprn: str | int,
-        postcode: (
-            str | None
-        ) = None,  # Not used but kept for compatibility with old version
-        house_number: (
-            str | int | None
-        ) = None,  # Not used but kept for compatibility with old version
+        postcode: (str | None) = None,  # Not used but kept for compatibility with old version
+        house_number: (str | int | None) = None,  # Not used but kept for compatibility with old version
     ):
         self._uprn = str(uprn)
 
@@ -67,19 +63,14 @@ class Source:
 
         entries = []
         for service in data:
-            waste_type: str = (
-                service["Service"].removesuffix("collection service").strip()
-            )
+            waste_type: str = service["Service"].removesuffix("collection service").strip()
             icon = ICON_MAP.get(waste_type)
             date_str: str
 
             for date_str in service["Dates"]:
                 entries.append(
                     Collection(
-                        date=datetime.fromtimestamp(
-                            int(date_str.strip("/").removeprefix("Date").strip("()"))
-                            / 1000
-                        ).date(),
+                        date=datetime.fromtimestamp(int(date_str.strip("/").removeprefix("Date").strip("()")) / 1000).date(),
                         t=waste_type,
                         icon=icon,
                     )

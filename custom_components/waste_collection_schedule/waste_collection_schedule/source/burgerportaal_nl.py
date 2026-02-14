@@ -67,18 +67,14 @@ class Source:
         self._addition: str = addition
         self._post_code: str = post_code
         self._house_number: str = house_number
-        self._url: str = (
-            "https://europe-west3-burgerportaal-production.cloudfunctions.net"
-        )
+        self._url: str = "https://europe-west3-burgerportaal-production.cloudfunctions.net"
         self._organization_code: str = get_service_name_map()[organization]
         self._refresh_token: str = ""
         self._id_token: str = ""
         self._address_id: str = ""
 
     def _set_refresh_token(self):
-        res = requests.post(
-            f"https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key={self._api_key}"
-        )
+        res = requests.post(f"https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key={self._api_key}")
         payload = res.json()
         if not payload:
             _LOGGER.error("Unable to fetch refresh token!")
@@ -151,9 +147,7 @@ class Source:
                 continue
 
             collection = Collection(
-                date=datetime.datetime.strptime(
-                    item["collectionDate"].split("T")[0], "%Y-%m-%d"
-                ).date(),
+                date=datetime.datetime.strptime(item["collectionDate"].split("T")[0], "%Y-%m-%d").date(),
                 t=waste_type,
                 icon=item["fraction"].lower(),
             )

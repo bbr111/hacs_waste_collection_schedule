@@ -46,9 +46,7 @@ class Source:
         now = datetime.now()
         localtime_str = now.strftime("%Y-%m-%d %H:%M:%S")
         session.cookies.set("localtime", localtime_str, domain="myangus.angus.gov.uk")
-        session.cookies.set(
-            "fs-timezone", "Europe/London", domain="myangus.angus.gov.uk"
-        )
+        session.cookies.set("fs-timezone", "Europe/London", domain="myangus.angus.gov.uk")
 
         # Perform Search (Initializes the form)
         api_base = f"https://myangus.angus.gov.uk/apibroker/runLookup?id={{}}&repeat_against=&noRetry=false&getOnlyTokens=undefined&log_id=&app_name=AF-Renderer::Self&sid={sid}"
@@ -134,9 +132,7 @@ class Source:
             if date_str and bin_t and "1900" not in date_str:
                 try:
                     dt = datetime.strptime(date_str, "%Y-%m-%d").date()
-                    entries.append(
-                        Collection(date=dt, t=bin_t, icon=self.get_icon(bin_t))
-                    )
+                    entries.append(Collection(date=dt, t=bin_t, icon=self.get_icon(bin_t)))
                 except ValueError:
                     continue
 

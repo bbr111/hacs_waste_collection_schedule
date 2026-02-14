@@ -47,9 +47,7 @@ class Source:
                 break
 
         if suburb_id is None:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "suburb", self.suburb, [x["name"] for x in data["localities"]]
-            )
+            raise SourceArgumentNotFoundWithSuggestions("suburb", self.suburb, [x["name"] for x in data["localities"]])
 
         # Retrieve the streets in our suburb
         params = {"locality": suburb_id}
@@ -68,9 +66,7 @@ class Source:
                 break
 
         if street_id is None:
-            SourceArgumentNotFoundWithSuggestions(
-                "street_name", self.street_name, [x["name"] for x in data["streets"]]
-            )
+            SourceArgumentNotFoundWithSuggestions("street_name", self.street_name, [x["name"] for x in data["streets"]])
 
         # Retrieve the properties in our street
         params = {"street": street_id}

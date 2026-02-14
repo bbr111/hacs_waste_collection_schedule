@@ -1,7 +1,8 @@
+---
 name: Source Request
 description: Request that a municipality or region is supported
-title: "[Source Request]: "
-labels: ["source request"]
+title: '[Source Request]: '
+labels: [source request]
 body:
   - type: markdown
     attributes:
@@ -18,7 +19,7 @@ body:
   - type: input
     id: collection-url
     attributes:
-      label: Collection Calendar Webpage 
+      label: Collection Calendar Webpage
       description: Where are information about bin collections listed (preferred ULR)
       placeholder: https://example.com
     validations:
@@ -42,7 +43,7 @@ body:
         - Dedicated IOS/Android APP
         - As PDF Download
         - As documented API
-        - Something different (add to additional information) 
+        - Something different (add to additional information)
       multiple: true
     validations:
       required: true

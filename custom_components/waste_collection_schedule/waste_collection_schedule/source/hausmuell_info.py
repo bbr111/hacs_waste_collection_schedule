@@ -242,9 +242,7 @@ class Source:
         to_return = [i.strip() for i in ids if i.strip().isdigit()]
         return to_return
 
-    def request_all(
-        self, url: str, data: dict, params: dict, error_message: str
-    ) -> requests.Response:
+    def request_all(self, url: str, data: dict, params: dict, error_message: str) -> requests.Response:
         """Request url with data if not successful retry with different kinds of replaced special chars.
 
         Args:
@@ -271,9 +269,7 @@ class Source:
             return r
         r = requests.post(
             url,
-            data=replace_special_chars_args(
-                data, replace_special_chars_with_underscore
-            ),
+            data=replace_special_chars_args(data, replace_special_chars_with_underscore),
             params=replace_special_chars_args(params),
         )
         if "kein Eintrag gefunden" not in r.text and not "<ul></ul>" == r.text.strip():
@@ -334,9 +330,7 @@ class Source:
 
             ids = self._get_elemts(r.text)
 
-            args["ort_id"] = args["hidden_id_ortsteil"] = (
-                args["hidden_id_ort"] if ids[0] == "0" else ids[0]
-            )
+            args["ort_id"] = args["hidden_id_ortsteil"] = args["hidden_id_ort"] if ids[0] == "0" else ids[0]
             if len(ids) > 1:
                 args["hidden_id_egebiet"] = ids[1]
 
@@ -368,9 +362,7 @@ class Source:
 
         r = requests.post(self._search_url + "check_zusatz.php", data=args)
         id_string = BeautifulSoup(r.text, "html.parser").find("span")
-        args["hidden_id_zusatz"] = (
-            args["hidden_id_hnr"] if id_string is None else id_string.text.strip()
-        )
+        args["hidden_id_zusatz"] = args["hidden_id_hnr"] if id_string is None else id_string.text.strip()
 
         r = requests.post(self._ics_url, data=args)
         r.raise_for_status()
@@ -383,9 +375,7 @@ class Source:
         entries = []
         for d in dates:
             bin_type = d[1].replace("Ã¼", "ü").replace("Entsorgung:", "").strip()
-            icon = ICON_MAP.get(
-                bin_type.lower().replace("verschobene abholung:", "").strip()
-            )
+            icon = ICON_MAP.get(bin_type.lower().replace("verschobene abholung:", "").strip())
             entries.append(Collection(d[0], bin_type, icon))
 
         return entries

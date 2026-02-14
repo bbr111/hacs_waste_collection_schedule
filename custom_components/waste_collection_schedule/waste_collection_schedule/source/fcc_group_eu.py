@@ -90,9 +90,7 @@ class Source:
         self._frequency: FREQUENCIES_LITERAL | None = frequency
 
         if frequency and frequency not in FREQUENCIES:
-            raise ValueError(
-                f"Invalid frequency: {frequency}, must be one of {FREQUENCIES}"
-            )
+            raise ValueError(f"Invalid frequency: {frequency}, must be one of {FREQUENCIES}")
 
         self._location_id: int | None = None
         self._waste_dict: dict[int, str] | None = None
@@ -106,9 +104,7 @@ class Source:
             if cmp(city["city"], self._city) or cmp(city["code"], self._city):
                 matches.append(city)
         if len(matches) == 0:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "city", self._city, [city["city"] for city in data]
-            )
+            raise SourceArgumentNotFoundWithSuggestions("city", self._city, [city["city"] for city in data])
         if len(matches) == 1:
             return matches[0]
 
@@ -116,17 +112,11 @@ class Source:
             raise SourceArgumentRequiredWithSuggestions(
                 "location",
                 "for this city",
-                [
-                    location
-                    for city in matches
-                    for location in (city["locations"] or [])
-                ],
+                [location for city in matches for location in (city["locations"] or [])],
             )
 
         for city in matches:
-            if any(
-                cmp(location, self._location) for location in (city["locations"] or [])
-            ):
+            if any(cmp(location, self._location) for location in (city["locations"] or [])):
                 return city
 
         raise SourceArgumentNotFoundWithSuggestions(
@@ -136,9 +126,7 @@ class Source:
         )
 
     def fetch_options(self, location_id: int) -> OptionsResult:
-        r = requests.get(
-            API_URL + "/schedule/options", params={"locationId": location_id}
-        )
+        r = requests.get(API_URL + "/schedule/options", params={"locationId": location_id})
         r.raise_for_status()
         data: OptionsResult = r.json()
         if len(data["frequencies"]) == 0:
@@ -147,9 +135,7 @@ class Source:
         if len(data["frequencies"]) == 1:
             self._frequency = FREQUENCIES[data["frequencies"][0] - 1]
 
-        available_freqs: list[FREQUENCIES_LITERAL] = [
-            FREQUENCIES[freq - 1] for freq in data["frequencies"]
-        ]
+        available_freqs: list[FREQUENCIES_LITERAL] = [FREQUENCIES[freq - 1] for freq in data["frequencies"]]
         if self._frequency in available_freqs:
             return data
 
@@ -166,14 +152,10 @@ class Source:
 
         if len(data["frequencies"]) > 1:
             if not self._frequency:
-                raise SourceArgumentRequiredWithSuggestions(
-                    "frequency", "for this location", available_freqs
-                )
+                raise SourceArgumentRequiredWithSuggestions("frequency", "for this location", available_freqs)
 
             if self._frequency not in available_freqs:
-                raise SourceArgumentNotFoundWithSuggestions(
-                    "frequency", self._frequency, available_freqs
-                )
+                raise SourceArgumentNotFoundWithSuggestions("frequency", self._frequency, available_freqs)
             if self._frequency in changed:
                 self._frequency = changed[self._frequency]
 
@@ -184,9 +166,7 @@ class Source:
         return {waste["wasteId"]: waste["title"] for waste in options["wastes"]}
 
     def fetch_schedule(self, location_id: int, year: int) -> list[CollecctionEntry]:
-        r = requests.get(
-            API_URL + "/schedule", params={"locationId": location_id, "year": year}
-        )
+        r = requests.get(API_URL + "/schedule", params={"locationId": location_id, "year": year})
         r.raise_for_status()
         return r.json()
 

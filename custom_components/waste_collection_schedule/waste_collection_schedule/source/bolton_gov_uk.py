@@ -82,14 +82,10 @@ class Source:
         entries = []
         soup = BeautifulSoup(html_content, "html.parser")
 
-        bin_sections = soup.find_all(
-            "div", style=lambda value: value and "overflow:auto" in value
-        )
+        bin_sections = soup.find_all("div", style=lambda value: value and "overflow:auto" in value)
 
         for section in bin_sections:
-            bin_type = (
-                section.find("strong").get_text(strip=True).replace(":", "").strip()
-            )
+            bin_type = section.find("strong").get_text(strip=True).replace(":", "").strip()
             if "caddy" in bin_type.lower():
                 bin_type = "Food container"
             else:
@@ -158,9 +154,7 @@ class Source:
         uprn, auth_token = self._find_uprn(auth_token=auth_token)
 
         set_object_url = (API_BASE + API_URLS["set_object"]).format(uprn=uprn)
-        set_object_response = self._session.post(
-            set_object_url, headers=self._get_headers(auth_token)
-        )
+        set_object_response = self._session.post(set_object_url, headers=self._get_headers(auth_token))
         set_object_response.raise_for_status()
 
         set_object_data = set_object_response.json()

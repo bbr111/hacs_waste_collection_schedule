@@ -152,9 +152,7 @@ class Source:
         # get json file
         entries = []
         for endpoint in ENDPOINTS:
-            r = requests.get(
-                API_URL.format(endpoint=endpoint, lat=self._lat, lon=self._lon)
-            )
+            r = requests.get(API_URL.format(endpoint=endpoint, lat=self._lat, lon=self._lon))
             r.raise_for_status()
             for features in r.json()["features"]:
                 data = features["attributes"]
@@ -168,12 +166,10 @@ class Source:
                 freq: int = data["Col_Freq"]
                 offset: int = data["Col_Offset"]
 
-                start = datetime.now().replace(
-                    month=1, day=1, hour=0, minute=0, second=0, microsecond=0
-                ).date() + timedelta(weeks=offset)
-                end = datetime.now().replace(
-                    hour=0, minute=0, second=0, microsecond=0
-                ).date() + timedelta(days=365)
+                start = datetime.now().replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0).date() + timedelta(
+                    weeks=offset
+                )
+                end = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0).date() + timedelta(days=365)
 
                 dates = [
                     d.date()
@@ -187,17 +183,11 @@ class Source:
                 ]
                 if additionals_str:
                     for additional_str in additionals_str.split(","):
-                        dates.append(
-                            datetime.strptime(additional_str.strip(), "%Y-%m-%d").date()
-                        )
+                        dates.append(datetime.strptime(additional_str.strip(), "%Y-%m-%d").date())
                 if exclusions_str:
                     for exclusion_str in exclusions_str.split(","):
                         try:
-                            dates.remove(
-                                datetime.strptime(
-                                    exclusion_str.strip(), "%Y-%m-%d"
-                                ).date()
-                            )
+                            dates.remove(datetime.strptime(exclusion_str.strip(), "%Y-%m-%d").date())
                         except ValueError:
                             print("Exclusion date not found in dates", exclusion_str)
 

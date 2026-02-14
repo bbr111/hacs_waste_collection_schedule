@@ -48,9 +48,7 @@ class Source:
 
             entries.append(
                 Collection(
-                    date=datetime.strptime(
-                        next_service_date.text.strip(), "%d/%m/%Y"
-                    ).date(),
+                    date=datetime.strptime(next_service_date.text.strip(), "%d/%m/%Y").date(),
                     t=service_name,
                     icon=ICON_MAP.get(service_name),
                 )

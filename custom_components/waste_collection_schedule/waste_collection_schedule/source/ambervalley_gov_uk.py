@@ -5,9 +5,7 @@ import requests
 from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 
 TITLE = "Amber Valley Borough Council"
-DESCRIPTION = (
-    "Source for ambervalley.gov.uk services for Amber Valley Borough Council, UK."
-)
+DESCRIPTION = "Source for ambervalley.gov.uk services for Amber Valley Borough Council, UK."
 URL = "https://ambervalley.gov.uk"
 TEST_CASES = {
     "Test_001": {"uprn": "100030011612", "predict": True},

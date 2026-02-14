@@ -126,17 +126,13 @@ class Source:
         self._address = address
 
     def __get_csrf(self, session: requests.Session) -> str:
-        session.get(
-            "https://www.ashfield.gov.uk/environment-health/bins-waste-recycling/bin-calendar/"
-        )
+        session.get("https://www.ashfield.gov.uk/environment-health/bins-waste-recycling/bin-calendar/")
 
         r = session.get(BASE_URL, params={"service": "bin_calendar"})
         r.raise_for_status()
         return (re.search(CSRF_REGEX, r.text) or Invalid()).group(1)
 
-    def __get_request_data(
-        self, session: requests.Session, csrf: str
-    ) -> tuple[str, str, str, str]:
+    def __get_request_data(self, session: requests.Session, csrf: str) -> tuple[str, str, str, str]:
         """Get data required for further requests.
 
         Args:
@@ -156,15 +152,9 @@ class Source:
         r.raise_for_status()
         resone_json = r.json()
         webpage_subpage_id = resone_json["page"]["id"]
-        webpage_token = (
-            re.search(WEBPAGE_TOKEN_REGEX, resone_json["data"]) or Invalid()
-        ).group(1)
-        data_cell_id = (
-            re.search(DATA_CELL_ID_REGEX, resone_json["data"]) or Invalid()
-        ).group(1)
-        data_page_id = (
-            re.search(DATA_PAGE_ID_REGEX, resone_json["data"]) or Invalid()
-        ).group(1)
+        webpage_token = (re.search(WEBPAGE_TOKEN_REGEX, resone_json["data"]) or Invalid()).group(1)
+        data_cell_id = (re.search(DATA_CELL_ID_REGEX, resone_json["data"]) or Invalid()).group(1)
+        data_page_id = (re.search(DATA_PAGE_ID_REGEX, resone_json["data"]) or Invalid()).group(1)
 
         return webpage_subpage_id, webpage_token, data_cell_id, data_page_id
 
@@ -209,9 +199,7 @@ class Source:
         csrf = (re.search(CSRF_REGEX, r.text) or Invalid()).group(1)
         return csrf
 
-    def __get_relevant_data(
-        self, session: requests.Session, next_url: str, csrf: str
-    ) -> RequestData:
+    def __get_relevant_data(self, session: requests.Session, next_url: str, csrf: str) -> RequestData:
         data = DEFAULT_DATA_1.copy()
         data["form_check_ajax"] = csrf
         r = session.post(next_url, data=data, headers=POST_HEADERS)
@@ -223,37 +211,20 @@ class Source:
             raise ValueError("Could not find system address")
         system_address = system_address_match.group(1)
 
-        ajax_url = (re.search(AJAX_URL_REGEX, resone_json["data"]) or Invalid()).group(
-            1
-        )
+        ajax_url = (re.search(AJAX_URL_REGEX, resone_json["data"]) or Invalid()).group(1)
 
         return RequestData(
             levels=(re.search(LEVEL_REGEX, resone_json["data"]) or Invalid()).group(1),
             system_address=system_address,
             ajax_url=ajax_url,
-            full_ajax_url=system_address.rstrip("/")
-            + "/"
-            + ajax_url.replace(r"\/", "/").lstrip("/"),
+            full_ajax_url=system_address.rstrip("/") + "/" + ajax_url.replace(r"\/", "/").lstrip("/"),
             webpage_subpage_id=resone_json["page"]["id"],
-            webpage_hash=(
-                re.search(WEBPAGE_HASH_REGEX, resone_json["data"]) or Invalid()
-            ).group(1),
-            data_widget_group_id=(
-                re.search(DATA_WIDGET_GROUP_ID_REGEX, resone_json["data"]) or Invalid()
-            ).group(1),
-            data_cell_id=(
-                re.search(DATA_CELL_ID_REGEX, resone_json["data"]) or Invalid()
-            ).group(1),
-            data_unique_key=(
-                re.search(DATA_UNIQUE_KEY_REGEX, resone_json["data"]) or Invalid()
-            ).group(1),
-            data_parent_fragment_id=(
-                re.search(DATA_PARENT_FRAGMENT_ID_REGEX, resone_json["data"])
-                or Invalid()
-            ).group(1),
-            request_uri=(
-                re.search(REQUEST_URI_REGEX, resone_json["data"]) or Invalid()
-            ).group(1),
+            webpage_hash=(re.search(WEBPAGE_HASH_REGEX, resone_json["data"]) or Invalid()).group(1),
+            data_widget_group_id=(re.search(DATA_WIDGET_GROUP_ID_REGEX, resone_json["data"]) or Invalid()).group(1),
+            data_cell_id=(re.search(DATA_CELL_ID_REGEX, resone_json["data"]) or Invalid()).group(1),
+            data_unique_key=(re.search(DATA_UNIQUE_KEY_REGEX, resone_json["data"]) or Invalid()).group(1),
+            data_parent_fragment_id=(re.search(DATA_PARENT_FRAGMENT_ID_REGEX, resone_json["data"]) or Invalid()).group(1),
+            request_uri=(re.search(REQUEST_URI_REGEX, resone_json["data"]) or Invalid()).group(1),
             page_data=resone_json["data"],
         )
 
@@ -343,11 +314,7 @@ class Source:
                     submit_data[key] = address_id
 
         submit_data["_session_storage"] = (
-            '{"_global":{"destination_stack":["'
-            + request_uri
-            + '"],"last_context_record_id":"'
-            + context_record_id
-            + '"}}'
+            '{"_global":{"destination_stack":["' + request_uri + '"],"last_context_record_id":"' + context_record_id + '"}}'
         )
 
         return submit_url, submit_data
@@ -382,9 +349,7 @@ class Source:
             k, v = p.split("=")
             params[k] = v
 
-        r = session.post(
-            paramless_url, data=submit_data, params=params, headers=POST_HEADERS
-        )
+        r = session.post(paramless_url, data=submit_data, params=params, headers=POST_HEADERS)
         r.raise_for_status()
         return r
 
@@ -407,9 +372,7 @@ class Source:
             except ValueError:
                 _LOGGER.warning("Could not parse date: %s", date_str)
                 continue
-            collections.append(
-                Collection(date, NAMES.get(bin_type, bin_type), ICON_MAP.get(bin_type))
-            )
+            collections.append(Collection(date, NAMES.get(bin_type, bin_type), ICON_MAP.get(bin_type)))
         return collections
 
     def fetch(self) -> list[Collection]:

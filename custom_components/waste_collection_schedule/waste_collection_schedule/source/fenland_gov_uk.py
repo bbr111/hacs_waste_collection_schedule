@@ -46,9 +46,7 @@ class Source:
         address_ids = [
             address
             for address in addresses
-            if re.search(
-                f"^{self._house_number} ", address["line1"]
-            )  # House numbers are not separated from address line
+            if re.search(f"^{self._house_number} ", address["line1"])  # House numbers are not separated from address line
         ]
 
         if len(address_ids) == 0:
@@ -76,9 +74,7 @@ class Source:
 
         collections = r.json()["features"][0]["properties"]["upcoming"]
         for collection_date_dict in collections:
-            collection_date = datetime.strptime(
-                collection_date_dict["date"], "%Y-%m-%dT%H:%M:%SZ"
-            )
+            collection_date = datetime.strptime(collection_date_dict["date"], "%Y-%m-%dT%H:%M:%SZ")
             if collection_date.hour == 23:
                 collection_date = (timedelta(days=1) + collection_date).date()
             else:

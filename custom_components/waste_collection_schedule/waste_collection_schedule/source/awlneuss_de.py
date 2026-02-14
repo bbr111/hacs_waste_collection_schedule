@@ -9,9 +9,7 @@ from waste_collection_schedule.exceptions import (
 )
 
 TITLE = "AWL Neuss"  # Title will show up in README.md and info.md
-DESCRIPTION = (
-    "Source for Bürgerportal AWL Neuss waste collection."  # Describe your source
-)
+DESCRIPTION = "Source for Bürgerportal AWL Neuss waste collection."  # Describe your source
 URL = "https://buergerportal.awl-neuss.de/"  # Insert url to service homepage. URL will show up in README.md and info.md
 TEST_CASES = {  # Insert arguments for test cases to be used by test_sources.py script
     "Neuss, Theodor-Heuss-Platz 13": {"street_code": 8650, "building_number": 13},

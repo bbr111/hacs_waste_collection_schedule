@@ -111,9 +111,7 @@ class Source:
         calendar_page.raise_for_status()
 
         # 1. Extract the content of the `var data = "..."` string
-        match = re.search(
-            r'var data = "(.*?)getJSONData', calendar_page.text, re.DOTALL
-        )
+        match = re.search(r'var data = "(.*?)getJSONData', calendar_page.text, re.DOTALL)
         if not match:
             raise GreyhoundAPIError("Could not find embedded calendar data.")
 
@@ -141,8 +139,6 @@ class Source:
                 for bin_type in bin_entry.get("waste_types", []):
                     bin_type_normalized = bin_type.strip().upper()
                     icon = ICON_MAP.get(bin_type_normalized)
-                    entries.append(
-                        Collection(date=event_date, t=bin_type_normalized, icon=icon)
-                    )
+                    entries.append(Collection(date=event_date, t=bin_type_normalized, icon=icon))
 
         return entries

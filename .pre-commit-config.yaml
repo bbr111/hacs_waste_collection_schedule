@@ -30,7 +30,7 @@ repos:
     rev: 0.2.3
     hooks:
       - id: yamlfmt
-        args: [--mapping, "2", --sequence, "4", --width, "150", --offset, "2"]
+        args: [--mapping, '2', --sequence, '4', --width, '150', --offset, '2']
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:

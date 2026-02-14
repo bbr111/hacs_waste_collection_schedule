@@ -38,9 +38,7 @@ class Source:
             if len(bins) < 1:
                 continue
 
-            date = datetime.strptime(
-                day["title"].replace("today is ", ""), "%A, %d %B %Y"
-            ).date()
+            date = datetime.strptime(day["title"].replace("today is ", ""), "%A, %d %B %Y").date()
 
             for bin in bins:
                 binname = bin["title"].split()
@@ -72,9 +70,7 @@ class Source:
             data = {
                 "__EVENTTARGET": match.group(1),
                 "__EVENTARGUMENT": match.group(2),
-                "__EVENTVALIDATION": soup.find("input", id="__EVENTVALIDATION")[
-                    "value"
-                ],
+                "__EVENTVALIDATION": soup.find("input", id="__EVENTVALIDATION")["value"],
                 "__VIEWSTATE": soup.find("input", id="__VIEWSTATE")["value"],
             }
             r = session.post(f"{API_URL}{self._uprn}", data=data)

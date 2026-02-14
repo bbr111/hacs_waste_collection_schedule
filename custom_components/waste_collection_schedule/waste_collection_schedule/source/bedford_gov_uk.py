@@ -1,7 +1,7 @@
-import requests
 import json
-
 from datetime import datetime
+
+import requests
 from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 
 TITLE = "Bedford Borough Council"
@@ -28,9 +28,11 @@ class Source:
         self._uprn = str(uprn).zfill(12)
 
     def fetch(self):
-
         s = requests.Session()
-        r = s.get(f"https://bbaz-as-prod-bartecapi.azurewebsites.net/api/bincollections/residential/getbyuprn/{self._uprn}/35", headers=HEADERS)
+        r = s.get(
+            f"https://bbaz-as-prod-bartecapi.azurewebsites.net/api/bincollections/residential/getbyuprn/{self._uprn}/35",
+            headers=HEADERS,
+        )
         json_data = json.loads(r.text)["BinCollections"]
 
         entries = []

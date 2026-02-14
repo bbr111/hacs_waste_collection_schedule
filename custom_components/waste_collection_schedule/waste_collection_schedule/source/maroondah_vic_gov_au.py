@@ -11,25 +11,13 @@ DESCRIPTION = "Source for Maroondah City Council. Finds both green waste and gen
 URL = "https://www.maroondah.vic.gov.au"
 TEST_CASES = {
     "Monday - Area A": {"address": "1 Abbey Court, RINGWOOD 3134"},  # Monday - Area A
-    "Monday - Area B": {
-        "address": "1 Angelica Crescent, CROYDON HILLS 3136"
-    },  # Monday - Area B
+    "Monday - Area B": {"address": "1 Angelica Crescent, CROYDON HILLS 3136"},  # Monday - Area B
     "Tuesday - Area B": {"address": "6 Como Close, CROYDON 3136"},  # Tuesday - Area B
-    "Wednesday - Area A": {
-        "address": "113 Dublin Road, RINGWOOD EAST 3135"
-    },  # Wednesday - Area A
-    "Wednesday - Area B": {
-        "address": "282 Maroondah Highway, RINGWOOD 3134"
-    },  # Wednesday - Area B
-    "Thursday - Area A": {
-        "address": "4 Albury Court, CROYDON NORTH 3136"
-    },  # Thursday - Area A
-    "Thursday - Area B": {
-        "address": "54 Lincoln Road, CROYDON 3136"
-    },  # Thursday - Area B
-    "Friday - Area A": {
-        "address": "6 Lionel Crescent, CROYDON 3136"
-    },  # Friday - Area A
+    "Wednesday - Area A": {"address": "113 Dublin Road, RINGWOOD EAST 3135"},  # Wednesday - Area A
+    "Wednesday - Area B": {"address": "282 Maroondah Highway, RINGWOOD 3134"},  # Wednesday - Area B
+    "Thursday - Area A": {"address": "4 Albury Court, CROYDON NORTH 3136"},  # Thursday - Area A
+    "Thursday - Area B": {"address": "54 Lincoln Road, CROYDON 3136"},  # Thursday - Area B
+    "Friday - Area A": {"address": "6 Lionel Crescent, CROYDON 3136"},  # Friday - Area A
     "Friday - Area B": {"address": "61 Timms Avenue, KILSYTH 3137"},  # Friday - Area B
 }
 
@@ -49,9 +37,7 @@ class Source:
     def fetch(self):
         session = requests.Session()
 
-        response = session.get(
-            "https://www.maroondah.vic.gov.au/Residents-property/Waste-rubbish/Waste-collection-schedule"
-        )
+        response = session.get("https://www.maroondah.vic.gov.au/Residents-property/Waste-rubbish/Waste-collection-schedule")
         response.raise_for_status()
 
         response = session.get(
@@ -60,10 +46,7 @@ class Source:
         )
         response.raise_for_status()
         addressSearchApiResults = response.json()
-        if (
-            addressSearchApiResults["Items"] is None
-            or len(addressSearchApiResults["Items"]) < 1
-        ):
+        if addressSearchApiResults["Items"] is None or len(addressSearchApiResults["Items"]) < 1:
             raise Exception(
                 f"Address search for '{self._street_address}' returned no results. Check your address on https://www.maroondah.vic.gov.au/Residents-property/Waste-rubbish/Waste-collection-schedule"
             )
@@ -91,11 +74,7 @@ class Source:
             icon = ICON_MAP.get(waste_type)
             next_pickup = article.find(class_="next-service").string.strip()
             if re.match(r"[^\s]* \d{1,2}\/\d{1,2}\/\d{4}", next_pickup):
-                next_pickup_date = datetime.strptime(
-                    next_pickup.split(sep=" ")[1], "%d/%m/%Y"
-                ).date()
-                entries.append(
-                    Collection(date=next_pickup_date, t=waste_type, icon=icon)
-                )
+                next_pickup_date = datetime.strptime(next_pickup.split(sep=" ")[1], "%d/%m/%Y").date()
+                entries.append(Collection(date=next_pickup_date, t=waste_type, icon=icon))
 
         return entries

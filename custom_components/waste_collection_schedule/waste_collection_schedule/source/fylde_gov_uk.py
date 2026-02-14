@@ -36,9 +36,7 @@ class Source:
     def _getToken(self, session: requests.Session) -> str:
         # The token required for the API call can only be generated dynamically
         # We generate our own token by loading the "bin collection" web page and scraping it from the relevant iframe
-        r = session.get(
-            f"{URL}/resident/bins-recycling-and-rubbish/bin-collection-day/"
-        )
+        r = session.get(f"{URL}/resident/bins-recycling-and-rubbish/bin-collection-day/")
         r.raise_for_status()
 
         soup: BeautifulSoup = BeautifulSoup(r.text, "html.parser")
@@ -75,12 +73,7 @@ class Source:
         entries = []
         for job in jobs:
             # "Empty Bin GREY BIN 240L" -> "Grey Bin"
-            jobName = (
-                re.search(REGEX_JOB_NAME, job["title"])
-                .group("bin_type")
-                .strip()
-                .title()
-            )
+            jobName = re.search(REGEX_JOB_NAME, job["title"]).group("bin_type").strip().title()
             # Job 'start' string to epoch. "/Date(1580515199000)/" -> "1580515199000"
             date = job["start"][6:-2]
 

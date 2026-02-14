@@ -43,9 +43,7 @@ class Source:
             verify=self._ssl_verify,
         )
         r.raise_for_status()
-        soup = BeautifulSoup(
-            json.loads(r.text)["ajax/budaorsResults"], features="html.parser"
-        )
+        soup = BeautifulSoup(json.loads(r.text)["ajax/budaorsResults"], features="html.parser")
 
         if soup.find("div", attrs={"class": "alert"}) is not None:
             raise Exception("Address not found")
@@ -54,17 +52,13 @@ class Source:
         communal_divs = soup.find_all("div", attrs={"class": "communal"})
 
         selective = soup.find_all("div", attrs={"class": "selective"})
-        communal = [
-            i for i in filter(lambda div: div.text == "Kommunális", communal_divs)
-        ]
+        communal = [i for i in filter(lambda div: div.text == "Kommunális", communal_divs)]
         green = [i for i in filter(lambda div: div.text == "Zöld", communal_divs)]
 
         for element in communal:
             entries.append(
                 Collection(
-                    date=datetime.datetime.strptime(
-                        element.parent.parent.findAll("td")[1].text, "%Y.%m.%d"
-                    ).date(),
+                    date=datetime.datetime.strptime(element.parent.parent.findAll("td")[1].text, "%Y.%m.%d").date(),
                     t="Communal",
                     icon=ICON_MAP.get("COMMUNAL"),
                 )
@@ -73,9 +67,7 @@ class Source:
         for element in selective:
             entries.append(
                 Collection(
-                    date=datetime.datetime.strptime(
-                        element.parent.parent.findAll("td")[1].text, "%Y.%m.%d"
-                    ).date(),
+                    date=datetime.datetime.strptime(element.parent.parent.findAll("td")[1].text, "%Y.%m.%d").date(),
                     t="Selective",
                     icon=ICON_MAP.get("SELECTIVE"),
                 )
@@ -84,9 +76,7 @@ class Source:
         for element in green:
             entries.append(
                 Collection(
-                    date=datetime.datetime.strptime(
-                        element.parent.parent.findAll("td")[1].text, "%Y.%m.%d"
-                    ).date(),
+                    date=datetime.datetime.strptime(element.parent.parent.findAll("td")[1].text, "%Y.%m.%d").date(),
                     t="Green",
                     icon=ICON_MAP.get("GREEN"),
                 )

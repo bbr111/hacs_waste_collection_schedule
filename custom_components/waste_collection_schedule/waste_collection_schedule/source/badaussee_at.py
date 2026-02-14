@@ -29,7 +29,7 @@ ICS_PARAMS = {
 }
 
 # Mapping of zone codes to their ICS 'do' parameter values
-ICS_ZONE_MAPPING = {
+ICS_ZONE_MAPPING: dict[str, str | dict[str, str]] = {
     "gelber_sack": "MjI1MjYyNTgx",  # gs
     "restmuell": {
         "1": "MjI1MjYyNTQw",
@@ -53,14 +53,14 @@ ICS_ZONE_MAPPING = {
     },
 }
 
-ICON_MAP = {
+ICON_MAP: dict[str, str] = {
     "Gelber Sack": "mdi:sack",
     "Restmüll": "mdi:trash-can",
     "Biomüll": "mdi:leaf",
     "Altpapier": "mdi:package-variant",
 }
 
-PARAM_DESCRIPTIONS = {
+PARAM_DESCRIPTIONS: dict[str, dict[str, str]] = {
     "en": {
         "restmuell_zone": "Zone number for residual waste (Restmüll)",
         "biomuell_zone": "Zone number for organic waste (Biomüll)",
@@ -103,17 +103,27 @@ class Source:
         entries = []
 
         # Always include Gelber Sack
-        ics_urls = [self._build_ics_url(ICS_ZONE_MAPPING["gelber_sack"])]
+        gelber_sack_code = ICS_ZONE_MAPPING["gelber_sack"]
+        if isinstance(gelber_sack_code, str):
+            ics_urls = [self._build_ics_url(gelber_sack_code)]
+        else:
+            ics_urls = []
 
         # Add zone-specific URLs based on configured zones
         if self._restmuell_zone and self._restmuell_zone in ICS_ZONE_MAPPING["restmuell"]:
-            ics_urls.append(self._build_ics_url(ICS_ZONE_MAPPING["restmuell"][self._restmuell_zone]))
+            restmuell_code = ICS_ZONE_MAPPING["restmuell"]
+            if isinstance(restmuell_code, dict) and self._restmuell_zone in restmuell_code:
+                ics_urls.append(self._build_ics_url(restmuell_code[self._restmuell_zone]))
 
         if self._biomuell_zone and self._biomuell_zone in ICS_ZONE_MAPPING["biomuell"]:
-            ics_urls.append(self._build_ics_url(ICS_ZONE_MAPPING["biomuell"][self._biomuell_zone]))
+            biomuell_code = ICS_ZONE_MAPPING["biomuell"]
+            if isinstance(biomuell_code, dict) and self._biomuell_zone in biomuell_code:
+                ics_urls.append(self._build_ics_url(biomuell_code[self._biomuell_zone]))
 
         if self._altpapier_zone and self._altpapier_zone in ICS_ZONE_MAPPING["altpapier"]:
-            ics_urls.append(self._build_ics_url(ICS_ZONE_MAPPING["altpapier"][self._altpapier_zone]))
+            altpapier_code = ICS_ZONE_MAPPING["altpapier"]
+            if isinstance(altpapier_code, dict) and self._altpapier_zone in altpapier_code:
+                ics_urls.append(self._build_ics_url(altpapier_code[self._altpapier_zone]))
 
         # Fetch and parse each ICS feed
         for ics_url in ics_urls:

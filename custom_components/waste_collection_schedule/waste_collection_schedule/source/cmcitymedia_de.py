@@ -30,9 +30,7 @@ DATE_FORMAT = "%Y-%m-%d"
 class Source:
     def __init__(self, hpid, realmid=None, district=None):
         self.hpid = hpid
-        self.service = next(
-            (item for item in SERVICE_MAP if item["hpid"] == self.hpid), None
-        )
+        self.service = next((item for item in SERVICE_MAP if item["hpid"] == self.hpid), None)
         self.realmid = realmid if realmid else self.service["realm"]
         self.district = district
 
@@ -40,9 +38,7 @@ class Source:
         entries = []
 
         district_param = f"?district={self.district}" if self.district else ""
-        result = requests.get(
-            API_URL.format(self.hpid, self.service["realm"]) + district_param
-        )
+        result = requests.get(API_URL.format(self.hpid, self.service["realm"]) + district_param)
 
         result.raise_for_status()
 

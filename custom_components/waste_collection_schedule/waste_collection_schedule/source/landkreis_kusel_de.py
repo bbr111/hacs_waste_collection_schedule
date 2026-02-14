@@ -34,13 +34,7 @@ API_URL = "https://abfallwirtschaft.landkreis-kusel.de"
 
 
 def make_comparable(ortsgemeinde: str) -> str:
-    return (
-        ortsgemeinde.lower()
-        .replace("-", "")
-        .replace(".", "")
-        .replace("/", "")
-        .replace(" ", "")
-    )
+    return ortsgemeinde.lower().replace("-", "").replace(".", "").replace("/", "").replace(" ", "")
 
 
 class Source:
@@ -51,15 +45,8 @@ class Source:
     def fetch(self):
         entries = self.get_data(API_URL)
         try:
-            if (
-                sorted(entries, key=lambda x: x.date)[0].date.year
-                != datetime.now().year
-            ):
-                entries += self.get_data(
-                    API_URL.replace(
-                        "abfallwirtschaft", f"abfall{str(datetime.now().year)[2:]}"
-                    )
-                )
+            if sorted(entries, key=lambda x: x.date)[0].date.year != datetime.now().year:
+                entries += self.get_data(API_URL.replace("abfallwirtschaft", f"abfall{str(datetime.now().year)[2:]}"))
         except Exception:
             pass
         return entries
@@ -92,18 +79,12 @@ class Source:
         now = datetime.now()
         start_date: str = now.strftime("%Y-%m-%d")
         end_date: str = (now + timedelta(days=365)).strftime("%Y-%m-%d")
-        r = s.get(
-            f"{api_url}/ical?location={pickup_id}&startDate={start_date}&endDate={end_date}"
-        )
+        r = s.get(f"{api_url}/ical?location={pickup_id}&startDate={start_date}&endDate={end_date}")
         r.raise_for_status()
 
         dates = self._ics.convert(r.text)
         entries = []
         for d in dates:
-            entries.append(
-                Collection(
-                    d[0], d[1].split(" ")[0], ICON_MAP.get(d[1].split(" ")[0].lower())
-                )
-            )
+            entries.append(Collection(d[0], d[1].split(" ")[0], ICON_MAP.get(d[1].split(" ")[0].lower())))
 
         return entries

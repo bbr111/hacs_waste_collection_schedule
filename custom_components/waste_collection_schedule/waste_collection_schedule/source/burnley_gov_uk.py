@@ -43,7 +43,6 @@ class Source:
         self._uprn = str(uprn).zfill(12)
 
     def fetch(self):
-
         s = requests.Session()
 
         # Set up session
@@ -69,9 +68,7 @@ class Source:
             headers=HEADERS,
             json=payload,
         )
-        rowdata = json.loads(schedule_request.content)["integration"]["transformed"][
-            "rows_data"
-        ]
+        rowdata = json.loads(schedule_request.content)["integration"]["transformed"]["rows_data"]
 
         # Extract bin types and next collection dates
         # Website doesn't return a year, so compare months to deal with collection spanning a year-end

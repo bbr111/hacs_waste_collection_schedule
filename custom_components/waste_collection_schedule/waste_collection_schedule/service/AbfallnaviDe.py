@@ -3,6 +3,7 @@
 from datetime import datetime
 
 import requests
+
 from waste_collection_schedule.exceptions import (
     SourceArgumentNotFoundWithSuggestions,
     SourceArgumentRequiredWithSuggestions,
@@ -173,21 +174,15 @@ class AbfallnaviDe:
     def __init__(self, service_domain):
         self._service_domain = service_domain
         self._service_url = f"https://{service_domain}-abfallapp.regioit.de/abfall-app-{service_domain}/rest"
-        self._service_url_fallback = (
-            f"https://abfallapp.regioit.de/abfall-app-{service_domain}/rest"
-        )
+        self._service_url_fallback = f"https://abfallapp.regioit.de/abfall-app-{service_domain}/rest"
         self._session = requests.Session()
 
     def _fetch(self, path, params=None):
         try:
-            r = self._session.get(
-                f"{self._service_url}/{path}", params=params, timeout=DEFAULT_TIMEOUT
-            )
+            r = self._session.get(f"{self._service_url}/{path}", params=params, timeout=DEFAULT_TIMEOUT)
         except requests.exceptions.ConnectionError:
             self._service_url = self._service_url_fallback
-            r = self._session.get(
-                f"{self._service_url}/{path}", params=params, timeout=DEFAULT_TIMEOUT
-            )
+            r = self._session.get(f"{self._service_url}/{path}", params=params, timeout=DEFAULT_TIMEOUT)
         r.encoding = "utf-8"  # requests doesn't guess the encoding correctly
         if r.status_code == 404:
             raise SourceArgumentNotFoundWithSuggestions(
@@ -211,9 +206,7 @@ class AbfallnaviDe:
         cities = self.get_cities()
         city_id = self._find_in_inverted_dict(cities, city)
         if not city_id:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "city", city, list(cities.values())
-            )
+            raise SourceArgumentNotFoundWithSuggestions("city", city, list(cities.values()))
         return city_id
 
     def get_streets(self, city_id):
@@ -230,14 +223,10 @@ class AbfallnaviDe:
         if len(streets) == 1:
             return list(streets.keys())
         if street is None:
-            raise SourceArgumentRequiredWithSuggestions(
-                "street", "street is required of this city", list(streets.values())
-            )
+            raise SourceArgumentRequiredWithSuggestions("street", "street is required of this city", list(streets.values()))
         matches = [id for id, name in streets.items() if name == street]
         if len(matches) == 0:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "street", street, list(streets.values())
-            )
+            raise SourceArgumentNotFoundWithSuggestions("street", street, list(streets.values()))
         return matches
 
     def get_house_numbers(self, street_id):
@@ -264,9 +253,7 @@ class AbfallnaviDe:
             )
         house_number_id = self._find_in_inverted_dict(house_numbers, house_number)
         if house_number_id is None:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "house_number", house_number, list(house_numbers.values())
-            )
+            raise SourceArgumentNotFoundWithSuggestions("house_number", house_number, list(house_numbers.values()))
 
         return house_number_id
 

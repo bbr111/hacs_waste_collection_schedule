@@ -1,3 +1,4 @@
+from datetime import date as date_type
 from urllib.parse import urlparse
 
 import requests
@@ -79,13 +80,11 @@ class Source:
             },
             verify=False,
         )
-        results = {}
+        results: dict[str, date_type] = {}
         for item in response.json()["binCollections"]["tile"]:
             try:
                 soup = BeautifulSoup(item[0], "html.parser")
-                date = parser.parse(
-                    soup.find_all("b")[2].text.split(",")[1].strip()
-                ).date()
+                date = parser.parse(soup.find_all("b")[2].text.split(",")[1].strip()).date()
                 service = soup.text.split("\n")[0]
             except parser._parser.ParserError:
                 continue
@@ -124,20 +123,19 @@ class Source:
             verify=False,
         )
         soup = BeautifulSoup(r.text, "html.parser")
-        services = soup.find(
+        services_container = soup.find(
             "div",
             attrs={"class": "blocks block-your-next-scheduled-bin-collection-days"},
-        ).find_all("li")
+        )
+        if services_container is None:
+            return []
+        services = services_container.find_all("li")
         entries = []
         for service in services:
             for type in _icons:
                 if type.lower() in service.text.lower():
                     try:
-                        date = parser.parse(
-                            service.find(
-                                "span", attrs={"class": "pull-right"}
-                            ).text.strip()
-                        ).date()
+                        date = parser.parse(service.find("span", attrs={"class": "pull-right"}).text.strip()).date()
                     except parser._parser.ParserError:
                         continue
 
@@ -158,6 +156,5 @@ class Source:
                 endpoint="https://westdevon.fccenvironment.co.uk/ajaxprocessor/getcollectiondetails"
             )
         elif self.region == "southhams":
-            return self.getcollectiondetails(
-                endpoint="https://waste.southhams.gov.uk/mycollections/getcollectiondetails"
-            )
+            return self.getcollectiondetails(endpoint="https://waste.southhams.gov.uk/mycollections/getcollectiondetails")
+        return []

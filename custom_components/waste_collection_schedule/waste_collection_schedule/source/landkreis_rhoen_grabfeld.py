@@ -74,16 +74,12 @@ class Source:
         if self._district is not None:
             # determine district id
             for area in config["areas"]:
-                if area["name"] == self._district and (
-                    int(area["city_id"]) == city_id or city_id is None
-                ):
+                if area["name"] == self._district and (int(area["city_id"]) == city_id or city_id is None):
                     area_id = int(area["id"])
                     break
             if area_id is None:
                 districts = [area["name"] for area in config["areas"]]
-                raise SourceArgumentNotFoundWithSuggestions(
-                    "district", self._district, districts
-                )
+                raise SourceArgumentNotFoundWithSuggestions("district", self._district, districts)
 
         # determine trash types
         trash_types_map_id_to_name = {}

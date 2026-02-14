@@ -16,9 +16,7 @@ ICON_MAP = {
 }
 
 ADDRESS_SUGGEST_URL = "https://opendata.ccc.govt.nz/CCCSearch/rest/address/suggest"
-BIN_SERVICE_URL = (
-    "https://ccc-data-citizen-api-v1-prod.au-s1.cloudhub.io/api/v1/properties/"
-)
+BIN_SERVICE_URL = "https://ccc-data-citizen-api-v1-prod.au-s1.cloudhub.io/api/v1/properties/"
 OVERRIDES_URL = "https://ccc.govt.nz/api/kerbsidedateoverrides"
 
 BINS_HEADERS = {
@@ -47,9 +45,7 @@ class Source:
 
         _LOGGER.debug("Fetching address from %s", ADDRESS_SUGGEST_URL)
         addressResponse = requests.get(ADDRESS_SUGGEST_URL, params=addressQuery)
-        _LOGGER.debug(
-            "Got address response %s... attempting to JSONify...", addressResponse
-        )
+        _LOGGER.debug("Got address response %s... attempting to JSONify...", addressResponse)
         address = addressResponse.json()
         _LOGGER.debug("Got JSON address %s", address)
 
@@ -77,24 +73,16 @@ class Source:
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:138.0) Gecko/20100101 Firefox/138.0",
         }
         incap = session.get(OVERRIDES_URL, headers=headers)
-        _LOGGER.debug(
-            "Fetching overrides from %s with required WAF cookies", OVERRIDES_URL
-        )
-        overridesResponse = session.get(
-            OVERRIDES_URL, headers=headers, cookies=incap.cookies
-        )
-        _LOGGER.debug(
-            "Got overrides response %s... attempting to JSONify...", overridesResponse
-        )
+        _LOGGER.debug("Fetching overrides from %s with required WAF cookies", OVERRIDES_URL)
+        overridesResponse = session.get(OVERRIDES_URL, headers=headers, cookies=incap.cookies)
+        _LOGGER.debug("Got overrides response %s... attempting to JSONify...", overridesResponse)
         overrides = overridesResponse.json()
 
         _LOGGER.debug("Processing overrides...")
         for bin in bins:
             for override in overrides:
                 if override["OriginalDate"] == bin["next_planned_date_app"]:
-                    _LOGGER.debug(
-                        "Processing overrides for %s", override["OriginalDate"]
-                    )
+                    _LOGGER.debug("Processing overrides for %s", override["OriginalDate"])
                     bin["next_planned_date_app"] = override["NewDate"]
         _LOGGER.debug("Overrides processing complete")
 
@@ -103,9 +91,7 @@ class Source:
             _LOGGER.debug("Processing bin %s", bin)
             entries.append(
                 Collection(
-                    date=datetime.datetime.strptime(
-                        bin["next_planned_date_app"], "%Y-%m-%d"
-                    ).date(),
+                    date=datetime.datetime.strptime(bin["next_planned_date_app"], "%Y-%m-%d").date(),
                     t=bin["material"],
                     icon=ICON_MAP.get(bin["material"]),
                 )

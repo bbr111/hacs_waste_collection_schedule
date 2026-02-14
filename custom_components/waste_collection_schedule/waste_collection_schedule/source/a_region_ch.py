@@ -66,17 +66,13 @@ class Source:
         self._municipality = municipality
         self._district = district
         if municipality not in MUNICIPALITIES:
-            raise SourceArgumentNotFoundWithSuggestions(
-                "municipality", self._municipality, MUNICIPALITIES.keys()
-            )
+            raise SourceArgumentNotFoundWithSuggestions("municipality", self._municipality, MUNICIPALITIES.keys())
         self._municipality_url = MUNICIPALITIES[municipality]
 
         self._ics_sources = []
 
     def _get_ics_sources(self):
-        self._ics_sources = A_region_ch(
-            "a_region", self._municipality_url, self._district
-        ).fetch()
+        self._ics_sources = A_region_ch("a_region", self._municipality_url, self._district).fetch()
 
     def fetch(self) -> list[Collection]:
         fresh_sources = False

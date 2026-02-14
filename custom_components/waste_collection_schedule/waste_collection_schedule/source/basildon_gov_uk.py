@@ -74,10 +74,7 @@ class Source:
         self._address = address
 
     def compare_address(self, address) -> bool:
-        return (
-            self._address.replace(",", "").replace(" ", "").upper()
-            == address.replace(",", "").replace(" ", "").upper()
-        )
+        return self._address.replace(",", "").replace(" ", "").upper() == address.replace(",", "").replace(" ", "").upper()
 
     def get_uprn(self, s):
         r = s.post(

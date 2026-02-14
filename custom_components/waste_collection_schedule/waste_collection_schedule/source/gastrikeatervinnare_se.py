@@ -43,11 +43,7 @@ class Source:
 
         for addressTag, info in zip(addresses, infos):
             street = addressTag.text.split(",")[0].strip().lower()
-            city = (
-                addressTag.find("span", attrs={"class": "pickup-locality"})
-                .text.strip()
-                .lower()
-            )
+            city = addressTag.find("span", attrs={"class": "pickup-locality"}).text.strip().lower()
             streets.append(street)
             cities.append(city)
             if street == self._street and city == self._city:
@@ -73,11 +69,7 @@ class Source:
         return entries
 
     def get_date(self, waste_type_info):
-        pickup_date = (
-            waste_type_info.find("div", attrs={"class": "pickup-time"})
-            .find_all("span")[1]
-            .text.split(" ")[1]
-        )
+        pickup_date = waste_type_info.find("div", attrs={"class": "pickup-time"}).find_all("span")[1].text.split(" ")[1]
 
         today = date.today()
         pickup_date_day = int(pickup_date.split("/")[0])

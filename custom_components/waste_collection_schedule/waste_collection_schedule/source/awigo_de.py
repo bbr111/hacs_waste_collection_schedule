@@ -33,10 +33,7 @@ API_URL = "https://www.awigo.de/index.php"
 
 
 def compare_cities(a: str, b: str) -> bool:
-    return (
-        re.sub(r"\([0-9]+\)", "", a.lower()).strip()
-        == re.sub(r"\([0-9]+\)", "", b.lower()).strip()
-    )
+    return re.sub(r"\([0-9]+\)", "", a.lower()).strip() == re.sub(r"\([0-9]+\)", "", b.lower()).strip()
 
 
 class Source:
@@ -86,18 +83,14 @@ class Source:
                     break
             if "calendar[streetID]" not in args:
                 raise SourceArgumentNotFoundWithSuggestions(
-                    "strasse",
-                    self._strasse,
-                    [option.text for option in soup.findAll("option")]
+                    "strasse", self._strasse, [option.text for option in soup.findAll("option")]
                 )
 
             args["calendar[method]"] = "getNumbers"
             r = s.post(API_URL, params=urllib.parse.urlencode(args, safe="[]"))
             soup = BeautifulSoup(r.text, features="html.parser")
             for option in soup.findAll("option"):
-                if option.text.lower().strip().replace(
-                    " ", ""
-                ) == self._hnr.lower().strip().replace(" ", ""):
+                if option.text.lower().strip().replace(" ", "") == self._hnr.lower().strip().replace(" ", ""):
                     args["calendar[locationID]"] = option.get("value")
                     break
             if "calendar[locationID]" not in args:

@@ -232,7 +232,7 @@ SERVICE_PROVIDERS = {
         "title": "Herrljunga & Vårgårda kommun",
         "url": "https://www.remondisrecycling.se/hushallsavfall/herrljunga-vargarda/",
         "api_url": "https://edpfuture.remondis.se/EDPFutureWeb/SimpleWastePickup",
-    }
+    },
 }
 
 EXTRA_INFO = [
@@ -263,9 +263,7 @@ class Source:
                     "You must provide either a service provider or a url",
                 )
             # Get the api url using the service provider
-            self._url = SERVICE_PROVIDERS.get(service_provider.lower(), {}).get(
-                "api_url"
-            )
+            self._url = SERVICE_PROVIDERS.get(service_provider.lower(), {}).get("api_url")
         if self._url is None:
             raise SourceArgumentNotFoundWithSuggestions(
                 "service_provider",
@@ -327,9 +325,7 @@ class Source:
                     date_parts = next_pickup.split()
                     month = MONTH_MAP[date_parts[1]]
                     date_joined = "-".join([date_parts[0], str(month), date_parts[2]])
-                    next_pickup_date = datetime.strptime(
-                        date_joined, "v%W-%m-%Y"
-                    ).date()
+                    next_pickup_date = datetime.strptime(date_joined, "v%W-%m-%Y").date()
                 elif not next_pickup:
                     continue
                 else:
@@ -361,11 +357,7 @@ class Source:
             # Get the icon for the waste type, default to help icon if not found
             icon = ICON_MAP.get(item["WasteType"], "mdi:help")
 
-            found = found = any(
-                x.date == next_pickup_date and x.type == waste_type for x in entries
-            )
+            found = found = any(x.date == next_pickup_date and x.type == waste_type for x in entries)
             if not found:
-                entries.append(
-                    Collection(date=next_pickup_date, t=waste_type, icon=icon)
-                )
+                entries.append(Collection(date=next_pickup_date, t=waste_type, icon=icon))
         return entries

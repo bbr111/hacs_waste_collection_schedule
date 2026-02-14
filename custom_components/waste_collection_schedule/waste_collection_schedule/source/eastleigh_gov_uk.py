@@ -55,9 +55,7 @@ class Source:
                 except ValueError:
                     continue
 
-                icon = ICON_MAP.get(
-                    dt.text.strip().split(" ")[0].lower()
-                )  # Collection icon
+                icon = ICON_MAP.get(dt.text.strip().split(" ")[0].lower())  # Collection icon
                 type = dt.text
                 entries.append(Collection(date=date, t=type, icon=icon))
 

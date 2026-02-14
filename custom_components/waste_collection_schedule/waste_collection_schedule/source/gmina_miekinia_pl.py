@@ -32,9 +32,7 @@ class Source:
             "x-skycms-type": "iOS",
             "x-skycms-device": "04C977DF-F4BB-4541-AEF2-EB2F454CB4D2",
         }
-        api_response = requests.get(
-            API_URL + str(self._location_id), headers=api_headers
-        )
+        api_response = requests.get(API_URL + str(self._location_id), headers=api_headers)
 
         entries = []
 

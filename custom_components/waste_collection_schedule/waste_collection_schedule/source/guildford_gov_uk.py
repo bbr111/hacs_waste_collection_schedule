@@ -69,9 +69,7 @@ class Source:
             try:
                 entries.append(
                     Collection(
-                        date=datetime.strptime(
-                            collection["NextDate"], "%Y-%m-%dT%H:%M:%S.000Z"
-                        ).date(),
+                        date=datetime.strptime(collection["NextDate"], "%Y-%m-%dT%H:%M:%S.000Z").date(),
                         t=collection["FeatureName"],
                         icon=ICON_MAP.get(collection["FeatureName"]),
                     )

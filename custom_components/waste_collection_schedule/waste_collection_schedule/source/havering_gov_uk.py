@@ -39,9 +39,7 @@ class Source:
             "getCollectionByUprnAndDate": {
                 "getCollectionByUprnAndDateInput": {
                     "uprn": self._uprn,
-                    "nextCollectionFromDate": datetime.datetime.today().strftime(
-                        "%Y/%m/%d"
-                    ),
+                    "nextCollectionFromDate": datetime.datetime.today().strftime("%Y/%m/%d"),
                 }
             }
         }
@@ -56,9 +54,7 @@ class Source:
 
         entries = []
 
-        for next_collection in data["getCollectionByUprnAndDateResponse"][
-            "getCollectionByUprnAndDateResult"
-        ]["Collections"]:
+        for next_collection in data["getCollectionByUprnAndDateResponse"]["getCollectionByUprnAndDateResult"]["Collections"]:
             collection_type = COLLECTION_MAP.get(
                 next_collection["service"],
                 {"waste_type": next_collection["service"], "icon": "mdi:trash-can"},
@@ -66,9 +62,7 @@ class Source:
             collection_date = next_collection["date"]
             entries.append(
                 Collection(
-                    date=datetime.datetime.strptime(
-                        collection_date, "%d/%m/%Y %H:%M:%S"
-                    ).date(),
+                    date=datetime.datetime.strptime(collection_date, "%d/%m/%Y %H:%M:%S").date(),
                     t=collection_type["waste_type"],
                     icon=collection_type["icon"],
                 )

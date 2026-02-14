@@ -104,9 +104,7 @@ class Source:
 
             try:
                 # Strip carriage returns and newlines out of the HTML content
-                cleaned_date_text = (
-                    date_text.text.replace("\r", "").replace("\n", "").strip()
-                )
+                cleaned_date_text = date_text.text.replace("\r", "").replace("\n", "").strip()
 
                 # Parse the date
                 date = datetime.strptime(cleaned_date_text, date_format).date()

@@ -96,16 +96,9 @@ class Source:
             lis = u1.find_all("li", recursive=False)
             entries.append(
                 Collection(
-                    date=datetime.strptime(
-                        lis[1].text.replace("\n", ""), "%d/%m/%Y"
-                    ).date(),
+                    date=datetime.strptime(lis[1].text.replace("\n", ""), "%d/%m/%Y").date(),
                     t=lis[2].text.replace("\n", ""),
-                    icon=ICON_MAP.get(
-                        lis[2]
-                        .text.replace("\n", "")
-                        .replace(" Collection", "")
-                        .replace(" Service", "")
-                    ),
+                    icon=ICON_MAP.get(lis[2].text.replace("\n", "").replace(" Collection", "").replace(" Service", "")),
                 )
             )
 

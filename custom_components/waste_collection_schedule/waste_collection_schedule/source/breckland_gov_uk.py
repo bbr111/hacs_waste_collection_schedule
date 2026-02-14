@@ -4,7 +4,6 @@ from datetime import datetime
 import requests
 from waste_collection_schedule import Collection
 from waste_collection_schedule.exceptions import (
-    SourceArgumentException,
     SourceArgumentExceptionMultiple,
 )
 
@@ -42,9 +41,7 @@ class Source:
                 errors.append("postcode")
             else:
                 errors = ["postcode", "address", "uprn"]
-            raise SourceArgumentExceptionMultiple(
-                errors, "specify postcode and address or just uprn"
-            )
+            raise SourceArgumentExceptionMultiple(errors, "specify postcode and address or just uprn")
 
     def fetch(self):
         if self._uprn is None:
@@ -84,9 +81,7 @@ class Source:
         for data in waste:
             entries.append(
                 Collection(
-                    datetime.strptime(
-                        data["nextcollection"], "%d/%m/%Y %H:%M:%S"
-                    ).date(),
+                    datetime.strptime(data["nextcollection"], "%d/%m/%Y %H:%M:%S").date(),
                     data["collectiontype"],
                     ICON_MAP.get(data["collectiontype"]),
                 )

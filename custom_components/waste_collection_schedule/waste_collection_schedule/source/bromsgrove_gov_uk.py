@@ -64,9 +64,7 @@ class Source:
             for detail in collection_details:
                 date_string = detail.text.split()[-3:]
                 collection_date = " ".join(date_string)
-                collection_dates.append(
-                    datetime.strptime(collection_date, "%d %B %Y").date()
-                )
+                collection_dates.append(datetime.strptime(collection_date, "%d %B %Y").date())
             bin_info.append(
                 {
                     "Bin Name": bin_name,
@@ -87,8 +85,6 @@ class Source:
                 )
 
         if not entries:
-            raise ValueError(
-                "Could not get collections for the given combination of UPRN and Postcode."
-            )
+            raise ValueError("Could not get collections for the given combination of UPRN and Postcode.")
 
         return entries

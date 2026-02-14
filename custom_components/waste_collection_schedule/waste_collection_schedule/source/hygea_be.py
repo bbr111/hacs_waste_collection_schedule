@@ -31,22 +31,16 @@ class Source:
         params = {"start": int(time.time()), "end": int(time.time() + 2678400)}
         if self._street_index is not None:
             params["street"] = self._street_index
-            response = requests.get(
-                "https://www.hygea.be/displaycal.html", params=params
-            )
+            response = requests.get("https://www.hygea.be/displaycal.html", params=params)
         elif self._cp is not None:
             params["street"] = self._cp
-            response = requests.get(
-                "https://www.hygea.be/displaycalws.html", params=params
-            )
+            response = requests.get("https://www.hygea.be/displaycalws.html", params=params)
         response.raise_for_status()
         data = json.loads(response.text)
 
         entries = []
         for day in data:
-            date = datetime.datetime.strptime(
-                day["start"], "%Y-%m-%dT%H:%M:%S%z"
-            ).date()
+            date = datetime.datetime.strptime(day["start"], "%Y-%m-%dT%H:%M:%S%z").date()
 
             # example for day["className"]: 12  notadded pos136 om multi
             waste_types = set(day["className"].split())

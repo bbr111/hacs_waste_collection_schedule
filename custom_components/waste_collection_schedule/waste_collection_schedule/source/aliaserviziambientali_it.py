@@ -26,9 +26,7 @@ TEST_CASES = {
 
 
 API_URL = "https://differenziata.junker.app/embed/{municipality}/calendario"
-API_URL_WITH_AREA = (
-    "https://differenziata.junker.app/embed/{municipality}/area/{area}/calendario"
-)
+API_URL_WITH_AREA = "https://differenziata.junker.app/embed/{municipality}/area/{area}/calendario"
 
 MUNICIPALITIES_WITH_AREA = {
     "Bagno a Ripoli": [12035, 12036],
@@ -153,9 +151,7 @@ MUNICIPALITIES_WITHOUT_AREA = [
 ]
 
 MUNICIPALITIES = list(MUNICIPALITIES_WITH_AREA.keys()) + MUNICIPALITIES_WITHOUT_AREA
-EXTRA_INFO = [
-    {"title": mun, "default_params": {"municipality": mun}} for mun in MUNICIPALITIES
-]
+EXTRA_INFO = [{"title": mun, "default_params": {"municipality": mun}} for mun in MUNICIPALITIES]
 
 
 class Source(Junker):
@@ -205,9 +201,7 @@ def print_municipalities() -> None:
         for link in junker_links:
             if "area" in link["href"]:
                 area = int(link["href"].split("/")[-2])
-                municipalities_with_area[mun_name] = municipalities_with_area.get(
-                    mun_name, []
-                ) + [area]
+                municipalities_with_area[mun_name] = municipalities_with_area.get(mun_name, []) + [area]
             else:
                 municipalites_without_area.append(mun_name)
 

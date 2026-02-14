@@ -38,24 +38,16 @@ class Source:
         address_lookup = requests.post(self.url, files=self.form_data)
         address_lookup.raise_for_status()
         addresses = {}
-        for address in BeautifulSoup(address_lookup.text, "html.parser").find_all(
-            "option"
-        ):
+        for address in BeautifulSoup(address_lookup.text, "html.parser").find_all("option"):
             if len(address["value"]) > 5:  # Skip the first option
                 addresses[address["value"]] = address.text.strip()
-        id = next(
-            address
-            for address in addresses
-            if addresses[address].startswith(self.house_number)
-        )
+        id = next(address for address in addresses if addresses[address].startswith(self.house_number))
         self.form_data["qe15dda0155d237d1ea161004d1839e3369ed4831_1_0"] = (None, id)
         self.form_data["next"] = (None, "Next")
         collection_lookup = requests.post(self.url, files=self.form_data)
         collection_lookup.raise_for_status()
         entries = []
-        for results in BeautifulSoup(collection_lookup.text, "html.parser").find_all(
-            "div", class_="date_display"
-        ):
+        for results in BeautifulSoup(collection_lookup.text, "html.parser").find_all("div", class_="date_display"):
             try:
                 collection_info = results.text.strip().split("\n")
                 collection_type = collection_info[0].strip()

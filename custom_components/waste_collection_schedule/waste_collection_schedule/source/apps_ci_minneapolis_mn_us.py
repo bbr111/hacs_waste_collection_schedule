@@ -44,9 +44,7 @@ class Source:
             )
         self._area_number = apn
 
-    logging.basicConfig(
-        level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s"
-    )
+    logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
 
     # Updated request using SSL code snippet
     def fetch(self):
@@ -68,37 +66,19 @@ class Source:
         entries = []
 
         # 1. Find the next garbage collection date
-        garbage_collection_text = (
-            soup.find("strong", text="Next Garbage Collection:")
-            .find_next("a")
-            .text.strip()
-        )
+        garbage_collection_text = soup.find("strong", text="Next Garbage Collection:").find_next("a").text.strip()
         logging.info("garbage_collection_text: %s", garbage_collection_text)
-        garbage_collection_date_str = " ".join(
-            garbage_collection_text.split()[1:]
-        )  # Remove first word (day of the week)
+        garbage_collection_date_str = " ".join(garbage_collection_text.split()[1:])  # Remove first word (day of the week)
         logging.info("garbage_collection_date_str: %s", garbage_collection_date_str)
-        garbage_collection_date = datetime.strptime(
-            garbage_collection_date_str, "%b. %d, %Y"
-        )
+        garbage_collection_date = datetime.strptime(garbage_collection_date_str, "%b. %d, %Y")
         logging.info("garbage_collection_date: %s", garbage_collection_date)
 
         # 2. Find the next recycling collection date
-        recycling_collection_text = (
-            soup.find("strong", text="Next Recycling Collection:")
-            .find_next("a")
-            .text.strip()
-        )
+        recycling_collection_text = soup.find("strong", text="Next Recycling Collection:").find_next("a").text.strip()
         logging.info("recycling_collection_text: %s", recycling_collection_text)
-        grecycling_collection_date_str = " ".join(
-            recycling_collection_text.split()[1:]
-        )  # Remove first word (day of the week)
-        logging.info(
-            "recycling_collection_date_str: %s", grecycling_collection_date_str
-        )
-        recycling_collection_date = datetime.strptime(
-            grecycling_collection_date_str, "%b. %d, %Y"
-        )
+        grecycling_collection_date_str = " ".join(recycling_collection_text.split()[1:])  # Remove first word (day of the week)
+        logging.info("recycling_collection_date_str: %s", grecycling_collection_date_str)
+        recycling_collection_date = datetime.strptime(grecycling_collection_date_str, "%b. %d, %Y")
         logging.info("recycling_collection_date: %s", recycling_collection_date)
 
         entries = []  # List that holds collection schedule

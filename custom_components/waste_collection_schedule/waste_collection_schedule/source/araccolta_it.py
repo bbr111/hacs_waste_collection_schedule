@@ -70,18 +70,13 @@ class Source:
 
         entries: list[Collection] = []
         for card in section.select("div.calendar-card"):
-            weekdays = (
-                card.select_one("div.day-wrapper").text.strip().lower().split("/")
-            )
+            weekdays = card.select_one("div.day-wrapper").text.strip().lower().split("/")
             if len(weekdays) == 1:
                 weekdays = weekdays[0].split(" - ")
             waste_types = (t.text for t in card.select("h3"))
             for weekday in weekdays:
                 weekday_int = ITALIAN_WEEKDAYS.index(weekday)
-                next_date = (
-                    datetime.now()
-                    + timedelta(days=(weekday_int - datetime.now().weekday()) % 7)
-                ).date()
+                next_date = (datetime.now() + timedelta(days=(weekday_int - datetime.now().weekday()) % 7)).date()
                 for waste_type in waste_types:
                     entries += [
                         Collection(

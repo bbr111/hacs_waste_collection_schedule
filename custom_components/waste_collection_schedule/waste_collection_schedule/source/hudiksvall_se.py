@@ -49,9 +49,7 @@ class Source:
 
         entries = []
         for container in response:
-            date_ = self.parse_date(
-                container["year"], container["week"], container["day"]
-            )
+            date_ = self.parse_date(container["year"], container["week"], container["day"])
             icon = ICON_MAP.get(container["type"])
             entries.append(Collection(date_, container["type"], icon))
 

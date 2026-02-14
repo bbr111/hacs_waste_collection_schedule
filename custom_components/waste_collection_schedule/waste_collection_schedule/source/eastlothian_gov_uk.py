@@ -48,9 +48,7 @@ class Source:
         address_id: str | None = None,
     ):
         self._postcode: str | None = postcode.strip() if postcode else None
-        self._address: str | None = (
-            address.lower().replace(" ", "") if address else None
-        )
+        self._address: str | None = address.lower().replace(" ", "") if address else None
         self._address_id: str | None = address_id.strip() if address_id else None
         self._collection_url: str | None = None
         self._streets_url: str | None = None
@@ -100,18 +98,14 @@ class Source:
                 raise ValueError("No address options found")
             options = select.find_all("option")
         except Exception as e:
-            raise SourceArgumentNotFound(
-                "postcode", self._postcode, "Invalid postcode Request recheck postcode"
-            ) from e
+            raise SourceArgumentNotFound("postcode", self._postcode, "Invalid postcode Request recheck postcode") from e
 
         for level in range(3):
             for option in options:
                 if self._address_match(option.text, level):
                     self._address_id = option["value"]
                     return
-        raise SourceArgumentNotFoundWithSuggestions(
-            "address", self._address, [option.text for option in options]
-        )
+        raise SourceArgumentNotFoundWithSuggestions("address", self._address, [option.text for option in options])
 
     def _get_colledctions(self) -> list[Collection]:
         if not self._collection_url:

@@ -1,6 +1,5 @@
 import logging
 from datetime import datetime
-from typing import Dict
 
 import requests
 from bs4 import BeautifulSoup, Tag
@@ -42,14 +41,10 @@ class Source:
         self._postcode: str = postcode.strip()
         self._uprn: str = str(uprn)
 
-    def _get_form_args(self, soup: BeautifulSoup) -> Dict[str, str]:
-        return {
-            i.get("name"): i.get("value")
-            for i in soup.find_all(["input", "select"])
-            if i.get("id") in FORM_ARG_IDS
-        }
+    def _get_form_args(self, soup: BeautifulSoup) -> dict[str, str]:
+        return {i.get("name"): i.get("value") for i in soup.find_all(["input", "select"]) if i.get("id") in FORM_ARG_IDS}
 
-    def _parse_address_list(self, select_element: Tag) -> Dict[str, str]:
+    def _parse_address_list(self, select_element: Tag) -> dict[str, str]:
         uprn_addresses = {}
         for row in select_element.children:
             # Ensure child element is a Tag
@@ -68,16 +63,10 @@ class Source:
             bin_type = children[0].getText().strip()  # Green bin
             bin_type_icon = ICON_MAP.get(bin_type.lower())
             if bin_type != "":
-                collection_date_str = (
-                    children[1].getText().strip()
-                )  # 'Next collection on: Wed, 09 Oct 2024'
+                collection_date_str = children[1].getText().strip()  # 'Next collection on: Wed, 09 Oct 2024'
                 try:
-                    collection_date = datetime.strptime(
-                        collection_date_str, "Next collection on: %a, %d %b %Y"
-                    ).date()
-                    return Collection(
-                        date=collection_date, t=bin_type, icon=bin_type_icon
-                    )
+                    collection_date = datetime.strptime(collection_date_str, "Next collection on: %a, %d %b %Y").date()
+                    return Collection(date=collection_date, t=bin_type, icon=bin_type_icon)
                 except ValueError:
                     return None
         return None
@@ -103,9 +92,7 @@ class Source:
         # Find address value for uprn
         addresses = self._parse_address_list(address_input)
         if self._uprn not in addresses:
-            raise Exception(
-                f"uprn '{self._uprn}' not found for postcode '{self._postcode}'"
-            )
+            raise Exception(f"uprn '{self._uprn}' not found for postcode '{self._postcode}'")
         address_input["value"] = addresses[self._uprn]
 
         # Find collections for address

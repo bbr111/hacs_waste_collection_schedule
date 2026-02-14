@@ -2,6 +2,7 @@ import datetime
 
 from bs4 import BeautifulSoup
 from waste_collection_schedule import Collection
+
 # Include work around for SSL UNSAFE_LEGACY_RENEGOTIATION_DISABLED error
 from waste_collection_schedule.service.SSLError import get_legacy_session
 
@@ -38,9 +39,7 @@ MONTH_NAMES = [
 
 
 class Source:
-    def __init__(
-        self, zone
-    ):  # argX correspond to the args dict in the source configuration
+    def __init__(self, zone):  # argX correspond to the args dict in the source configuration
         zones = {"A": "1", "B": "2"}
         self._zone = zones[zone]
 
@@ -70,8 +69,6 @@ class Source:
                     t = "Déchets toxiques"  # Remove collecting instructions
                 date_fr = cells[2].text.strip().split(", ")[1]
                 day, month, year = date_fr.split()
-                date = datetime.datetime(
-                    year=int(year), month=MONTH_NAMES.index(month) + 1, day=int(day)
-                ).date()
+                date = datetime.datetime(year=int(year), month=MONTH_NAMES.index(month) + 1, day=int(day)).date()
                 entries.append(Collection(date, t, icon=ICON_MAP.get(t)))
         return entries

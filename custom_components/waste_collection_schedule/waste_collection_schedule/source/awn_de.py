@@ -35,9 +35,7 @@ TEST_CASES = {
         "address_suffix": "A",
     },
 }
-SERVLET = (
-    "https://athos.awn-online.de/WasteManagementNeckarOdenwald/WasteManagementServlet"
-)
+SERVLET = "https://athos.awn-online.de/WasteManagementNeckarOdenwald/WasteManagementServlet"
 
 PARAM_TRANSLATIONS = {
     "de": {

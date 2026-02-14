@@ -1,5 +1,3 @@
-import logging
-
 import requests
 from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 from waste_collection_schedule.exceptions import (
@@ -40,10 +38,7 @@ class Source:
         }
         header = {"Referer": URL}
         r = requests.get(
-            "https://www.neunkirchen-siegerland.de/output/autocomplete.php",
-            params=args,
-            headers=header,
-            timeout=30
+            "https://www.neunkirchen-siegerland.de/output/autocomplete.php", params=args, headers=header, timeout=30
         )
         r.raise_for_status()
 
@@ -53,25 +48,13 @@ class Source:
             raise Exception("Unexpected autocomplete response")
 
         if not ids:
-            raise SourceArgumentNotFound(
-                f"No address found for '{self._strasse}'")
+            raise SourceArgumentNotFound(f"No address found for '{self._strasse}'")
 
         if len(ids) > 1:
-            raise SourceArgAmbiguousWithSuggestions(
-                "strasse", self._strasse, [id[1] for id in ids]
-            )
+            raise SourceArgAmbiguousWithSuggestions("strasse", self._strasse, [id[1] for id in ids])
 
-        args = {"ModID": 48,
-                "call": "ical",
-                "pois": ids[0][0],
-                "kat": 1,
-                "alarm": 0}
-        r = requests.get(
-            "https://www.neunkirchen-siegerland.de/output/options.php",
-            params=args,
-            headers=header,
-            timeout=30
-        )
+        args = {"ModID": 48, "call": "ical", "pois": ids[0][0], "kat": 1, "alarm": 0}
+        r = requests.get("https://www.neunkirchen-siegerland.de/output/options.php", params=args, headers=header, timeout=30)
         r.raise_for_status()
 
         dates = self._ics.convert(r.text)

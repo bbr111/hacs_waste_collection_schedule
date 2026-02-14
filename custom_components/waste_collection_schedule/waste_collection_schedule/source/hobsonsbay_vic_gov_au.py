@@ -59,9 +59,7 @@ class Source:
             ]
         }
 
-        search_response = requests.post(
-            SEARCH_API_URL, params=search_params, json=search_data
-        )
+        search_response = requests.post(SEARCH_API_URL, params=search_params, json=search_data)
 
         search_response.raise_for_status()
         match = search_response.json()["results"][0]["hits"][0]

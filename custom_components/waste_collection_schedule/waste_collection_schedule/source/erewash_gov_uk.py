@@ -61,9 +61,7 @@ class Source:
             for collection in data:
                 entries.append(
                     Collection(
-                        date=datetime.fromtimestamp(
-                            int(collection["timestamp"])
-                        ).date(),
+                        date=datetime.fromtimestamp(int(collection["timestamp"])).date(),
                         t=collection["service"],
                         icon=ICON_MAP.get(collection["service-identifier"]),
                     )

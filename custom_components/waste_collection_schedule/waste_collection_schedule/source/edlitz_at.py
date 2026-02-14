@@ -36,9 +36,7 @@ class Source:
         for i in range(0, len(dts)):
             entries.append(
                 Collection(
-                    date=datetime.strptime(
-                        dts[i].text.split(" ")[0].strip(), "%d.%m.%Y"
-                    ).date(),
+                    date=datetime.strptime(dts[i].text.split(" ")[0].strip(), "%d.%m.%Y").date(),
                     t=wst[i].text.strip(),
                     icon=ICON_MAP.get(wst[i].text.strip()),
                 )

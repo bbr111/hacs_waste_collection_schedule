@@ -1,6 +1,5 @@
 import logging
 from datetime import datetime
-from typing import Union
 
 import requests
 from bs4 import BeautifulSoup
@@ -9,9 +8,7 @@ from waste_collection_schedule import Collection  # type: ignore[attr-defined]
 TITLE = "Lancaster City Council"
 DESCRIPTION = "Source for lancaster.gov.uk services for Lancaster City Council, UK."
 URL = "https://lancaster.gov.uk"
-TEST_CASES = {
-    "1 Queen Street Lancaster, LA1 1RS": {"house_number": 1, "postcode": "LA1 1RS"}
-}
+TEST_CASES = {"1 Queen Street Lancaster, LA1 1RS": {"house_number": 1, "postcode": "LA1 1RS"}}
 API_URLS = {"BASE": "https://lcc-wrp.whitespacews.com"}
 ICON_MAP = {
     "Domestic Waste": "mdi:trash-can",
@@ -23,9 +20,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class Source:
-    def __init__(
-        self, postcode: str, house_number: Union[int, str, None] = None
-    ) -> None:
+    def __init__(self, postcode: str, house_number: int | str | None = None) -> None:
         self._house_number = house_number
         self._postcode = postcode
         self._session = requests.Session()
@@ -35,10 +30,7 @@ class Source:
 
         # start session
         response = self._session.get(API_URLS["BASE"] + "/#!")
-        links = [
-            a["href"]
-            for a in BeautifulSoup(response.text, features="html.parser").select("a")
-        ]
+        links = [a["href"] for a in BeautifulSoup(response.text, features="html.parser").select("a")]
         portal_link = ""
         for link in links:
             if "seq=1" in link:
@@ -56,10 +48,7 @@ class Source:
 
         # get (first) found address
         response = self._session.post(form_url, data=payload)
-        links = [
-            a["href"]
-            for a in BeautifulSoup(response.text, features="html.parser").select("a")
-        ]
+        links = [a["href"] for a in BeautifulSoup(response.text, features="html.parser").select("a")]
         addr_link = ""
         for link in links:
             if "seq=3" in link:
@@ -89,7 +78,5 @@ class Source:
                     )
                 )
             except ValueError:
-                _LOGGER.info(
-                    f"Skipped {date_text} as it does not match time format"
-                )
+                _LOGGER.info(f"Skipped {date_text} as it does not match time format")
         return entries

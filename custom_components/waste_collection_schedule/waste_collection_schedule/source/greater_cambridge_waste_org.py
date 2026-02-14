@@ -62,7 +62,6 @@ class Source:
         postcode: str | None = None,
         name_or_number: str | int | None = None,
     ) -> None:
-
         if uprn is not None:
             self._uprn = str(uprn)
             self._postcode = None
@@ -74,9 +73,7 @@ class Source:
 
     def get_address_details(self, a: str) -> str:
         matches = re.findall(REGEX["details"], a, flags=re.IGNORECASE | re.DOTALL)
-        temp_id: str = [
-            did.strip() for addr, did in matches if self._name_or_number in addr
-        ][0]
+        temp_id: str = [did.strip() for addr, did in matches if self._name_or_number in addr][0]
         return temp_id
 
     def fetch(self) -> Collection:

@@ -2,7 +2,6 @@ import logging
 import re
 import urllib.parse
 from html.parser import HTMLParser
-from typing import Tuple
 
 import requests
 from bs4 import BeautifulSoup, Tag
@@ -222,11 +221,7 @@ class Source:
         _LOGGER.debug(str(b_location_id_options))
         _LOGGER.debug(str(p_location_id_options))
 
-        if (
-            len(r_location_id_options) > 0
-            or len(b_location_id_options) > 0
-            or len(p_location_id_options) > 0
-        ):
+        if len(r_location_id_options) > 0 or len(b_location_id_options) > 0 or len(p_location_id_options) > 0:
             _LOGGER.debug("Ok, we need location IDs.")
             # YES. We need to provide these, because at least one of R, B or P needs a selection.
             # Collect which ever are needed from the input and POST.
@@ -240,10 +235,7 @@ class Source:
                         SourceArgumentRequiredWithSuggestions(
                             argument="r_location_id",
                             reason="multiple choices returned from AWM service.",
-                            suggestions=[
-                                f"'{option.get('value')}' for {option.text}"
-                                for option in r_location_id_options
-                            ],
+                            suggestions=[f"'{option.get('value')}' for {option.text}" for option in r_location_id_options],
                         )
                     )
                 else:
@@ -253,9 +245,7 @@ class Source:
                 # Ok, option was set in UI, e.g., to:
                 # * """'12345678' for XYZ-Street 12""" from a suggestion, and with regex "\d+" we get 12345678
                 # * """11122233""", because the user knows their location ID already, then with regex "\d+" we get 11122233
-                args[
-                    "tx_awmabfuhrkalender_abfuhrkalender[stellplatz][restmuell]"
-                ] = re.findall("\\d+", self._r_location_id)[0]
+                args["tx_awmabfuhrkalender_abfuhrkalender[stellplatz][restmuell]"] = re.findall("\\d+", self._r_location_id)[0]
 
             # Second, the Biomuell...
             if self._b_location_id == "":
@@ -264,16 +254,11 @@ class Source:
                         SourceArgumentRequiredWithSuggestions(
                             argument="b_location_id",
                             reason="multiple choices returned from AWM service.",
-                            suggestions=[
-                                f"'{option.get('value')}' for {option.text}"
-                                for option in b_location_id_options
-                            ],
+                            suggestions=[f"'{option.get('value')}' for {option.text}" for option in b_location_id_options],
                         )
                     )
             else:
-                args[
-                    "tx_awmabfuhrkalender_abfuhrkalender[stellplatz][bio]"
-                ] = re.findall("\\d+", self._b_location_id)[0]
+                args["tx_awmabfuhrkalender_abfuhrkalender[stellplatz][bio]"] = re.findall("\\d+", self._b_location_id)[0]
 
             # Third and last, the Papermuell...
             if self._p_location_id == "":
@@ -282,16 +267,11 @@ class Source:
                         SourceArgumentRequiredWithSuggestions(
                             argument="p_location_id",
                             reason="multiple choices returned from AWM service.",
-                            suggestions=[
-                                f"'{option.get('value')}' for {option.text}"
-                                for option in p_location_id_options
-                            ],
+                            suggestions=[f"'{option.get('value')}' for {option.text}" for option in p_location_id_options],
                         )
                     )
             else:
-                args[
-                    "tx_awmabfuhrkalender_abfuhrkalender[stellplatz][papier]"
-                ] = re.findall("\\d+", self._p_location_id)[0]
+                args["tx_awmabfuhrkalender_abfuhrkalender[stellplatz][papier]"] = re.findall("\\d+", self._p_location_id)[0]
             _LOGGER.debug("Location-ID path, POSTing args:")
             _LOGGER.debug(str(args))
 
@@ -353,11 +333,7 @@ class Source:
         _LOGGER.debug(str(b_collection_cycle_options))
         _LOGGER.debug(str(p_collection_cycle_options))
 
-        if (
-            len(r_collection_cycle_options) > 0
-            or len(b_collection_cycle_options) > 0
-            or len(p_collection_cycle_options) > 0
-        ):
+        if len(r_collection_cycle_options) > 0 or len(b_collection_cycle_options) > 0 or len(p_collection_cycle_options) > 0:
             # YES. We need to provide these, because either R, B or P needs a selection.
             # Collect which ever are needed from the input and POST.
             # Note: We'll use a very dirty hack to extract the value we want from the HA form input / select. See comment below.
@@ -371,8 +347,7 @@ class Source:
                             argument="r_collection_cycle_string",
                             reason="multiple choices returned from AWM service.",
                             suggestions=[
-                                f"'{option.get('value')}' for {option.text}"
-                                for option in r_collection_cycle_options
+                                f"'{option.get('value')}' for {option.text}" for option in r_collection_cycle_options
                             ],
                         )
                     )
@@ -383,13 +358,9 @@ class Source:
                 # Ok, option was set in UI, e.g. to:
                 # * """'001;U' for 1x pro Woche""", and with regex "(?:\d{3}|\d\/\d);[A-Z]" we get 001;U
                 # * ""'1/2;G""", because the user knows their collection cycle string already, then with regex "(?:\d{3}|\d\/\d);[A-Z]" we get 1/2;G
-                args[
-                    "tx_awmabfuhrkalender_abfuhrkalender[leerungszyklus][R]"
-                ] = re.findall(
+                args["tx_awmabfuhrkalender_abfuhrkalender[leerungszyklus][R]"] = re.findall(
                     "(?:\\d{3}|\\d\\/\\d);[A-Z]", self._r_collection_cycle_string
-                )[
-                    0
-                ]
+                )[0]
 
             # Second, the Biomuell...
             if self._b_collection_cycle_string == "":
@@ -399,19 +370,14 @@ class Source:
                             argument="b_collection_cycle_string",
                             reason="multiple choices returned from AWM service.",
                             suggestions=[
-                                f"'{option.get('value')}' for {option.text}"
-                                for option in b_collection_cycle_options
+                                f"'{option.get('value')}' for {option.text}" for option in b_collection_cycle_options
                             ],
                         )
                     )
             else:
-                args[
-                    "tx_awmabfuhrkalender_abfuhrkalender[leerungszyklus][B]"
-                ] = re.findall(
+                args["tx_awmabfuhrkalender_abfuhrkalender[leerungszyklus][B]"] = re.findall(
                     "(?:\\d{3}|\\d\\/\\d);[A-Z]", self._b_collection_cycle_string
-                )[
-                    0
-                ]
+                )[0]
 
             # Third, the Papermuell...
             if self._p_collection_cycle_string == "":
@@ -421,28 +387,21 @@ class Source:
                             argument="p_collection_cycle_string",
                             reason="multiple choices returned from AWM service.",
                             suggestions=[
-                                f"'{option.get('value')}' for {option.text}"
-                                for option in p_collection_cycle_options
+                                f"'{option.get('value')}' for {option.text}" for option in p_collection_cycle_options
                             ],
                         )
                     )
             else:
-                args[
-                    "tx_awmabfuhrkalender_abfuhrkalender[leerungszyklus][P]"
-                ] = re.findall(
+                args["tx_awmabfuhrkalender_abfuhrkalender[leerungszyklus][P]"] = re.findall(
                     "(?:\\d{3}|\\d\\/\\d);[A-Z]", self._p_collection_cycle_string
-                )[
-                    0
-                ]
+                )[0]
 
             r = s.post(
                 action_url,
                 data=args,
             )
             r.raise_for_status()
-            _LOGGER.debug(
-                "got third response after address [+ location IDs ?] + collection cycle strings."
-            )
+            _LOGGER.debug("got third response after address [+ location IDs ?] + collection cycle strings.")
 
             # After this POST, there must be the link for the ICS.
             page_soup = BeautifulSoup(r.text, "html.parser")
@@ -456,13 +415,9 @@ class Source:
                     )
                 return entries
 
-        raise ValueError(
-            "Unknown error getting ICS link with calendar entries from AWM server."
-        )
+        raise ValueError("Unknown error getting ICS link with calendar entries from AWM server.")
 
-    def _retrieve_and_append_entries(
-        self, s: requests.Session, download_link: Tag, entries: list
-    ):
+    def _retrieve_and_append_entries(self, s: requests.Session, download_link: Tag, entries: list):
         ics_action_url = download_link.get("href")
         r = s.get(f"{URL}{urllib.parse.unquote(ics_action_url)}")
         r.raise_for_status()
@@ -473,7 +428,7 @@ class Source:
             bin_type = d[1].split(",")[0].replace("Achtung:", "").strip()
             entries.append(Collection(d[0], bin_type, ICON_MAP.get(bin_type)))
 
-    def _get_html_form_infos(self, html: str, form_name: str) -> Tuple[str, dict]:
+    def _get_html_form_infos(self, html: str, form_name: str) -> tuple[str, dict]:
         """Return a tuple with form action url and hidden form fields."""
         # collect the url where we post to
         page_soup = BeautifulSoup(html, "html.parser")

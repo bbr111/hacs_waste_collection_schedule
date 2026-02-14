@@ -30,7 +30,6 @@ class Source:
         self._ics = ICS()
 
     def fetch(self):
-
         # get collection overview page
         r = requests.get(API_URL.format(uprn=self._uprn))
         r.raise_for_status()
@@ -53,12 +52,7 @@ class Source:
         entries = []
         for d in collections:
             bin_type = d[1].replace("Reminder", "").replace(" - ", "").strip()
-            icon = ICON_MAP.get(
-                bin_type.lower()
-                .replace("domestic", "")
-                .replace("collection", "")
-                .strip()
-            )
+            icon = ICON_MAP.get(bin_type.lower().replace("domestic", "").replace("collection", "").strip())
             entries.append(Collection(date=d[0], t=bin_type, icon=icon))
 
         return entries

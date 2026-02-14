@@ -128,9 +128,7 @@ class Source:
 
         objects = data["objects"]
         changes_postcode = data["changes"]
-        changes_postcode[list(changes_postcode.keys())[0]][
-            "EnquiryPostcodeOrStreetName"
-        ] = {"value": self._postcode}
+        changes_postcode[list(changes_postcode.keys())[0]]["EnquiryPostcodeOrStreetName"] = {"value": self._postcode}
 
         params = {
             "OS_MissedBinEnquiry": {
@@ -153,20 +151,14 @@ class Source:
         uprn_chage_element: tuple[str, dict] | None = None
 
         for change_id, chage_dict in data["changes"].items():
-            if "UPRN" in chage_dict and chage_dict["UPRN"]["value"].strip().strip(
-                "0"
-            ) == str(self._uprn).strip().strip("0"):
+            if "UPRN" in chage_dict and chage_dict["UPRN"]["value"].strip().strip("0") == str(self._uprn).strip().strip("0"):
                 uprn_chage_element = (change_id, chage_dict)
                 break
 
         if uprn_chage_element is None:
             raise SourceArgumentNotFound("uprn", self._uprn)
 
-        objects += [
-            next(
-                iter([o for o in data["objects"] if o["guid"] == uprn_chage_element[0]])
-            )
-        ]
+        objects += [next(iter([o for o in data["objects"] if o["guid"] == uprn_chage_element[0]]))]
         params = {"Generic_Address": {"guid": objects[-1]["guid"]}}
 
         changes = changes_postcode.copy()
@@ -195,9 +187,7 @@ class Source:
                 try:
                     date = datetime.strptime(date_str, "%A %d/%m/%Y").date()
                 except ValueError:
-                    _LOGGER.warning(
-                        f"Could not parse date: {date_str} for bin type {bin_type}"
-                    )
+                    _LOGGER.warning(f"Could not parse date: {date_str} for bin type {bin_type}")
                 icon = ICON_MAP.get(bin_type)
                 entries.append(Collection(date=date, t=bin_type, icon=icon))
 

@@ -46,9 +46,7 @@ class Source:
         if "Den adress du har angivit finns inte" in r.text:
             raise ValueError("Address not found")
 
-        clean_html = (
-            r.text.encode().decode("unicode_escape").replace(r"\/", "/").strip('"')
-        )
+        clean_html = r.text.encode().decode("unicode_escape").replace(r"\/", "/").strip('"')
 
         soup = BeautifulSoup(clean_html, "html.parser")
         results = soup.find("div", {"class": "waste-result-list"})

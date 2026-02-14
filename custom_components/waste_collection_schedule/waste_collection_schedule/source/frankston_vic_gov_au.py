@@ -9,9 +9,7 @@ DESCRIPTION = "Source script for frankston.vic.gov.au"  # Describe your source
 URL = "https://frankston.gov.au"  # Insert url to service homepage. URL will show up in README.md and info.md
 TEST_CASES = {  # Insert arguments for test cases to be used by test_sources.py script
     "45r Wedge Rd": {"address": "45r Wedge Rd, Carrum Downs Vic"},  # Monday
-    "300 Wedge Rd": {
-        "address": "300 Wedge Rd, Skye Vic"
-    },  # Monday, but inverse recycling week to 45r Wedge Rd
+    "300 Wedge Rd": {"address": "300 Wedge Rd, Skye Vic"},  # Monday, but inverse recycling week to 45r Wedge Rd
     "66 Skye Rd": {"address": "66 Skye Rd, Skye Vic"},  # Tuesday
     "160 North Rd": {"address": "160 North Road, Langwarrin Vic"},  # Wednesday
     "65 Golf Links Rd": {"address": "65 Golf Links Rd, Frankston Vic"},  # Thursday
@@ -28,9 +26,7 @@ ICON_MAP = {
 
 
 class Source:
-    def __init__(
-        self, address
-    ):  # argX correspond to the args dict in the source configuration
+    def __init__(self, address):  # argX correspond to the args dict in the source configuration
         self._address = address
 
     def get_collections(self, collection_day, weeks, start_date):

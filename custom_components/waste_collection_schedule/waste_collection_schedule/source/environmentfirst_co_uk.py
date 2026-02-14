@@ -12,7 +12,7 @@ EXTRA_INFO = [
     {"title": "Lewes District Council", "url": "https://lewes-eastbourne.gov.uk"},
 ]
 DESCRIPTION = """Consolidated source for waste collection services from:
-        Eastbourne Borough Council 
+        Eastbourne Borough Council
         Lewes District Council
         """
 TEST_CASES = {
@@ -81,9 +81,7 @@ class Source:
             responseContent = r.text
 
         else:
-            raise Exception(
-                "You need to specify either (uprn) or (post_code and (number or name))"
-            )
+            raise Exception("You need to specify either (uprn) or (post_code and (number or name))")
 
         entries = []
 

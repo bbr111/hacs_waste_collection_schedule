@@ -53,13 +53,13 @@ def parse_date(date_str: str) -> datetime.date:
             date_str = date_str.replace(month, "")
             break
     if month_number is None:
-        raise ValueError("Could not find month in date string %s" % date_str)
+        raise ValueError(f"Could not find month in date string {date_str}")
 
     date_str = date_str.replace(".", "").strip()
     try:
         day = int(date_str)
     except ValueError:
-        raise ValueError("Day is not an integer: %s" % date_str)
+        raise ValueError(f"Day is not an integer: {date_str}")
 
     date_ = datetime.date(datetime.datetime.now().year, month_number, day)
     if datetime.date.today() > date_:
@@ -82,17 +82,8 @@ class Source:
 
         for match in matches:
             if (
-                match["label"]
-                .lower()
-                .replace(" ", "")
-                .replace(",", "")
-                .replace(".", "")
-                .casefold()
-                == self._address.lower()
-                .replace(" ", "")
-                .replace(",", "")
-                .replace(".", "")
-                .casefold()
+                match["label"].lower().replace(" ", "").replace(",", "").replace(".", "").casefold()
+                == self._address.lower().replace(" ", "").replace(",", "").replace(".", "").casefold()
             ):
                 href = match["href"]
                 break

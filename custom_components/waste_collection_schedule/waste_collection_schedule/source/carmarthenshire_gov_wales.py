@@ -54,9 +54,7 @@ PARAM_TRANSLATIONS = {  # Optional dict to translate the arguments, will be show
 
 
 class Source:
-    def __init__(
-        self, uprn: str | int
-    ):  # argX correspond to the args dict in the source configuration
+    def __init__(self, uprn: str | int):  # argX correspond to the args dict in the source configuration
         self._uprn = str(uprn)
 
     def fetch(self) -> list[Collection]:
@@ -75,9 +73,7 @@ class Source:
                 continue
             entries.append(
                 Collection(
-                    date=datetime.strptime(
-                        dates[0].text.split("  ")[1].strip(), "%d/%m/%Y"
-                    ).date(),
+                    date=datetime.strptime(dates[0].text.split("  ")[1].strip(), "%d/%m/%Y").date(),
                     t=REMAP_WASTE.get(item["class"][1].upper()),
                     icon=ICON_MAP.get(item["class"][1].upper()),
                 )

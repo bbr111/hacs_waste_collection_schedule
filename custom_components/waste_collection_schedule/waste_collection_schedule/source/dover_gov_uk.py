@@ -44,9 +44,7 @@ class Source:
         for service_element in service_elements:
             service_name = service_element.select(".service-name")[0].text.strip()
 
-            next_service_dates = service_element.select(
-                "td.next-service"
-            ) + service_element.select("td.last-service")
+            next_service_dates = service_element.select("td.next-service") + service_element.select("td.last-service")
             if len(next_service_dates) == 0:
                 continue
             for next_service_date in next_service_dates:
@@ -57,9 +55,7 @@ class Source:
 
                 entries.append(
                     Collection(
-                        date=datetime.strptime(
-                            next_service_date.text.strip(), "%d/%m/%Y"
-                        ).date(),
+                        date=datetime.strptime(next_service_date.text.strip(), "%d/%m/%Y").date(),
                         t=service_name,
                         icon=ICON_MAP.get(service_name),
                     )

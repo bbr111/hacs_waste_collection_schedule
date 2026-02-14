@@ -1,4 +1,3 @@
-// See https://aka.ms/vscode-remote/devcontainer.json for format details.
 {
 	"name": "Waste Collection Schedule development",
 	"image": "mcr.microsoft.com/devcontainers/base:ubuntu",
@@ -6,7 +5,7 @@
 		"9123:8123"
 	],
 	"containerEnv": {
-		"TZ": "Europe/Berlin" // Set your local timezone here
+		"TZ": "Europe/Berlin"
 	},
 	"features": {
 		"ghcr.io/devcontainers/features/python:1": {}
@@ -27,7 +26,7 @@
 				"python.defaultInterpreterPath": "/usr/bin/python3",
 				"python.analysis.autoSearchPaths": false,
 				"[python]": {
-					"editor.defaultFormatter": "charliermarsh.ruff"
+					"editor.defaultFormatter": "ms-python.python"
 				},
 				"editor.codeActionsOnSave": {
 					"source.organizeImports.ruff": "explicit",
