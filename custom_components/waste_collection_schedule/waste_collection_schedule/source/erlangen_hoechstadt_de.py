@@ -18,6 +18,7 @@ still passes through, leaving the current year's collections intact.
 from typing import ClassVar, final
 
 from waste_collection_schedule import parsers
+from waste_collection_schedule import waste_types as wt
 from waste_collection_schedule.base_source import BaseSource
 from waste_collection_schedule.config_params import city, street
 from waste_collection_schedule.service.ICS import IcsFeedsParser, IcsSessionRetriever
@@ -60,11 +61,12 @@ class Source(BaseSource):
 
     parse = IcsFeedsParser(parsers.IcsParser(split_at=" / "))
 
-    # No WASTE_TYPES. A bare pass-through transformer has no
-    # type_value_map, so every label this feed sends is classified by the
-    # shared multilingual vocabulary, which cannot be enumerated
-    # statically; and with no cassette yet (#7051) the produced set
-    # cannot be derived by replay either. An empty declaration is the
-    # honest one, and it only narrows a config-flow dropdown offer
-    # (#7028). Declare the real vocabulary once this source is recorded.
+    # The vocabulary this feed actually produces, derived by replaying the
+    # recorded cassettes. Declared explicitly because the labels are resolved
+    # by the shared vocabulary rather than a type_value_map.
+    WASTE_TYPES: ClassVar[list] = [
+        wt.GENERAL_WASTE,
+        wt.ORGANIC,
+        wt.PAPER,
+    ]
     transform = ICSTransformer()

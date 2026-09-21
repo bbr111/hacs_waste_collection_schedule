@@ -6267,21 +6267,14 @@ def test_the_hand_rolled_retrieval_backlog_is_not_stale() -> None:
 SOURCES_AWAITING_CASSETTE = {
     "alba_com_pl",
     "allerdale_gov_uk",
-    "awn_de",
-    "bielefeld_de",
     "chesapeake_va_us",
     "data_umweltprofis_at",
-    "erlangen_hoechstadt_de",
-    "fredrikstad_no",
     "fuquay_varina_nc_us",
     "nuernberger_land_de",
     "plano_gov",
-    "regioentsorgung_de",
     "sepan_remondis_pl",
     # Arrived from master in the v2.32.0 merge; never recorded.
-    "stadt_kerpen_de",
     "shawinigan_ca",
-    "stadt_bamberg_de",
 }
 
 
