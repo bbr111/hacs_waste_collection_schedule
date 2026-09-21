@@ -158,6 +158,9 @@ class Source:
             raise SourceArgumentNotFound(
                 "pickup_address",
                 self._pickup_address,
+                "the address must match the one offered by the search box on "
+                "the Borlänge Energi waste page exactly (street name and "
+                "number, same capitalisation, no city or postcode)",
             )
 
         entries = []
