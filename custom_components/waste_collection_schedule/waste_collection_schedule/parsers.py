@@ -478,6 +478,7 @@ class JsonParser(Parser[Any]):
 
         parse = parsers.JsonParser("collections")     # response.json()["collections"]
         parse = parsers.JsonParser("data", "items")   # response.json()["data"]["items"]
+        parse = parsers.JsonParser(0)                 # response.json()[0]
 
     If the response is already a list at the top level, omit keys entirely.
 
@@ -489,13 +490,18 @@ class JsonParser(Parser[Any]):
         parse = parsers.JsonParser("collections", shape=list[CollectionRecord])
     """
 
-    def __init__(self, *keys: str, shape: Any = None):
+    def __init__(self, *keys: "str | int", shape: Any = None):
         self.keys = keys
         self.shape = shape
 
     def __call__(self, response: Response, source: "BaseSource | None" = None) -> Any:
         data = response.json()
         for key in self.keys:
+            # An int indexes a list; an empty (or null) reply at that step is an
+            # empty result, not an error, so a lookup that matched nothing
+            # reaches RAISE_ON_EMPTY instead of an IndexError.
+            if isinstance(key, int) and not data:
+                return []
             data = data[key]
         if self.shape is not None:
             data = response_shape.validate(
