@@ -505,7 +505,10 @@ class JsonParser(Parser[Any]):
                 data is None or (isinstance(data, list) and not data)
             ):
                 return []
-            data = data[key]
+            # ``response.json()`` can be either a mapping or a sequence, so
+            # the JSON library's statically inferred type cannot represent
+            # both string and integer keys here.
+            data = cast(Any, data)[key]
         if self.shape is not None:
             data = response_shape.validate(
                 data, self.shape, source_name=response_shape.source_name(source)
