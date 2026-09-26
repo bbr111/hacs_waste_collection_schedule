@@ -495,12 +495,15 @@ class JsonParser(Parser[Any]):
         self.shape = shape
 
     def __call__(self, response: Response, source: "BaseSource | None" = None) -> Any:
+        response.raise_for_status()
         data = response.json()
         for key in self.keys:
             # An int indexes a list; an empty (or null) reply at that step is an
             # empty result, not an error, so a lookup that matched nothing
             # reaches RAISE_ON_EMPTY instead of an IndexError.
-            if isinstance(key, int) and not data:
+            if isinstance(key, int) and (
+                data is None or (isinstance(data, list) and not data)
+            ):
                 return []
             data = data[key]
         if self.shape is not None:
