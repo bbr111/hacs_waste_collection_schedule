@@ -35,9 +35,25 @@ _DATE = r"\d{1,2}\.\d{1,2}\.\d{4}"
 _DATE_SPAN = re.compile(rf"({_DATE})(?:\s*-\s*({_DATE}))?")
 
 
+class _AbfalldatenParser(AttributeJsonParser):
+    """``AttributeJsonParser`` that lets an HTTP error status propagate.
+
+    ``AttributeJsonParser`` answers a page without the table with ``[]``. An
+    error page (403, 5xx) has no table either, and on a ``RAISE_ON_EMPTY``
+    source that empty list would be reported as a wrong argument, so an error
+    status is raised here before the page is searched.
+    """
+
+    def __call__(
+        self, response: Any, source: "BaseSource | None" = None
+    ) -> "list[Any]":
+        response.raise_for_status()
+        return super().__call__(response, source)
+
+
 def abfalldaten_parser() -> AttributeJsonParser:
     """The ``/abfalldaten`` schedule records, their fields reduced to text."""
-    return AttributeJsonParser(
+    return _AbfalldatenParser(
         "table#icmsTable-abfallsammlung[data-entities]",
         "data-entities",
         "data",

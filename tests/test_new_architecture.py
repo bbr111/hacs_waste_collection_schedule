@@ -2669,6 +2669,17 @@ class TestIWebAbfalldatenRows:
             (datetime.date(2026, 10, 27), "Häckseldienst"),
         ]
 
+    def test_parser_raises_on_an_http_error_status(self):
+        """An error page is not reported as an empty (wrong-argument) schedule."""
+        from requests import HTTPError
+        from waste_collection_schedule.service.IWeb import abfalldaten_parser
+
+        resp = MagicMock()
+        resp.text = "<html><body>Service Unavailable</body></html>"
+        resp.raise_for_status.side_effect = HTTPError("503 Server Error")
+        with pytest.raises(HTTPError):
+            abfalldaten_parser()(resp)
+
 
 class TestWeekdayRecurrence:
     """WeekdayRecurrence: a named collection weekday projected into dates."""
