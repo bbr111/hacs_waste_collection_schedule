@@ -14,6 +14,10 @@ _TYPE_MAP = {
     "Papierabfuhr": wt.PAPER,
     "Grobsperrgut": wt.BULKY_WASTE,
     "Häckseldienst": wt.GARDEN_WASTE,
+    # No canonical type for scrap metal or non-combustibles; the raw label is
+    # carried so the user still sees which collection it is.
+    "Metallabfuhr": wt.OTHER,
+    "Unbrennbares": wt.OTHER,
 }
 
 
@@ -30,6 +34,7 @@ class Source(BaseSource):
         wt.PAPER,
         wt.BULKY_WASTE,
         wt.GARDEN_WASTE,
+        wt.OTHER,
     ]
 
     TEST_CASES: ClassVar[dict] = {
@@ -62,4 +67,5 @@ class Source(BaseSource):
         type_key=lambda record: record["fields"]["art"],
         parse_date=date_parsers.for_format("%Y-%m-%d"),
         type_value_map=_TYPE_MAP,
+        carry_raw_label=True,
     )
