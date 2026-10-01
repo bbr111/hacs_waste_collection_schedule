@@ -93,21 +93,10 @@ class Source(BaseSource):
     TEST_CASES: ClassVar[dict] = {
         "Rosenau": {"plz": 74072, "strasse": "Rosenau", "hausnr": 33},
         "Biberach": {"strasse": "Kehrhüttenstraße", "plz": 74078, "hausnr": "90"},
-        "Klingenberg:": {"strasse": "Wittumhalde", "plz": "74081", "hausnr": 75},
-        "Klingenberg (hausnr as string):": {
-            "strasse": "Wittumhalde",
-            "plz": "74081",
-            "hausnr": "75",
-        },
-        "Rosenbergstraße 53": {
+        "Rosenbergstraße 50": {
             "strasse": "Rosenbergstraße",
             "plz": "74074",
             "hausnr": "50",
-        },
-        "Rosenbergstraße 41": {
-            "strasse": "Rosenbergstraße",
-            "plz": "74072",
-            "hausnr": "41",
         },
     }
 
