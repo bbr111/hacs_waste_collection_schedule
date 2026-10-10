@@ -5027,6 +5027,12 @@
       "id": "hygea_be"
     },
     {
+      "title": "Intradel (community calendars)",
+      "module": "ics",
+      "default_params": {},
+      "id": "ics_intradel_be"
+    },
+    {
       "title": "Ittre",
       "module": "ittre_be",
       "default_params": {},

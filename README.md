@@ -857,6 +857,7 @@ If you already have enough information for your municipality/region, you are ver
 - [Bep-Environnement](/doc/source/bep_environnement_be.md) / bep-environnement.be
 - [Eupen](/doc/ics/eupen_be.md) / eupen.be
 - [Hygea](/doc/source/hygea_be.md) / hygea.be
+- [Intradel (community calendars)](/doc/ics/intradel_be.md) / intradel-icals.pages.dev
 - [Ittre](/doc/source/ittre_be.md) / ittre.be
 - [Limburg.net](/doc/ics/limburg_net.md) / limburg.net
 - [Recycle!](/doc/source/recycleapp_be.md) / recycleapp.be
