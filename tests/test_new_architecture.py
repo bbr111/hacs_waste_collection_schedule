@@ -7703,6 +7703,40 @@ def test_pipeline_sources_do_not_use_extra_info(stem: str) -> None:
     )
 
 
+@pytest.mark.skipif(
+    len(_NEW_STYLE_SOURCES) == 0,
+    reason="No new-style sources discoverable (likely missing dependencies)",
+)
+@pytest.mark.parametrize(
+    "stem", [s[0] for s in _NEW_STYLE_SOURCES], ids=[s[0] for s in _NEW_STYLE_SOURCES]
+)
+def test_regions_do_not_repeat_the_source_listing(stem: str) -> None:
+    """REGIONS adds entries; it must not relist the source itself.
+
+    The generated README emits the source entry plus one entry per region, so a
+    parameterless region titled like the source shows up as a duplicate row. A
+    region that carries parameters (even under the source's title) pre-fills the
+    form and is a real entry.
+    """
+    cls = dict(_NEW_STYLE_SOURCES)[stem]
+    regions = cls.REGIONS() if callable(cls.REGIONS) else cls.REGIONS
+
+    def norm(title: str) -> str:
+        return " ".join(title.casefold().split())
+
+    repeated = [
+        reg.title
+        for reg in regions
+        if not reg.params and norm(reg.title) == norm(cls.TITLE)
+    ]
+    assert not repeated, (
+        f"{stem} lists {repeated} twice in the README: a region without params "
+        "repeats the source's TITLE. REGIONS is for additional entries only. If "
+        "this source subclasses a source that declares REGIONS, set "
+        "`REGIONS = ()` rather than redeclaring the source itself."
+    )
+
+
 def named_waste_type_imports(text: str) -> list[str]:
     """Names this source imports individually from waste_types."""
     import ast
