@@ -8055,6 +8055,29 @@
           "quartier": "Uw wijk of deel van de gemeente."
         }
       },
+      "args_cyclad_org": {
+        "title": "Bron configureren",
+        "description": "Configureer je serviceprovider. {howto}Meer details: {docs_url}.",
+        "data": {
+          "calendar_title": "Kalendertitel",
+          "commune": "Gemeente"
+        },
+        "data_description": {
+          "calendar_title": "Een leesbaardere, of gebruiksvriendelijkere, naam voor de afvalkalender. Als er niets wordt opgegeven, wordt de naam gebruikt die de bron teruggeeft.",
+          "commune": "De naam van uw gemeente, zoals weergegeven op de website van de aanbieder."
+        }
+      },
+      "reconfigure_cyclad_org": {
+        "title": "Bron opnieuw configureren",
+        "description": "Configureer je serviceprovider. {howto}Meer details: {docs_url}.",
+        "data": {
+          "calendar_title": "Kalendertitel",
+          "commune": "Gemeente"
+        },
+        "data_description": {
+          "commune": "De naam van uw gemeente, zoals weergegeven op de website van de aanbieder."
+        }
+      },
       "args_grandbesancon_fr": {
         "title": "Bron configureren",
         "description": "Configureer je serviceprovider. {howto}Meer details: {docs_url}.",
@@ -28682,6 +28705,29 @@
         }
       },
       "reconfigure_north_ayrshire_gov_uk": {
+        "title": "Bron opnieuw configureren",
+        "description": "Configureer je serviceprovider. {howto}Meer details: {docs_url}.",
+        "data": {
+          "calendar_title": "Kalendertitel",
+          "uprn": "UPRN"
+        },
+        "data_description": {
+          "uprn": "Uw Unique Property Reference Number (UPRN). Vind het op {url_www_findmyaddress_co_uk}"
+        }
+      },
+      "args_ne_derbyshire_gov_uk": {
+        "title": "Bron configureren",
+        "description": "Configureer je serviceprovider. {howto}Meer details: {docs_url}.",
+        "data": {
+          "calendar_title": "Kalendertitel",
+          "uprn": "UPRN"
+        },
+        "data_description": {
+          "calendar_title": "Een leesbaardere, of gebruiksvriendelijkere, naam voor de afvalkalender. Als er niets wordt opgegeven, wordt de naam gebruikt die de bron teruggeeft.",
+          "uprn": "Uw Unique Property Reference Number (UPRN). Vind het op {url_www_findmyaddress_co_uk}"
+        }
+      },
+      "reconfigure_ne_derbyshire_gov_uk": {
         "title": "Bron opnieuw configureren",
         "description": "Configureer je serviceprovider. {howto}Meer details: {docs_url}.",
         "data": {

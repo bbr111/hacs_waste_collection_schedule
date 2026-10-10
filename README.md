@@ -1130,6 +1130,7 @@ If you already have enough information for your municipality/region, you are ver
 - [Corancez](/doc/source/chartres_metropole_fr.md) / chartres-metropole.fr/dechets/collectes
 - [Corps-Nuds](/doc/source/metropole_rennes_fr.md) / dechets.metropole.rennes.fr
 - [Créteil](/doc/source/sudestavenir_fr.md) / sudestavenir.fr
+- [Cyclad](/doc/source/cyclad_org.md) / cyclad.org
 - [Dammarie et Bois-de-Mivoye](/doc/source/chartres_metropole_fr.md) / chartres-metropole.fr/dechets/collectes
 - [Dangers](/doc/source/chartres_metropole_fr.md) / chartres-metropole.fr/dechets/collectes
 - [Denonville](/doc/source/chartres_metropole_fr.md) / chartres-metropole.fr/dechets/collectes
@@ -4829,6 +4830,7 @@ If you already have enough information for your municipality/region, you are ver
 - [Newcastle upon Tyne](/doc/ics/recollect.md) / new.newcastle.gov.uk/recycling-waste/check-your-bin-collection-day
 - [Newport City Council](/doc/source/iapp_itouchvision_com.md) / newport.gov.uk
 - [North Ayrshire Council](/doc/source/north_ayrshire_gov_uk.md) / north-ayrshire.gov.uk
+- [North East Derbyshire District Council](/doc/source/ne_derbyshire_gov_uk.md) / ne-derbyshire.gov.uk
 - [North East Lincolnshire Council](/doc/source/nelincs_gov_uk.md) / nelincs.gov.uk
 - [North Herts Council](/doc/source/northherts_gov_uk.md) / north-herts.gov.uk
 - [North Kesteven District Council](/doc/source/north_kesteven_org_uk.md) / n-kesteven.org.uk

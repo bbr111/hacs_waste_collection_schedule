@@ -1971,6 +1971,14 @@
     },
     "urls": {}
   },
+  "cyclad_org": {
+    "docs_url": "https://github.com/mampfes/hacs_waste_collection_schedule/blob/master/doc/source/cyclad_org.md",
+    "howto": {
+      "en": "Enter your commune exactly as it is listed in the collection calendar on cyclad.org/les-dechets/collecte/calendrier-de-collecte/ (some towns are split, e.g. \"Surgères\" and \"Surgères centre\").",
+      "fr": "Saisissez votre commune telle qu'elle apparaît dans le calendrier de collecte sur cyclad.org/les-dechets/collecte/calendrier-de-collecte/ (certaines villes sont divisées, par ex. \"Surgères\" et \"Surgères centre\")."
+    },
+    "urls": {}
+  },
   "grandbesancon_fr": {
     "docs_url": "https://github.com/mampfes/hacs_waste_collection_schedule/blob/master/doc/source/grandbesancon_fr.md",
     "howto": {
@@ -6849,6 +6857,15 @@
     "docs_url": "https://github.com/mampfes/hacs_waste_collection_schedule/blob/master/doc/source/north_ayrshire_gov_uk.md",
     "howto": {
       "en": "Find your UPRN at https://www.findmyaddress.co.uk/ by searching for your address."
+    },
+    "urls": {
+      "url_www_findmyaddress_co_uk": "https://www.findmyaddress.co.uk/"
+    }
+  },
+  "ne_derbyshire_gov_uk": {
+    "docs_url": "https://github.com/mampfes/hacs_waste_collection_schedule/blob/master/doc/source/ne_derbyshire_gov_uk.md",
+    "howto": {
+      "en": "Find the UPRN of your property at https://www.findmyaddress.co.uk/. Your collection weekday and North/South calendar are looked up from it; the dates come from the council's bin collection dates page."
     },
     "urls": {
       "url_www_findmyaddress_co_uk": "https://www.findmyaddress.co.uk/"
