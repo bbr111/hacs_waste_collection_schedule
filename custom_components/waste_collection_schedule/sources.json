@@ -19490,12 +19490,6 @@
       "id": "rh_entsorgung_de"
     },
     {
-      "title": "Rhein-Hunsr\u00fcck Entsorgung (RHE)",
-      "module": "rh_entsorgung_de",
-      "default_params": {},
-      "id": "rh_entsorgung_de"
-    },
-    {
       "title": "Rhein-Lahn Kreis",
       "module": "ics",
       "default_params": {},
@@ -20404,12 +20398,6 @@
         "customer": "kaufbeuren"
       },
       "id": "awido_de"
-    },
-    {
-      "title": "Stadt Kerpen",
-      "module": "stadt_kerpen_de",
-      "default_params": {},
-      "id": "stadt_kerpen_de"
     },
     {
       "title": "Stadt Kerpen",

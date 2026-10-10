@@ -2646,7 +2646,6 @@ If you already have enough information for your municipality/region, you are ver
 - [Reutlingen](/doc/source/app_abfallplus_de.md) / abfallplus.de
 - [Rhein-Hunsrück (Jumomind)](/doc/source/jumomind_de.md) / rh-entsorgung.de
 - [Rhein-Hunsrück Entsorgung (RHE)](/doc/source/rh_entsorgung_de.md) / rh-entsorgung.de
-- [Rhein-Hunsrück Entsorgung (RHE)](/doc/source/rh_entsorgung_de.md) / rh-entsorgung.de
 - [Rhein-Lahn Kreis](/doc/ics/rhein_lahn_kreis_abfallwirtschaft_de.md) / rhein-lahn-kreis-abfallwirtschaft.de
 - [Rhein-Neckar-Kreis](/doc/source/app_abfallplus_de.md) / abfallplus.de
 - [Rhein-Neckar-Kreis](/doc/source/abfall_io.md) / rhein-neckar-kreis.de
@@ -2758,7 +2757,6 @@ If you already have enough information for your municipality/region, you are ver
 - [Stadt Hanau](/doc/source/muellmax_de.md) / hanau.de
 - [Stadt Hilchenbach](/doc/source/hilchenbach_de.md) / hilchenbach.de
 - [Stadt Kaufbeuren](/doc/source/awido_de.md) / kaufbeuren.de
-- [Stadt Kerpen](/doc/source/stadt_kerpen_de.md) / stadt-kerpen.de
 - [Stadt Kerpen](/doc/source/stadt_kerpen_de.md) / stadt-kerpen.de
 - [Stadt Koblenz](/doc/ics/koblenz_de.md) / koblenz.de
 - [Stadt Königstein im Taunus](/doc/source/awido_de.md) / koenigstein.de
