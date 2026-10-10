@@ -19706,12 +19706,6 @@
       "id": "muellabfuhr_de"
     },
     {
-      "title": "SAB Magdeburg Abfuhrkalender",
-      "module": "magdeburg_de",
-      "default_params": {},
-      "id": "magdeburg_de"
-    },
-    {
       "title": "Salgen",
       "module": "heimat_info_de",
       "default_params": {
@@ -31338,12 +31332,6 @@
     },
     {
       "title": "NSR - Nordv\u00e4stra Sk\u00e5nes Renh\u00e5llnings AB",
-      "module": "nsr_se",
-      "default_params": {},
-      "id": "nsr_se"
-    },
-    {
-      "title": "NSR T\u00f6mningskalender",
       "module": "nsr_se",
       "default_params": {},
       "id": "nsr_se"

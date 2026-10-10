@@ -3424,14 +3424,6 @@
     },
     "urls": {}
   },
-  "magdeburg_de": {
-    "docs_url": "https://github.com/mampfes/hacs_waste_collection_schedule/blob/master/doc/source/magdeburg_de.md",
-    "howto": {
-      "de": "Geben Sie Ihren Straßennamen und die Hausnummer ein, wie auf der SAB Magdeburg Webseite angezeigt (z.B. 'Halberstädter Chaussee 66'). Suchen Sie unter https://sab.ssl.metageneric.de/app/sab_i_tp/index.php",
-      "en": "Enter your street name and house number as shown on the SAB Magdeburg website (e.g. 'Halberstädter Chaussee 66'). Search at https://sab.ssl.metageneric.de/app/sab_i_tp/index.php"
-    },
-    "urls": {}
-  },
   "ics_asf_online_de": {
     "docs_url": "https://github.com/mampfes/hacs_waste_collection_schedule/blob/master/doc/ics/asf_online_de.md",
     "howto": {
@@ -3679,6 +3671,14 @@
   "staedteservice_de": {
     "docs_url": "https://github.com/mampfes/hacs_waste_collection_schedule/blob/master/doc/source/staedteservice_de.md",
     "howto": {},
+    "urls": {}
+  },
+  "magdeburg_de": {
+    "docs_url": "https://github.com/mampfes/hacs_waste_collection_schedule/blob/master/doc/source/magdeburg_de.md",
+    "howto": {
+      "de": "Geben Sie Ihren Straßennamen und die Hausnummer ein, wie auf der SAB Magdeburg Webseite angezeigt (z.B. 'Halberstädter Chaussee 66'). Suchen Sie unter https://sab.ssl.metageneric.de/app/sab_i_tp/index.php",
+      "en": "Enter your street name and house number as shown on the SAB Magdeburg website (e.g. 'Halberstädter Chaussee 66'). Search at https://sab.ssl.metageneric.de/app/sab_i_tp/index.php"
+    },
     "urls": {}
   },
   "ics_swk_herford_de": {

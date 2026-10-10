@@ -2673,7 +2673,6 @@ If you already have enough information for your municipality/region, you are ver
 - [Röttenbach](/doc/source/heimat_info_de.md) / heimat-info.de/gemeinden/rottenbach/abfallkalender
 - [Rüthen](/doc/source/lobbe_app.md) / lobbe.app
 - [Saalekreis](/doc/source/muellabfuhr_de.md) / portal.muellabfuhr-deutschland.de
-- [SAB Magdeburg Abfuhrkalender](/doc/source/magdeburg_de.md) / sab.ssl.metageneric.de/app/sab_i_tp/index.php
 - [Salgen](/doc/source/heimat_info_de.md) / heimat-info.de/gemeinden/salgen/abfallkalender
 - [Salzderhelden](/doc/source/nerdbridge_de.md) / abfall.nerdbridge.de
 - [Salzgitter (MyMuell App)](/doc/source/jumomind_de.md) / mymuell.de
@@ -4362,7 +4361,6 @@ If you already have enough information for your municipality/region, you are ver
 - [Norrtalje Vatten & Avfall](/doc/source/nvaa_se.md) / sjalvservice.nvaa.se
 - [North / Middle Bohuslän - Rambo AB](/doc/source/rambo_se.md) / rambo.se
 - [NSR - Nordvästra Skånes Renhållnings AB](/doc/source/nsr_se.md) / nsr.se
-- [NSR Tömningskalender](/doc/source/nsr_se.md) / nsr.se/privat/allt-om-din-sophamtning/nar-toms-mitt-karl/tomningskalender
 - [NVOA - Nacka Vatten och Avfall](/doc/source/edpevent_se.md) / nacka.se/nackavattenavfall/avfall/sophamtning/tomningsdag
 - [Nårab - Norra Åsbo Renhållnings AB](/doc/source/narab_se.md) / narab.se
 - [Orust kommun](/doc/source/edpevent_se.md) / orust.se
