@@ -4191,7 +4191,9 @@
   },
   "sica_lu": {
     "docs_url": "https://github.com/mampfes/hacs_waste_collection_schedule/blob/master/doc/source/sica_lu.md",
-    "howto": {},
+    "howto": {
+      "en": "Enter the name of your municipality as listed by SICA, e.g. 'Steinfort', 'Habscht' or 'Mamer'. A wrong name lists the valid ones."
+    },
     "urls": {}
   },
   "sidec_lu": {

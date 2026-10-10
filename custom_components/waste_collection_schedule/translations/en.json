@@ -19321,7 +19321,8 @@
           "municipality": "Municipality"
         },
         "data_description": {
-          "calendar_title": "A more readable, or user-friendly, name for the waste calendar. If nothing is provided, the name returned by the source will be used."
+          "calendar_title": "A more readable, or user-friendly, name for the waste calendar. If nothing is provided, the name returned by the source will be used.",
+          "municipality": "The name of your municipality, as shown on the provider's website."
         }
       },
       "reconfigure_sica_lu": {
@@ -19331,7 +19332,9 @@
           "calendar_title": "Calendar Title",
           "municipality": "Municipality"
         },
-        "data_description": {}
+        "data_description": {
+          "municipality": "The name of your municipality, as shown on the provider's website."
+        }
       },
       "args_sidec_lu": {
         "title": "Configure Source",
