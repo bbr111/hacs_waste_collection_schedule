@@ -9,6 +9,7 @@ import datetime
 import os
 import sys
 from types import SimpleNamespace
+from typing import ClassVar
 
 import pytest
 from freezegun import freeze_time
@@ -19,13 +20,18 @@ sys.path.append(
     )
 )
 
-from waste_collection_schedule import lookups, parsers, preprocessors, retrievers  # noqa: E402
-from waste_collection_schedule.exceptions import (  # noqa: E402
+from waste_collection_schedule import (
+    lookups,
+    parsers,
+    preprocessors,
+    retrievers,
+)
+from waste_collection_schedule.exceptions import (
     SourceArgumentNotFoundWithSuggestions,
 )
-from waste_collection_schedule.parsers import PdfRow, PdfWord  # noqa: E402
-from waste_collection_schedule.response_shape import ResponseShapeError  # noqa: E402
-from waste_collection_schedule.service.PdfTextCalendar import (  # noqa: E402
+from waste_collection_schedule.parsers import PdfRow, PdfWord
+from waste_collection_schedule.response_shape import ResponseShapeError
+from waste_collection_schedule.service.PdfTextCalendar import (
     GERMAN_WEEKDAY_ORDER,
     DayGridCalendarParser,
 )
@@ -101,7 +107,7 @@ def _row(page, y, *words):
 
 
 class TestPdfMonthRows:
-    LABELS = {"zmieszane": 1, "metale": 1, "szkło": 1, "bio": 1}
+    LABELS: ClassVar[dict] = {"zmieszane": 1, "metale": 1, "szkło": 1, "bio": 1}
 
     def rows(self):
         return [
@@ -210,7 +216,7 @@ def test_each_response_then_preprocesses_each_document_on_its_own():
 
 
 class TestDayGridCodesAndWeekdays:
-    CODES = {
+    CODES: ClassVar[dict] = {
         "B": "Bio",
         "B1": "Bio4",
         "GB": "Clean",
